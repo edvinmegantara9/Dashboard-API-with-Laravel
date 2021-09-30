@@ -22,6 +22,20 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->get('', 'UserController@get');
     });
 
+    $router->group(['prefix' => 'message'], function () use ($router) {
+        $router->get('', 'MessagesController@get');
+        $router->post('', 'MessagesController@create');
+        $router->put('update/{id}', 'MessagesController@update');
+        $router->delete('delete/{id}', 'MessagesController@delete');
+    });
+
+    $router->group(['prefix' => 'documents'], function () use ($router) {
+        $router->get('', 'DocumentsController@get');
+        $router->post('', 'DocumentsController@create');
+        $router->put('update/{id}', 'DocumentsController@update');
+        $router->delete('delete/{id}', 'DocumentsController@delete');
+    });
+
     $router->group(['prefix' => 'opd'], function () use ($router) {
         $router->get('', 'RolesOpdsController@get');
         $router->post('', 'RolesOpdsController@create');

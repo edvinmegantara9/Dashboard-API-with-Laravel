@@ -24,6 +24,14 @@ class AddSoftDeletes extends Migration
         Schema::table('roles_opds', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        Schema::table('messages', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('documents', function (Blueprint $table) {
+            $table->softDeletes();
+        });
         
     }
 
@@ -43,6 +51,14 @@ class AddSoftDeletes extends Migration
         });
 
         Schema::table('roles_opds', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('messages', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('documents', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
     }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Roles;
 use App\Models\RolesOpds;
-use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Support\Facades\DB;
 use Laravel\Lumen\Routing\Controller;
 
@@ -18,8 +17,21 @@ class RoleController extends Controller
 
     public function get(Request $request)
     {
+        $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
         try {
-            $role = Roles::with(['opd'])->get();
+            $role = Roles::with(['opd'])->orderBy('roles.' . $sortby, $sorttype)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('roles.name', 'LIKE', '%' . $keyword . '%');
+                })->paginate($row);
+
             if ($role) {
                 $response = [
                     'status' => 200,
@@ -115,6 +127,7 @@ class RoleController extends Controller
     public function delete($id)
     {
         try {
+            DB::beginTransaction();
             $role = Roles::findOrFail($id);
 
             RolesOpds::where('role_id', $id)->delete();
@@ -128,7 +141,7 @@ class RoleController extends Controller
 
                 return response()->json($response, 404);
             }
-
+            DB::commit();
             $response = [
                 'status' => 200,
                 'message' => 'role has been deleted'
@@ -136,6 +149,7 @@ class RoleController extends Controller
 
             return response()->json($response, 200);
         } catch (\Exception $e) {
+            DB::rollBack();
             $response = [
                 'status' => 400,
                 'message' => 'error occured on deleting role',

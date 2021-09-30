@@ -18,8 +18,23 @@ class RolesOpdsController extends Controller
 
     public function get(Request $request)
     {
+        $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+        $page = $request->input('page');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
         try {
-            $opds = RolesOpds::with(['role','opd'])->get();
+            $opds = RolesOpds::with(['role','opd'])->orderBy('roles_opds.' . $sortby, $sorttype)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('roles_opds.role.name', 'LIKE', '%' . $keyword . '%')
+                        ->where('roles_opds.opd.name', 'LIKE', '%' . $keyword . '%');
+                })->paginate($row);
+                
             if ($opds) {
                 $response = [
                     'status' => 200,
