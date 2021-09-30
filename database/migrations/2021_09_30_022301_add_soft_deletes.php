@@ -29,7 +29,35 @@ class AddSoftDeletes extends Migration
             $table->softDeletes();
         });
 
+        Schema::table('message_receivers', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
         Schema::table('documents', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('document_types', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('chats', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('chats_receivers', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('agenda_details', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('galleries', function (Blueprint $table) {
             $table->softDeletes();
         });
         
@@ -58,7 +86,35 @@ class AddSoftDeletes extends Migration
             $table->dropSoftDeletes();
         });
 
+        Schema::table('message_receivers', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
         Schema::table('documents', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('document_types', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('chats', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('chats_receivers', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('agenda_details', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('galleries', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
     }

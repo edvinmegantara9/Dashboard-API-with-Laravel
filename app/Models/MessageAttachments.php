@@ -12,4 +12,9 @@ class MessageAttachments extends Model
     protected $fillable = [
         'message_id'
     ];
+
+    public function message()
+    {
+        return $this->belongsTo(MessageAttachments::class, 'message_id', 'id');
+    }
 }
