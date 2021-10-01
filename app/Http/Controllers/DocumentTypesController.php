@@ -59,7 +59,7 @@ class DocumentTypesController extends Controller
         try {
 
             $documentType = DocumentTypes::create([
-                'title' => $request->input('name'),
+                'name' => $request->input('name'),
             ]);
 
             if ($documentType) {

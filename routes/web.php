@@ -77,7 +77,7 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->delete('delete/{id}', 'DocumentTypesController@delete');
     });
 
-    $router->group(['prefix' => 'documents'], function () use ($router) {
+    $router->group(['prefix' => 'document'], function () use ($router) {
         $router->get('', 'DocumentsController@get');
         $router->post('', 'DocumentsController@create');
         $router->put('update/{id}', 'DocumentsController@update');
