@@ -9,10 +9,7 @@ class Documents extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        'upload_by',
-        'document_type'
-    ];
+    protected $guarded = [];
 
     public function document_type()
     {

@@ -9,6 +9,8 @@ class AgendaDetails extends Model
 {
     use SoftDeletes;
 
+    protected $guarded = [];
+
     public function agenda()
     {
         return $this->belongsTo(Agendas::class, 'agenda_id', 'id');

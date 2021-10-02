@@ -9,6 +9,8 @@ class Chats extends Model
 {
     use SoftDeletes;
 
+    protected $guarded = [];
+
     public function user()
     {
         return $this->belongsTo(Roles::class, 'created_by', 'id');

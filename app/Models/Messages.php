@@ -9,6 +9,12 @@ class Messages extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'title',
+        'content',
+        'sender_id',
+        'created_by',
+    ];
 
     public function user()
     {

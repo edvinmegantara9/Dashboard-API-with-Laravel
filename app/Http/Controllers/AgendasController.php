@@ -53,27 +53,28 @@ class AgendasController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'content' => 'required',
-            'agenda_detail' => 'required|array'
+            'agenda_detail' => 'required'
         ]);
 
         try {
             DB::beginTransaction();
             $agendas = Agendas::create([
                 'title' => $request->input('title'),
-                'file' => $request->input('file')
+                'content' => $request->input('content')
             ]);
 
             if ($agendas) {
                 $agenda_details = $request->input('agenda_detail');
+                $agenda_details = (array) json_decode($agenda_details);
                 foreach ($agenda_details as $agenda) {
-                    $decoded_agenda = json_decode($agenda);
                     AgendaDetails::create([
-                        'agenda_id' => $decoded_agenda->agenda_id,
-                        'agenda_type' => $decoded_agenda->agenda_type,
-                        'schedule' => $decoded_agenda->schedule
+                        'agenda_id' => $agendas->id,
+                        'agenda_type' => $agenda->agenda_type,
+                        'schedule' => $agenda->schedule
                     ]);
                 }
                 DB::commit();
+                $agendas->schedules;
                 $response = [
                     'status' => 201,
                     'message' => 'agenda data has been created',
@@ -95,11 +96,11 @@ class AgendasController extends Controller
 
     public function update(Request $request, $id)
     {
-        
+
 
         $this->validate($request, [
             'title' => 'required',
-            // 'content' => 'required'
+            'content' => 'required'
         ]);
 
         try {
@@ -108,9 +109,23 @@ class AgendasController extends Controller
 
             if ($agendas) {
                 $agendas->title = $request->input('title');
-                if($request->input('agendas'))
-                // $agendas->content = $request->input('content');
+                $agendas->content = $request->input('content');
+                if ($request->input('agenda_detail')) {
+                    AgendaDetails::where('agenda_id', $id)->delete();
+                    $agenda_details = $request->input('agenda_detail');
+                    $agenda_details = (array) json_decode($agenda_details);
+                    foreach ($agenda_details as $agenda) {
+                        AgendaDetails::create([
+                            'agenda_id' => $agendas->id,
+                            'agenda_type' => $agenda->agenda_type,
+                            'schedule' => $agenda->schedule
+                        ]);
+                    }
+                }
+
                 $agendas->save();
+                DB::commit();
+                $agendas->schedules;
 
                 $response = [
                     'status' => 200,
@@ -144,8 +159,8 @@ class AgendasController extends Controller
             DB::beginTransaction();
             $agendas = Agendas::findOrFail($id);
 
-            if($agendas) 
-            AgendaDetails::where('agenda_id', $id)->delete();
+            if ($agendas)
+                AgendaDetails::where('agenda_id', $id)->delete();
 
             if (!$agendas->delete()) {
                 $response = [

@@ -91,7 +91,7 @@ class DocumentTypesController extends Controller
 
         try {
             $documentType = DocumentTypes::find($id);
-            $documentType->title = $request->input('name');
+            $documentType->name = $request->input('name');
             $documentType->save();
 
             if ($documentType) {

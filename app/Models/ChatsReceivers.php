@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ChatsReceivers extends Model
 {
     use SoftDeletes;
+
+    protected $guarded = [];
+
+    public function role()
+    {
+        return $this->belongsTo(Chats::class, 'chat_id', 'id');
+    }
 }

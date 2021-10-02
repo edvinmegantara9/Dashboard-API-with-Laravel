@@ -58,7 +58,7 @@ class MessagesController extends Controller
             'content' => 'required',
             'sender_id' => 'required',
             'created_by' => 'required',
-            'receivers' => 'required|array'
+            'receivers' => 'required'
         ]);
 
         try {
@@ -71,10 +71,11 @@ class MessagesController extends Controller
 
             if ($message) {
                 $receivers = $request->input('receivers');
+                $receivers = (array) json_decode($receivers); 
                 foreach ($receivers as $receiver) {
                     MessageReceivers::create([
-                        'is_read' => false,
                         'receiver_id' => $receiver,
+                        'is_read' => false,
                         'message_id' => $message->id
                     ]);
                 }
@@ -130,6 +131,7 @@ class MessagesController extends Controller
                 if($request->input('receivers'))
                 {
                     $receivers = $request->input('receivers');
+                    $receivers = (array) json_decode($receivers); 
                     MessageReceivers::where('message_id', $id)->delete();
                     foreach ($receivers as $receiver) {
                         MessageReceivers::create([
@@ -139,6 +141,10 @@ class MessagesController extends Controller
                     }
                 }
                 $message->save();
+
+                $message->user;
+                $message->sender;
+                $message->receivers;
 
                 $response = [
                     'status' => 200,

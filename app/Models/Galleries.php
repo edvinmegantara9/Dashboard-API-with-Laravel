@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Galleries extends Model
 {
     use SoftDeletes;
+
+    protected $guarded = [];
 }

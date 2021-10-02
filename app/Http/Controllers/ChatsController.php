@@ -55,10 +55,11 @@ class ChatsController extends Controller
             'title' => 'required',
             'firebase_key' => 'required',
             'created_by' => 'required',
-            'receivers' => 'required|array'
+            'receivers' => 'required'
         ]);
 
         try {
+            DB::beginTransaction();
             $chat = Chats::create([
                 'title' => $request->input('title'),
                 'firebase_key' => $request->input('firebase_key'),
@@ -68,11 +69,20 @@ class ChatsController extends Controller
 
             if ($chat) {
                 $receivers = $request->input('receivers');
+                $receivers = (array) json_decode($receivers);
                 foreach ($receivers as $receiver) {
                     ChatsReceivers::create([
                         'role_id' => $receiver,
                         'chat_id' => $chat->id
                     ]);
+                }
+                DB::commit();
+
+                $chat->user;
+                $chat->receivers;
+
+                foreach ($chat->receivers as $receiver) {
+                    $receiver->role;
                 }
 
                 $response = [
@@ -84,6 +94,8 @@ class ChatsController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            DB::rollBack();
+            
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating chat data',

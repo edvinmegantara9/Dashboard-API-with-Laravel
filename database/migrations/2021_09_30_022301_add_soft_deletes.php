@@ -33,6 +33,10 @@ class AddSoftDeletes extends Migration
             $table->softDeletes();
         });
 
+        Schema::table('message_attachments', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
         Schema::table('documents', function (Blueprint $table) {
             $table->softDeletes();
         });
@@ -87,6 +91,10 @@ class AddSoftDeletes extends Migration
         });
 
         Schema::table('message_receivers', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('message_attachments', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
 

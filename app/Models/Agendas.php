@@ -9,6 +9,8 @@ class Agendas extends Model
 {
     use SoftDeletes;
 
+    protected $guarded = [];
+
     public function schedules()
     {
         return $this->hasMany(AgendaDetails::class, 'agenda_id', 'id');

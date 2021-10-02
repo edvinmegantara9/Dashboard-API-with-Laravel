@@ -18,8 +18,8 @@ class CreateChatsTable extends Migration
             $table->string('title');
             $table->string('firebase_key')->unique();
             $table->dateTime('start_chat');
-            $table->dateTime('end_chat');
-            $table->integer('rating');
+            $table->dateTime('end_chat')->nullable();
+            $table->integer('rating')->nullable();
             $table->timestamps();
         });
 

@@ -15,7 +15,7 @@ class CreateMessageReceiversTable extends Migration
     {
         Schema::create('message_receivers', function (Blueprint $table) {
             $table->id();
-            $table->boolean('is_read');
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
 
