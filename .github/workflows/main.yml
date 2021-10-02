@@ -14,5 +14,3 @@ jobs:
         username: backend@silaper.xsrindonesia.com
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /silaper/
-        exclude:
-          - /public/
