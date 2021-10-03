@@ -109,7 +109,7 @@ class UserController extends Controller
                 // $users->nip      = $request->input('nip');
                 $users->position = $request->input('position');
                 $users->group    = $request->input('group');
-                $users->role_id  = $request->input('role');
+                $users->role_id  = $request->input('role_id');
                 $users->save();
 
                 $response = [
