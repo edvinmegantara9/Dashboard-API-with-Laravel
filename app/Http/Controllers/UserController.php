@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Messages;
 use App\Models\Users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -12,7 +14,7 @@ class UserController extends Controller
     {
         $this->middleware('auth:api');
     }
-    
+
     public function get(Request $request)
     {
         $row = $request->input('row');
@@ -46,6 +48,91 @@ class UserController extends Controller
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving user data',
+                'error' => $e
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $this->validate($request, [
+            'nip' => 'required|string|unique:users',
+            'password' => 'required',
+            'position' => 'required',
+            'group' => 'required',
+            'role_id' => 'required'
+        ]);
+
+        try {
+            $users = Users::find($id);
+
+            if ($users) {
+                $users->nip      = $request->input('nip');
+                $users->password = $request->input('password');
+                $users->position = $request->input('position');
+                $users->group    = $request->input('group');
+                $users->role_id  = $request->input('role');
+                $users->save();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'user data has been updated',
+                    'data' => $users
+                ];
+
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'user data not found',
+            ];
+            return response()->json($response, 404);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on updating user data',
+                'error' => $e
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function delete($id)
+    {
+
+        try {
+            DB::beginTransaction();
+            $users = Users::findOrFail($id);
+
+            if ($users) {
+                Messages::where('sender_id', $id)->delete();
+            }
+
+            if(!$users->delete())
+            {
+                $response = [
+                    'status' => 404,
+                    'message' => 'user data not found',
+                ];
+                return response()->json($response, 404);
+            }
+
+            DB::commit();
+
+            $response = [
+                'status' => 200,
+                'message' => 'user data has been deleted',
+            ];
+
+            return response()->json($response, 200);
+
+
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on deleting user data',
                 'error' => $e
             ];
             return response()->json($response, 400);
