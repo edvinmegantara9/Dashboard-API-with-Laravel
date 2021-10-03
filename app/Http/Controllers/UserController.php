@@ -54,11 +54,49 @@ class UserController extends Controller
         }
     }
 
+
+    public function changepassword(Request $request, $id)
+    {
+        $this->validate($request, [
+            'password' => 'required'
+        ]);
+
+        try {
+            $users = Users::find($id);
+            if($users)
+            {
+                $users->password = app('mash')->make($request->input('password'));
+                $users->save();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'user password has been updated',
+                    'data' => $users
+                ];
+    
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'user data not found',
+            ];
+            return response()->json($response, 404);
+
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on updating user data',
+                'error' => $e
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
     public function update(Request $request, $id)
     {
         $this->validate($request, [
             'nip' => 'required|string|unique:users',
-            'password' => 'required',
             'position' => 'required',
             'group' => 'required',
             'role_id' => 'required'
@@ -69,7 +107,6 @@ class UserController extends Controller
 
             if ($users) {
                 $users->nip      = $request->input('nip');
-                $users->password = $request->input('password');
                 $users->position = $request->input('position');
                 $users->group    = $request->input('group');
                 $users->role_id  = $request->input('role');
