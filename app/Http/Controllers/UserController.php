@@ -96,7 +96,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'nip' => 'required|string|unique:users',
+            // 'nip' => 'required|string|unique:users',
             'position' => 'required',
             'group' => 'required',
             'role_id' => 'required'
@@ -106,7 +106,7 @@ class UserController extends Controller
             $users = Users::find($id);
 
             if ($users) {
-                $users->nip      = $request->input('nip');
+                // $users->nip      = $request->input('nip');
                 $users->position = $request->input('position');
                 $users->group    = $request->input('group');
                 $users->role_id  = $request->input('role');
