@@ -49,6 +49,8 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
 
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->get('', 'UserController@get');
+        $router->put('update/{id}', 'UserController@update');
+        $router->delete('delete/{id}', 'UserController@delete');
     });
 
     $router->group(['prefix' => 'message_attachments'], function () use ($router) {
