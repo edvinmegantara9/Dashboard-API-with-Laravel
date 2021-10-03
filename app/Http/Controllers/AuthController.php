@@ -90,7 +90,10 @@ class AuthController extends BaseController
             // // ];
             $user->role->opd;
             if (!$token = Auth::attempt($credentials)) {
-              return response()->json(['message' => 'Unauthorized'], 401);
+              return response()->json(
+                [ 'status' => 401,
+                  'message' => 'Unauthorized']
+                , 401);
             }
             return $this->respondWithToken($token, $user);
           } else {
