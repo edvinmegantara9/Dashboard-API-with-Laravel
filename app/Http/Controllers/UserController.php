@@ -24,7 +24,7 @@ class UserController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $users = Users::with(['users'])->orderBy('users.' . $sortby, $sorttype)
+            $users = Users::with(['role'])->orderBy('users.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
