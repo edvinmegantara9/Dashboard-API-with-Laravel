@@ -13,14 +13,25 @@ class UserController extends Controller
         $this->middleware('auth:api');
     }
     
-    public function get()
+    public function get(Request $request)
     {
-        try {
-            $users = Users::with(['role'])->get();
+        $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
 
-            foreach ($users as $user) {
-                $user->role->opd;
-            }
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
+        try {
+            $users = Users::with(['users'])->orderBy('users.' . $sortby, $sorttype)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.nip', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.position', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.group', 'LIKE', '%' . $keyword . '%');
+                })->paginate($row);
 
             if ($users) {
                 $response = [
@@ -35,7 +46,7 @@ class UserController extends Controller
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving user data',
-                'error' => $e->getMessage()
+                'error' => $e
             ];
             return response()->json($response, 400);
         }
