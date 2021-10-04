@@ -2,15 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chats;
-use App\Models\ChatsReceivers;
-use App\Models\Documents;
-use App\Models\MessageReceivers;
-use App\Models\Messages;
+
 use Illuminate\Http\Request;
 use App\Models\Roles;
 use App\Models\RolesOpds;
-use App\Models\Users;
 use Illuminate\Support\Facades\DB;
 use Laravel\Lumen\Routing\Controller;
 
@@ -65,6 +60,8 @@ class RoleController extends Controller
         ]);
 
         try {
+
+            DB::beginTransaction();
             $role = Roles::create(
                 [
                     'name' => $request->input('name'),
@@ -73,6 +70,19 @@ class RoleController extends Controller
             );
 
             if ($role) {
+                if($request->input('opds'))
+                {
+                    $opds = (array) json_decode($request->input('opds'));
+                    foreach ($opds as $opd) {
+                        RolesOpds::create([
+                            'role_id' => $role->id,
+                            'opd_id' => $opd
+                        ]);
+                    }
+
+                }
+
+                DB::commit();
                 $response = [
                     'status' => 201,
                     'message' => 'role has been created',
@@ -82,6 +92,7 @@ class RoleController extends Controller
                 return response()->json($response, 201);
             }
         } catch (\Exception $e) {
+            DB::rollBack();
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating role',

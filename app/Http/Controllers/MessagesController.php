@@ -82,6 +82,7 @@ class MessagesController extends Controller
 
                 if ($request->input('attachments')) {
                     $attachments = $request->input('attachments');
+                    $attachments = (array) json_decode('attachments');
                     foreach ($attachments as $attachment) {
                         MessageAttachments::create([
                             'message_id' => $message->id,
