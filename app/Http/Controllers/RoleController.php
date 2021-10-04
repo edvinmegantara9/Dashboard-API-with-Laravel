@@ -110,12 +110,27 @@ class RoleController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
             $role = Roles::find($id);
             $role->name = $request->input('name');
             $role->is_opd = $request->input('is_opd');
             $role->save();
 
             if ($role) {
+                RolesOpds::where('role_id', $id)->delete();
+
+                if($request->input('opds'))
+                {
+                    $opds = (array) json_decode($request->input('opds'));
+                    foreach ($opds as $opd) {
+                        RolesOpds::create([
+                            'role_id' => $role->id,
+                            'opd_id' => $opd
+                        ]);
+                    }
+
+                }
+                DB::commit();
                 $response = [
                     'status' => 200,
                     'message' => 'role has been updated',
@@ -124,6 +139,7 @@ class RoleController extends Controller
 
                 return response()->json($response, 200);
             } else {
+                DB::rollBack();
                 $response = [
                     'status' => 404,
                     'message' => 'role data not found'
