@@ -146,7 +146,7 @@ class ChatsController extends Controller
             
             if($chat)
             {
-                ChatsReceivers::where('message_id', $id)->delete();
+                ChatsReceivers::where('chat_id', $id)->delete();
             }
 
             if(!$chat->delete())

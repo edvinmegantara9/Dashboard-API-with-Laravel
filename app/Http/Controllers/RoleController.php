@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Chats;
+use App\Models\ChatsReceivers;
+use App\Models\Documents;
+use App\Models\MessageReceivers;
+use App\Models\Messages;
 use Illuminate\Http\Request;
 use App\Models\Roles;
 use App\Models\RolesOpds;
+use App\Models\Users;
 use Illuminate\Support\Facades\DB;
 use Laravel\Lumen\Routing\Controller;
 
@@ -121,7 +126,10 @@ class RoleController extends Controller
 
                 if($request->input('opds'))
                 {
+                    if(gettype($request->input('opds')) == 'string')
                     $opds = (array) json_decode($request->input('opds'));
+                    else
+                    $opds = $request->input('opds');
                     foreach ($opds as $opd) {
                         RolesOpds::create([
                             'role_id' => $role->id,
@@ -163,14 +171,14 @@ class RoleController extends Controller
             DB::beginTransaction();
             $role = Roles::findOrFail($id);
 
-            // RolesOpds::where('role_id', $id)->delete();
-            // RolesOpds::where('opd_id', $id)->delete();
-            // Documents::where('upload_by', $id)->delete();
-            // ChatsReceivers::where('role_id', $id)->delete();
-            // Chats::where('created_by', $id)->delete();
-            // MessageReceivers::where('receiver_id', $id)->delete();
-            // Messages::where('created_by', $id)->delete();
-            // Users::where('role_id', $id)->delete();
+            RolesOpds::where('role_id', $id)->delete();
+            RolesOpds::where('opd_id', $id)->delete();
+            Documents::where('upload_by', $id)->delete();
+            ChatsReceivers::where('role_id', $id)->delete();
+            Chats::where('created_by', $id)->delete();
+            MessageReceivers::where('receiver_id', $id)->delete();
+            Messages::where('created_by', $id)->delete();
+            Users::where('role_id', $id)->delete();
 
             if (!$role->delete()) {
                 $response = [
