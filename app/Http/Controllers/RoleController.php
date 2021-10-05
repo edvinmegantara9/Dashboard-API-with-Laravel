@@ -96,7 +96,7 @@ class RoleController extends Controller
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating role',
-                'error' => $e
+                'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
         }
