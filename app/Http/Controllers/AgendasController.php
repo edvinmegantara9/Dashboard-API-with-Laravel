@@ -65,6 +65,7 @@ class AgendasController extends Controller
 
             if ($agendas) {
                 $agenda_details = $request->input('agenda_detail');
+                if(gettype($agenda_details) == 'string')
                 $agenda_details = (array) json_decode($agenda_details);
                 foreach ($agenda_details as $agenda) {
                     AgendaDetails::create([
@@ -113,6 +114,7 @@ class AgendasController extends Controller
                 if ($request->input('agenda_detail')) {
                     AgendaDetails::where('agenda_id', $id)->delete();
                     $agenda_details = $request->input('agenda_detail');
+                    if(gettype($agenda_details) == 'string')
                     $agenda_details = (array) json_decode($agenda_details);
                     foreach ($agenda_details as $agenda) {
                         AgendaDetails::create([

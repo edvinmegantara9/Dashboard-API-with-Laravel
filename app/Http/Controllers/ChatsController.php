@@ -69,6 +69,7 @@ class ChatsController extends Controller
 
             if ($chat) {
                 $receivers = $request->input('receivers');
+                if(gettype($receivers) == 'string')
                 $receivers = (array) json_decode($receivers);
                 foreach ($receivers as $receiver) {
                     ChatsReceivers::create([

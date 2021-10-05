@@ -77,7 +77,10 @@ class RoleController extends Controller
             if ($role) {
                 if($request->input('opds'))
                 {
+                    if(gettype($request->input('opds')) == 'string')
                     $opds = (array) json_decode($request->input('opds'));
+                    else
+                    $opds = $request->input('opds');
                     foreach ($opds as $opd) {
                         RolesOpds::create([
                             'role_id' => $role->id,
