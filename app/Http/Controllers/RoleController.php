@@ -125,7 +125,7 @@ class RoleController extends Controller
             $role->save();
 
             if ($role) {
-                $opds = RolesOpds::where('role_id', $id)->delete();
+                $opds = RolesOpds::where('role_id', $role->id)->delete();
 
                 if($request->input('opds'))
                 {
