@@ -125,7 +125,9 @@ class RoleController extends Controller
             $role->save();
 
             if ($role) {
-                RolesOpds::where('role_id', $id)->delete();
+                RolesOpds::where('role_id', $id)->each(function ($opd) {
+                    $opd->delete();
+                });
 
                 if($request->input('opds'))
                 {
@@ -142,6 +144,7 @@ class RoleController extends Controller
 
                 }
                 DB::commit();
+                $role->opd;
                 $response = [
                     'status' => 200,
                     'message' => 'role has been updated',
