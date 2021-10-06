@@ -11,11 +11,6 @@ class RolesOpds extends Model
     
     protected $guard = [];
 
-    protected $fillable = [
-        'role_id',
-        'opd_id'
-    ];
-
     public function role()
     {
         return $this->belongsTo(Roles::class, 'role_id', 'id');
