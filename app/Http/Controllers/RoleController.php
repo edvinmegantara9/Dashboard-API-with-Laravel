@@ -125,11 +125,11 @@ class RoleController extends Controller
             $role->save();
 
             if ($role) {
-                $opds = RolesOpds::where('role_id', $role->id)->get();
-                foreach ($opds as $opd) {
-                    $opd->delete();
-                }
-                
+                $opds = RolesOpds::where('role_id', $role->id)->delete();
+                // foreach ($opds as $opd) {
+                //     $opd->delete();
+                // }
+
                 if($request->input('opds'))
                 {
                     if(gettype($request->input('opds')) == 'string')

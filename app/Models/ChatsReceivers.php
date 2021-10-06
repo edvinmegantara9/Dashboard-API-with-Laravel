@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChatsReceivers extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
 
     protected $guarded = [];
 

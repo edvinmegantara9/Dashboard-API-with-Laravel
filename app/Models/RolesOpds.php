@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RolesOpds extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
     
     protected $guard = [];
 
