@@ -126,7 +126,17 @@ class RoleController extends Controller
 
             if ($role) {
                 $opds = RolesOpds::where('role_id', $role->id)->delete();
-
+                if($opds)
+                {
+                    DB::rollBack();
+                    dd('opds deleted');
+                    
+                }
+                else
+                {
+                    DB::rollBack();
+                    dd('opds not deleted');
+                }
                 if($request->input('opds'))
                 {
                     if(gettype($request->input('opds')) == 'string')
