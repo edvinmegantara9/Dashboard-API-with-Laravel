@@ -64,6 +64,10 @@ class AddSoftDeletes extends Migration
         Schema::table('galleries', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        Schema::table('daily_reports', function (Blueprint $table) {
+            $table->softDeletes();
+        });
         
     }
 
@@ -123,6 +127,10 @@ class AddSoftDeletes extends Migration
         });
 
         Schema::table('galleries', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('daily_reports', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
     }

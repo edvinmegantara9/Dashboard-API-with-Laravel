@@ -92,6 +92,13 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->put('update/{id}', 'RolesOpdsController@update');
         $router->delete('delete/{id}', 'RolesOpdsController@delete');
     });
+
+    $router->group(['prefix' => 'daily_report'], function () use ($router) {
+        $router->get('', 'DailyReportController@get');
+        $router->post('', 'DailyReportController@create');
+        $router->put('update/{id}', 'DailyReportController@update');
+        $router->delete('delete/{id}', 'DailyReportController@delete');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
