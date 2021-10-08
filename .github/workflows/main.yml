@@ -10,6 +10,6 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.1.0
       with:
-        server: ftp.xsrindonesia.com
-        username: backend@silaper.xsrindonesia.com
+        server: ftp.bappedapagaralam.org
+        username: backend-silaper@bappedapagaralam.org
         password: ${{ secrets.FTP_PASSWORD }}
