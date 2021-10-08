@@ -41,6 +41,10 @@ class AddSoftDeletes extends Migration
             $table->softDeletes();
         });
 
+        Schema::table('public_documents', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
         Schema::table('document_types', function (Blueprint $table) {
             $table->softDeletes();
         });
@@ -131,6 +135,10 @@ class AddSoftDeletes extends Migration
         });
 
         Schema::table('daily_reports', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('public_documents', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
     }

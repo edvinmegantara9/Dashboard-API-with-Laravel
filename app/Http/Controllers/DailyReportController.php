@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyReport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DailyReportController extends Controller
@@ -57,12 +58,19 @@ class DailyReportController extends Controller
             'nip' => 'required',
             'position' => 'required',
             'role' => 'required',
-            'date' => 'required',
             'report' => 'required'
         ]);
 
         try {
-            $dailyReport = DailyReport::create($request->validated());
+            $dailyReport = DailyReport::create([
+                'email' => $request->input('email'),
+                'name' => $request->input('name'),
+                'nip' => $request->input('nip'),
+                'position' => $request->input('position'),
+                'role' => $request->input('role'),
+                'date' => Carbon::now()->toDateString(),
+                'report' => $request->input('report')
+            ]);
             if ($dailyReport) {
                 $response = [
                     'status' => 201,
