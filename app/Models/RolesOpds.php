@@ -9,7 +9,7 @@ class RolesOpds extends Model
 {
     // use SoftDeletes;
     
-    protected $guard = [];
+    protected $guarded = [];
 
     public function role()
     {
