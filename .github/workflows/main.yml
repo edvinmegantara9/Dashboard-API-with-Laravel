@@ -13,3 +13,5 @@ jobs:
         server: ftp.bappedapagaralam.org
         username: backend-silaper@bappedapagaralam.org
         password: ${{ secrets.FTP_PASSWORD }}
+
+        
