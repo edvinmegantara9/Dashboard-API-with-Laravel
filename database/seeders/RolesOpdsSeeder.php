@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Roles;
+use App\Models\RolesOpds;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,7 @@ class RolesOpdsSeeder extends Seeder
             if($i + 1 == $role->id) continue;
             $opd = Roles::find($i + 1);
             if(!$opd->is_opd) continue;
-            DB::table('roles_opds')->insert([
+            RolesOpds::create([
                 'role_id' => $role->id,
                 'opd_id' => $i + 1
             ]);

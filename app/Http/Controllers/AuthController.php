@@ -29,7 +29,8 @@ class AuthController extends BaseController
             'password' => 'required',
             'position' => 'required',
             'group' => 'required',
-            'role_id' => 'required'
+            'role_id' => 'required',
+            'email' => 'required'
         ]);
 
         try 
@@ -40,6 +41,7 @@ class AuthController extends BaseController
             $user->password = app('hash')->make($request->input('password'));
             $user->position = $request->input('position');
             $user->group = $request->input('group');
+            $user->email = $request->input('email');
             $user->role_id = $request->input('role_id');
             $user->save();
 
