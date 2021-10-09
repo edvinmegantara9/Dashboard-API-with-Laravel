@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Users extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable;
-    use SoftDeletes;
+    // use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
