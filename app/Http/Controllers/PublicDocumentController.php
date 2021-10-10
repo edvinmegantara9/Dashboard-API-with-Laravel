@@ -49,13 +49,15 @@ class PublicDocumentController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
-            'file' => 'required'
+            'file' => 'required',
+            'document_type' => 'required'
         ]);
 
         try {
             $publicDocuments = PublicDocument::create([
                 'title' => $request->input('title'),
-                'file' => $request->input('file')
+                'file' => $request->input('file'),
+                'document_type' => $request->input('document_tupe')
             ]);
 
             if ($publicDocuments) {
@@ -81,7 +83,8 @@ class PublicDocumentController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
-            'file' => 'required'
+            'file' => 'required',
+            'document_type' => 'required'
         ]);
 
         try {
@@ -90,6 +93,7 @@ class PublicDocumentController extends Controller
             if ($publicDocuments) {
                 $publicDocuments->title = $request->input('title');
                 $publicDocuments->file = $request->input('file');
+                $publicDocuments->document_type = $request->input('document_type');
                 $publicDocuments->save();
 
                 $response = [

@@ -27,16 +27,23 @@ class RoleController extends Controller
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
+        $type = $request->input('type');
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
+        if ($type == 'null') $type = '';
 
         try {
             $role = Roles::with(['opd'])->orderBy('roles.' . $sortby, $sorttype)
+                ->when($type, function ($query) use ($type) {
+                    return $query
+                        ->whereIn('roles.is_opd', $type);
+                })
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('roles.name', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })
+                ->paginate($row);
 
             if ($role) {
                 $response = [
@@ -75,19 +82,17 @@ class RoleController extends Controller
             );
 
             if ($role) {
-                if($request->input('opds'))
-                {
-                    if(gettype($request->input('opds')) == 'string')
-                    $opds = (array) json_decode($request->input('opds'));
+                if ($request->input('opds')) {
+                    if (gettype($request->input('opds')) == 'string')
+                        $opds = (array) json_decode($request->input('opds'));
                     else
-                    $opds = $request->input('opds');
+                        $opds = $request->input('opds');
                     foreach ($opds as $opd) {
                         RolesOpds::create([
                             'role_id' => $role->id,
                             'opd_id' => $opd
                         ]);
                     }
-
                 }
 
                 DB::commit();
@@ -130,19 +135,17 @@ class RoleController extends Controller
                 //     $opd->delete();
                 // }
 
-                if($request->input('opds'))
-                {
-                    if(gettype($request->input('opds')) == 'string')
-                    $opds = (array) json_decode($request->input('opds'));
+                if ($request->input('opds')) {
+                    if (gettype($request->input('opds')) == 'string')
+                        $opds = (array) json_decode($request->input('opds'));
                     else
-                    $opds = $request->input('opds');
+                        $opds = $request->input('opds');
                     foreach ($opds as $opd) {
                         RolesOpds::create([
                             'role_id' => $role->id,
                             'opd_id' => $opd
                         ]);
                     }
-
                 }
                 DB::commit();
                 $role->opd;

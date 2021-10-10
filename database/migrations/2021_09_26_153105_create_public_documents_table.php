@@ -17,6 +17,9 @@ class CreatePublicDocumentsTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('name');
+            $table->smallInteger('document_type');
+            // 0 = Dokumen Kota
+            // 1 = PP
             $table->timestamps();
         });
     }
