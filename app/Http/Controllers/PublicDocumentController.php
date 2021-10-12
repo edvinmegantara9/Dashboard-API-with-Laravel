@@ -57,7 +57,7 @@ class PublicDocumentController extends Controller
             $publicDocuments = PublicDocument::create([
                 'title' => $request->input('title'),
                 'file' => $request->input('file'),
-                'document_type' => $request->input('document_tupe')
+                'document_type' => $request->input('document_type')
             ]);
 
             if ($publicDocuments) {
