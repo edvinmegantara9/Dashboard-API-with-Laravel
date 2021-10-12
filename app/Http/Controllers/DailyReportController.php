@@ -94,7 +94,6 @@ class DailyReportController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'date' => 'required',
             'report' => 'required'
         ]);
 
@@ -102,7 +101,6 @@ class DailyReportController extends Controller
             $dailyReport = DailyReport::find($id);
 
             if ($dailyReport) {
-                $dailyReport->date = $request->input('date');
                 $dailyReport->report = $request->input('report');
                 $dailyReport->save();
 
