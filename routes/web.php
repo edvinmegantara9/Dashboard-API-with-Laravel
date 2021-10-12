@@ -99,6 +99,13 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->put('update/{id}', 'DailyReportController@update');
         $router->delete('delete/{id}', 'DailyReportController@delete');
     });
+
+    $router->group(['prefix' => 'public_document'], function () use ($router) {
+        $router->get('', 'PublicDocumentController@get');
+        $router->post('', 'PublicDocumentController@create');
+        $router->put('update/{id}', 'PublicDocumentController@update');
+        $router->delete('delete/{id}', 'PublicDocumentController@delete');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
