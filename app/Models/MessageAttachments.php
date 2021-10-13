@@ -9,9 +9,7 @@ class MessageAttachments extends Model
 {
     // use SoftDeletes;
 
-    protected $fillable = [
-        'message_id'
-    ];
+    protected $guarded = [];
 
     public function message()
     {
