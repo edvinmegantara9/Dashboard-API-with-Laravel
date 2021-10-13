@@ -71,8 +71,8 @@ class MessagesController extends Controller
 
             if ($message) {
                 $receivers = $request->input('receivers');
-                if(gettype($receivers) == 'string')
-                $receivers = (array) json_decode($receivers); 
+                if (gettype($receivers) == 'string')
+                    $receivers = (array) json_decode($receivers);
                 foreach ($receivers as $receiver) {
                     MessageReceivers::create([
                         'receiver_id' => $receiver,
@@ -83,8 +83,8 @@ class MessagesController extends Controller
 
                 if ($request->input('attachments')) {
                     $attachments = $request->input('attachments');
-                    if(gettype($attachments) == 'string')
-                    $attachments = (array) json_decode('attachments');
+                    if (gettype($attachments) == 'string')
+                        $attachments = (array) json_decode('attachments');
                     foreach ($attachments as $attachment) {
                         MessageAttachments::create([
                             'message_id' => $message->id,
@@ -116,6 +116,66 @@ class MessagesController extends Controller
         }
     }
 
+    public function outbox($id)
+    {
+        try {
+            $outbox = Messages::with(['user', 'sender', 'receivers'])->where('sender_id', $id)->get();
+
+            if ($outbox) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'inbox message data has been retrieved',
+                    'data' => $outbox
+                ];
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'inbox message not found',
+            ];
+            return response()->json($response, 404);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving inbox message data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+
+    public function inbox($id)
+    {
+
+        try {
+            $inbox = MessageReceivers::with(['message'])->where('receiver_id', $id)->get();
+
+            if ($inbox) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'inbox message data has been retrieved',
+                    'data' => $inbox
+                ];
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'inbox message not found',
+            ];
+            return response()->json($response, 404);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving inbox message data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
     public function update(Request $request, $id)
     {
         $this->validate($request, [
@@ -126,16 +186,14 @@ class MessagesController extends Controller
         try {
             DB::beginTransaction();
             $message = Messages::find($id);
-            
-            if($message)
-            {
+
+            if ($message) {
                 $message->title = $request->input('title');
                 $message->content = $request->input('content');
-                if($request->input('receivers'))
-                {
+                if ($request->input('receivers')) {
                     $receivers = $request->input('receivers');
-                    if(gettype($receivers) == 'string')
-                    $receivers = (array) json_decode($receivers); 
+                    if (gettype($receivers) == 'string')
+                        $receivers = (array) json_decode($receivers);
                     MessageReceivers::where('message_id', $id)->delete();
                     foreach ($receivers as $receiver) {
                         MessageReceivers::create([
@@ -179,8 +237,6 @@ class MessagesController extends Controller
                 MessageReceivers::where('message_id', $id)->delete();
                 MessageAttachments::where('message_id', $id)->delete();
             }
-
-
 
             if (!$messages->delete()) {
                 $response = [
