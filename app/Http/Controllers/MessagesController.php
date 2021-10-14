@@ -116,10 +116,23 @@ class MessagesController extends Controller
         }
     }
 
-    public function outbox($id)
+    public function outbox(Request $request, $id)
     {
+        $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
         try {
-            $outbox = Messages::with(['user', 'sender', 'receivers', 'attachments'])->where('sender_id', $id)->get();
+            $outbox = Messages::with(['user', 'sender', 'receivers', 'attachments'])->orderBy('messages.' . $sortby, $sorttype)->where('sender_id', $id)
+            ->when($keyword, function ($query) use ($keyword) {
+                return $query
+                    ->where('messages.title', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('messages.content', 'LIKE', '%' . $keyword . '%');
+            })->paginate($row);
 
             if ($outbox) {
                 $response = [
@@ -146,17 +159,28 @@ class MessagesController extends Controller
     }
 
 
-    public function inbox($id)
+    public function inbox(Request $request, $id)
     {
+        $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
 
         try {
-            $inbox = MessageReceivers::with(['message'])->where('receiver_id', $id)->get();
+            $inbox = MessageReceivers::with(['message'])->orderBy('message_receivers.' . $sortby, $sorttype)->where('receiver_id', $id)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('message_receivers.message.title', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('message_receivers.messages.content', 'LIKE', '%' . $keyword . '%');
+                })->paginate($row);
 
             if ($inbox) {
                 foreach ($inbox as $_inbox) {
                     $_inbox->message->sender;
                     $_inbox->message->attachments;
-
                 }
 
                 $response = [
