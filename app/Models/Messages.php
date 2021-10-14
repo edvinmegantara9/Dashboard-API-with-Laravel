@@ -30,4 +30,9 @@ class Messages extends Model
     {
         return $this->belongsToMany(Roles::class,'message_receivers', 'message_id', 'receiver_id');
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(MessageAttachments::class, 'message_id', 'id');
+    }
 }

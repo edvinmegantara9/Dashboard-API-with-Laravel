@@ -23,7 +23,7 @@ class MessagesController extends Controller
 
         try {
 
-            $message = Messages::with(['user', 'sender', 'receivers'])->orderBy('messages.' . $sortby, $sorttype)
+            $message = Messages::with(['user', 'sender', 'receivers', 'attachments'])->orderBy('messages.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('messages.title', 'LIKE', '%' . $keyword . '%')
@@ -94,7 +94,7 @@ class MessagesController extends Controller
                 }
 
                 DB::commit();
-                $result = Messages::with(['user', 'sender', 'receivers'])->find($message->id);
+                $result = Messages::with(['user', 'sender', 'receivers', 'attachments'])->find($message->id);
 
                 if ($result) {
                     $response = [
@@ -119,7 +119,7 @@ class MessagesController extends Controller
     public function outbox($id)
     {
         try {
-            $outbox = Messages::with(['user', 'sender', 'receivers'])->where('sender_id', $id)->get();
+            $outbox = Messages::with(['user', 'sender', 'receivers', 'attachments'])->where('sender_id', $id)->get();
 
             if ($outbox) {
                 $response = [
@@ -155,6 +155,8 @@ class MessagesController extends Controller
             if ($inbox) {
                 foreach ($inbox as $_inbox) {
                     $_inbox->message->sender;
+                    $_inbox->message->attachments;
+
                 }
 
                 $response = [
