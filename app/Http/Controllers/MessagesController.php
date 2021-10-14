@@ -124,7 +124,7 @@ class MessagesController extends Controller
             if ($outbox) {
                 $response = [
                     'status' => 200,
-                    'message' => 'inbox message data has been retrieved',
+                    'message' => 'outbox message data has been retrieved',
                     'data' => $outbox
                 ];
                 return response()->json($response, 200);
@@ -132,7 +132,7 @@ class MessagesController extends Controller
 
             $response = [
                 'status' => 404,
-                'message' => 'inbox message not found',
+                'message' => 'outbox message not found',
             ];
             return response()->json($response, 404);
         } catch (\Exception $e) {
@@ -153,6 +153,10 @@ class MessagesController extends Controller
             $inbox = MessageReceivers::with(['message'])->where('receiver_id', $id)->get();
 
             if ($inbox) {
+                foreach ($inbox as $_inbox) {
+                    $_inbox->message->sender;
+                }
+
                 $response = [
                     'status' => 200,
                     'message' => 'inbox message data has been retrieved',
