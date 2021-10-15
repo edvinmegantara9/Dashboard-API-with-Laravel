@@ -21,7 +21,6 @@ class DocumentsController extends Controller
 
         $role = Roles::with(['opd'])->where('id', $role_id)->first();
         $is_opd = $role->is_opd;
-        dd($role->is_opd);
         $opd = $role->opd;
         $opdIds = [];
         foreach ($opd as $_opd) {
