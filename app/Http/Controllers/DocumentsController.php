@@ -22,10 +22,13 @@ class DocumentsController extends Controller
         try {
             $role = Roles::with(['opd'])->where('id', $role_id)->first();
             $is_opd = $role->is_opd;
-            $opd = $role->opd;
             $opdIds = [];
-            foreach ($opd as $_opd) {
-                array_push($opdIds, $_opd->opd_id);
+            if (!$is_opd) {
+                $role = Roles::with(['opd'])->where('id', $role_id)->get();
+                $opd = $role->opd;
+                foreach ($opd as $_opd) {
+                    array_push($opdIds, $_opd->opd_id);
+                }
             }
 
             $documents = Documents::with(['uploader', 'document_type'])->orderBy('documents.' . $sortby, $sorttype)
