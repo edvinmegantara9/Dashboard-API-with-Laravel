@@ -23,6 +23,7 @@ class DocumentsController extends Controller
         try {
             $role = Roles::with(['opd'])->where('id', $role_id)->get();
             $is_opd = $role->is_opd;
+            dd($role->is_opd);
             $opd = $role->opd;
             $opdIds = [];
             foreach ($opd as $_opd) {
