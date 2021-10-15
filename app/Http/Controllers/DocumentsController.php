@@ -25,8 +25,12 @@ class DocumentsController extends Controller
             $opdIds = [];
             if (!$is_opd) {
                 $roles = Roles::with(['opd'])->where('id', $role_id)->get();
-                foreach ($roles as $_role) {
-                    array_push($opdIds, $_role->opd->opd_id);
+                if($roles)
+                {
+                    dd($roles[0]->opd);
+                    foreach ($roles as $_role) {
+                        array_push($opdIds, $_role->opd->opd_id);
+                    }
                 }
             }
 
