@@ -19,23 +19,23 @@ class DocumentsController extends Controller
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
+        $role = Roles::with(['opd'])->where('id', $role_id)->get();
+        $is_opd = $role->is_opd;
+        dd($role->is_opd);
+        $opd = $role->opd;
+        $opdIds = [];
+        foreach ($opd as $_opd) {
+            array_push($opdIds, $_opd->opd_id);
+        }
 
         try {
-            $role = Roles::with(['opd'])->where('id', $role_id)->get();
-            $is_opd = $role->is_opd;
-            dd($role->is_opd);
-            $opd = $role->opd;
-            $opdIds = [];
-            foreach ($opd as $_opd) {
-                array_push($opdIds, $_opd->opd_id);
-            }
 
             $documents = Documents::with(['uploader', 'document_type'])->orderBy('documents.' . $sortby, $sorttype)
-                ->when($is_opd, function($query) use ($role_id) {
+                ->when($is_opd, function ($query) use ($role_id) {
                     return $query
                         ->where('documents.upload_by', $role_id);
                 })
-                ->when(!$is_opd, function($query) use ($opdIds) {
+                ->when(!$is_opd, function ($query) use ($opdIds) {
                     return $query
                         ->whereIn('documents.upload_by', $opdIds);
                 })
