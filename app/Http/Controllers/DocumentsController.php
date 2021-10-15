@@ -20,6 +20,7 @@ class DocumentsController extends Controller
         $keyword = urldecode($keyword);
 
         $role = Roles::with(['opd'])->where('id', $role_id)->get();
+        dd($role);
         $is_opd = $role->is_opd;
         dd($role->is_opd);
         $opd = $role->opd;
