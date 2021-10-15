@@ -19,9 +19,8 @@ class DocumentsController extends Controller
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
-        $role = Roles::with(['opd'])->where('id', $role_id)->get();
-        dd($role);
-        $is_opd = $role[0]->is_opd;
+        $role = Roles::with(['opd'])->where('id', $role_id)->first();
+        $is_opd = $role->is_opd;
         dd($role->is_opd);
         $opd = $role->opd;
         $opdIds = [];
