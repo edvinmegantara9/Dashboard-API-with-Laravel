@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Documents;
+use App\Models\Roles;
 use Illuminate\Http\Request;
 
 class DocumentsController extends Controller
@@ -13,13 +14,30 @@ class DocumentsController extends Controller
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
+        $role_id = $request->input('role_id');
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
+
         try {
+            $role = Roles::with(['opd'])->where('id', $role_id)->get();
+            $is_opd = $role->is_opd;
+            $opd = $role->opd;
+            $opdIds = [];
+            foreach ($opd as $_opd) {
+                array_push($opdIds, $_opd->opd_id);
+            }
 
             $documents = Documents::with(['uploader', 'document_type'])->orderBy('documents.' . $sortby, $sorttype)
+                ->when($is_opd, function($query) use ($role_id) {
+                    return $query
+                        ->where('documents.upload_by', $role_id);
+                })
+                ->when(!$is_opd, function($query) use ($opdIds) {
+                    return $query
+                        ->whereIn('documents.upload_by', $opdIds);
+                })
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('documents.title', 'LIKE', '%' . $keyword . '%')
