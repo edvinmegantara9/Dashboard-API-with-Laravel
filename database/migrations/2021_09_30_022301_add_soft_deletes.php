@@ -72,6 +72,14 @@ class AddSoftDeletes extends Migration
         Schema::table('daily_reports', function (Blueprint $table) {
             $table->softDeletes();
         });
+
+        Schema::table('citizen_reports', function (Blueprint $table) {
+            $table->softDeletes();
+        });
+
+        Schema::table('planning_schedules', function (Blueprint $table) {
+            $table->softDeletes();
+        });
         
     }
 
@@ -139,6 +147,14 @@ class AddSoftDeletes extends Migration
         });
 
         Schema::table('public_documents', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('citizen_reports', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
+
+        Schema::table('planning_schedules', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
     }

@@ -31,11 +31,11 @@ class DocumentsController extends Controller
             }
 
             $documents = Documents::with(['uploader', 'document_type'])->orderBy('documents.' . $sortby, $sorttype)
-                ->when($is_opd, function ($query) use ($role_id) {
+                ->when($is_opd && $role->name != 'ADMIN', function ($query) use ($role_id) {
                     return $query
                         ->where('documents.upload_by', $role_id);
                 })
-                ->when(!$is_opd, function ($query) use ($opdIds) {
+                ->when(!$is_opd && $role->name != 'ADMIN', function ($query) use ($opdIds) {
                     return $query
                         ->whereIn('documents.upload_by', $opdIds);
                 })

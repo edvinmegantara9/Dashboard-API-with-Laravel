@@ -108,6 +108,20 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->put('update/{id}', 'PublicDocumentController@update');
         $router->delete('delete/{id}', 'PublicDocumentController@delete');
     });
+
+    $router->group(['prefix' => 'planning_schedule'], function () use ($router) {
+        $router->get('', 'PlanningScheduleController@get');
+        $router->post('', 'PlanningScheduleController@create');
+        $router->put('update/{id}', 'PlanningScheduleController@update');
+        $router->delete('delete/{id}', 'PlanningScheduleController@delete');
+    });
+
+    $router->group(['prefix' => 'citizen_report'], function () use ($router) {
+        $router->get('', 'CitizenReportController@get');
+        $router->post('', 'CitizenReportController@create');
+        $router->put('update/{id}', 'CitizenReportController@update');
+        $router->delete('delete/{id}', 'CitizenReportController@delete');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
