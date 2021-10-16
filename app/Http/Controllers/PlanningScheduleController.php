@@ -18,7 +18,7 @@ class PlanningScheduleController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $planning_schedules = PlanningSchedule::orderBy('planning_schedules.', $sortby, $sorttype)
+            $planning_schedules = PlanningSchedule::orderBy('planning_schedules.'. $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('planning_schedules.plan', 'LIKE', '%' . $keyword . '%')

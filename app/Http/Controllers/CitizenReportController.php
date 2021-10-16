@@ -18,7 +18,7 @@ class CitizenReportController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $citizen_reports = CitizenReport::orderBy('citizen_reports.', $sortby, $sorttype)
+            $citizen_reports = CitizenReport::orderBy('citizen_reports.'. $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('citizen_reports.name', 'LIKE', '%' . $keyword . '%')
