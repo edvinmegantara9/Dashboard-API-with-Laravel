@@ -44,7 +44,7 @@ class CitizenReportController extends Controller
         }
     }
 
-    public function post(Request $request)
+    public function create(Request $request)
     {
         $this->validate($request, [
             'name' => 'required',
