@@ -54,7 +54,11 @@ class PlanningScheduleController extends Controller
 
         try {
 
-            $planning_schedules = PlanningSchedule::create($request->validated());
+            $planning_schedules = PlanningSchedule::create([
+                'plan' => $request->input('plan'),
+                'schedule' => $request->input('schedule'),
+                'type' => $request->input('type') 
+            ]);
 
             if ($planning_schedules) {
                 $response = [

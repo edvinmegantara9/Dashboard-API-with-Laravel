@@ -55,7 +55,12 @@ class CitizenReportController extends Controller
 
         try {
 
-            $citizen_reports = CitizenReport::create($request->validated());
+            $citizen_reports = CitizenReport::create([
+                'name' => $request->input('name'),
+                'address' => $request->input('address'),
+                'phone_number' => $request->input('phone_number'),
+                'report' => $request->input('report')
+            ]);
 
             if ($citizen_reports) {
                 $response = [
