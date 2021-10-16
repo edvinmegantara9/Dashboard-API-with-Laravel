@@ -9,4 +9,6 @@ class PlanningSchedule extends Model
 {
     use SoftDeletes;
     
+    protected $guarded = [];
+
 }
