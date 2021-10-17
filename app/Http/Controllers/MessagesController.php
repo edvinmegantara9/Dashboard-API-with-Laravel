@@ -130,20 +130,18 @@ class MessagesController extends Controller
 
                 if($is_opd)
                 {
-                    $related_roles = RolesOpds::where('opd_id', $role->id)->get();
+                    $related_roles = RolesOpds::with(['role'])->where('opd_id', $role->id)->get();
 
                     if($related_roles)
                     {
                         foreach ($related_roles as $related_role) {
-                            array_push($receivers, $related_role->id);
+                            array_push($receivers, $related_role->role);
                         }
                     }
                     
                 }
                 else {
-                    foreach ($role->opd as $related_role) {
-                        array_push($receivers, $related_role->id);
-                    }
+                    $receivers = $role->opd;
                 }
 
                 $response = [
@@ -161,7 +159,7 @@ class MessagesController extends Controller
             ];
 
             return response()->json($response, 404);
-            
+
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
