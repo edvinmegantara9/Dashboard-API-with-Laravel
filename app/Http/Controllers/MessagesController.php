@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\MessageAttachments;
 use App\Models\Messages;
 use App\Models\MessageReceivers;
+use App\Models\Roles;
+use App\Models\RolesOpds;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -110,6 +112,60 @@ class MessagesController extends Controller
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating message data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function receiver($id)
+    {
+        try {
+            $role = Roles::with(['opd'])->where('id', $id)->first();
+
+            if($role)
+            {
+                $receivers = [];
+                $is_opd = $role->is_opd;
+
+                if($is_opd)
+                {
+                    $related_roles = RolesOpds::where('opd_id', $role->id)->get();
+
+                    if($related_roles)
+                    {
+                        foreach ($related_roles as $related_role) {
+                            array_push($receivers, $related_role->id);
+                        }
+                    }
+                    
+                }
+                else {
+                    foreach ($role->opd as $related_role) {
+                        array_push($receivers, $related_role->id);
+                    }
+                }
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'message receivers has been retrieved',
+                    'data' => $receivers
+                ];
+                return response()->json($response, 200);
+
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'message receivers not found',
+            ];
+
+            return response()->json($response, 404);
+            
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving message receivers data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
