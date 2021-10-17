@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyReport;
+use App\Models\Roles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -14,12 +15,36 @@ class DailyReportController extends Controller
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
+        $role_id = $request->input('role_id');
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
+
         try {
+
+            $role = Roles::find($role_id);
+            $is_opd = 1;
+            $role_name = "";
+            if($role)
+            {
+                $is_opd = $role->is_opd;
+                $role_name = $role->name;
+            }
+            else {
+                $response = [
+                    'status' => 404,
+                    'message' => 'role not found, make sure role id is valid',
+                ];
+                return response()->json($response, 404);
+            }
+
+
             $dailyReport = DailyReport::orderBy('daily_reports.' . $sortby, $sorttype)
+                ->when(!$is_opd, function($query) use ($role_name) {
+                    return $query
+                        ->where('daily_reports.role', $role_name);
+                })
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('daily_reports.name', 'LIKE', '%' . $keyword . '%')

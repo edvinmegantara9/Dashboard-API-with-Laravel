@@ -13,12 +13,16 @@ class PlanningScheduleController extends Controller
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
+        $type = $request->input('type');
+
+        if (gettype($type) == 'string') $type = (array) json_decode($type);
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
         try {
             $planning_schedules = PlanningSchedule::orderBy('planning_schedules.'. $sortby, $sorttype)
+                ->whereIn('planning_schedules.type', $type)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('planning_schedules.plan', 'LIKE', '%' . $keyword . '%')
