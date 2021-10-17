@@ -115,6 +115,11 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->put('update/{id}', 'PlanningScheduleController@update');
         $router->delete('delete/{id}', 'PlanningScheduleController@delete');
     });
+});
+
+$router->group(['prefix' => 'api'], function () use ($router) {
+    $router->post('register', 'AuthController@register');
+    $router->post('login', 'AuthController@login');
 
     $router->group(['prefix' => 'citizen_report'], function () use ($router) {
         $router->get('', 'CitizenReportController@get');
@@ -122,11 +127,6 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->put('update/{id}', 'CitizenReportController@update');
         $router->delete('delete/{id}', 'CitizenReportController@delete');
     });
-});
-
-$router->group(['prefix' => 'api'], function () use ($router) {
-    $router->post('register', 'AuthController@register');
-    $router->post('login', 'AuthController@login');
 
     $router->group(['prefix' => 'role'], function () use ($router) {
         $router->get('', 'RoleController@get');
