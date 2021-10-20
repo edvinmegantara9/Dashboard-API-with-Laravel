@@ -53,7 +53,7 @@ class ChatsController extends Controller
     {
         $this->validate($request, [
             'room_name' => 'required',
-            'room_id' => 'required',
+            // 'room_id' => 'required',
             'created_by' => 'required',
             'receivers' => 'required'
         ]);
@@ -62,7 +62,7 @@ class ChatsController extends Controller
             DB::beginTransaction();
             $chat = Chats::create([
                 'room_name' => $request->input('room_name'),
-                'room_id' => $request->input('room_id'),
+                'room_id' => uniqid('silaper_room'),
                 'start_chat' => Carbon::now(),
                 'created_by' => $request->input('created_by')
             ]);
