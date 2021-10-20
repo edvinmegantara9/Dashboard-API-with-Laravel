@@ -20,6 +20,6 @@ class Chats extends Model
 
     public function receivers()
     {
-        return $this->belongsToMany(Roles::class, 'chats_receivers', 'room_id', 'role_id');
+        return $this->belongsToMany(Roles::class, 'room_receivers', 'room_id', 'role_id');
     }
 }

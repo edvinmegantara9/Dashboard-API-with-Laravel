@@ -26,15 +26,15 @@ class ChatsController extends Controller
             $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('chats.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('chats.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('chats.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('rooms.user.name', 'LIKE', '%' . $keyword . '%');
                 })->paginate($row);
 
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('room.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('room.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('room_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
                 })
                 ->get();
             
