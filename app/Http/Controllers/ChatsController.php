@@ -37,8 +37,6 @@ class ChatsController extends Controller
                         ->orWhere('room_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
                 })
                 ->get();
-            
-            dd($chat_receivers);
 
             foreach ($chat_receivers as $chat_receiver) {
                 array_push($chat, $chat_receiver->room);
