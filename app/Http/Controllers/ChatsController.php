@@ -33,8 +33,8 @@ class ChatsController extends Controller
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('chat_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('chat_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->where('room.room_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('room.user.name', 'LIKE', '%' . $keyword . '%');
                 })
                 ->get();
             
