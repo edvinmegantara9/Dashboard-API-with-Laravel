@@ -95,7 +95,7 @@ class ChatsController extends Controller
                 $chat->receivers;
 
                 foreach ($chat->receivers as $receiver) {
-                    $receiver->role;
+                    $receiver->room;
                 }
 
                 $response = [
