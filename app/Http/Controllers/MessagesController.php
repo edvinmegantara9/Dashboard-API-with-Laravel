@@ -260,6 +260,21 @@ class MessagesController extends Controller
         }
     }
 
+
+    public function read_message($id)
+    {
+        try {
+            $message = Messages::find($id);
+
+            if($message)
+            {
+                
+            }
+        } catch (\Exception $e) {
+            //throw $th;
+        }
+    }
+
     public function update(Request $request, $id)
     {
         $this->validate($request, [
