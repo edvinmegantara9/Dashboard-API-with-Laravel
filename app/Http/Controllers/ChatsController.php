@@ -16,19 +16,31 @@ class ChatsController extends Controller
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
+        $role_id = $request->input('role_id');
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
         try {
 
-            $chat = Chats::with(['receivers'])->orderBy('chats.' . $sortby, $sorttype)
+            $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('chats.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('chats.room_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('chats.user.name', 'LIKE', '%' . $keyword . '%');
                 })->paginate($row);
 
+            $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('chat_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('chat_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
+                })
+                ->get();
+            
+            foreach ($chat_receivers as $room) {
+                array_push($chat->data->data, $room);
+            }
 
             if ($chat) {
                 $response = [

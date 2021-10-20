@@ -13,8 +13,9 @@ class ChatsReceivers extends Model
 
     protected $table = 'room_receivers';
 
-    public function role()
+    public function room()
     {
         return $this->belongsTo(Chats::class, 'room_id', 'id');
     }
+    
 }
