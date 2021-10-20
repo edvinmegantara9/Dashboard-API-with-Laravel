@@ -43,7 +43,11 @@ class RoleController extends Controller
                     return $query
                         ->where('roles.name', 'LIKE', '%' . $keyword . '%');
                 })
-                ->paginate($row);
+                ->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                });
+                // ->paginate($row);
 
             if ($role) {
                 $response = [
