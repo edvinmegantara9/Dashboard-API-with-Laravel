@@ -106,12 +106,17 @@ class ChatsController extends Controller
         }
     }
 
-    public function endChat($id)
+    public function endChat(Request $request, $id)
     {
+        $this->validate($request, [
+            'rating' => 'required'
+        ]);
+
         try {
             $chat = Chats::find($id);
             if ($chat) {
                 $chat->end_chat = Carbon::now();
+                $chat->rating = $request->input('rating');
                 $chat->save();
 
                 $response = [
