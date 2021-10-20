@@ -12,7 +12,7 @@ class ChatsController extends Controller
 {
     public function get(Request $request)
     {
-        $row = $request->input('row');
+        // $row = $request->input('row');
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
@@ -28,7 +28,7 @@ class ChatsController extends Controller
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('rooms.user.name', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })->get();
 
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
                 ->when($keyword, function ($query) use ($keyword) {
@@ -38,7 +38,11 @@ class ChatsController extends Controller
                 })
                 ->get();
 
-            $data = [$chat];
+            $data = [];
+
+            foreach ($chat as $chat_sender) {
+                array_push($data, $chat_sender);
+            }
 
             foreach ($chat_receivers as $chat_receiver) {
                 array_push($data, $chat_receiver->room);
