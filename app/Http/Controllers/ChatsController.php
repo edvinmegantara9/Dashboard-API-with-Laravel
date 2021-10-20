@@ -25,7 +25,7 @@ class ChatsController extends Controller
             $chat = Chats::with(['receivers'])->orderBy('chats.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('chats.title', 'LIKE', '%' . $keyword . '%')
+                        ->where('chats.room_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('chats.user.name', 'LIKE', '%' . $keyword . '%');
                 })->paginate($row);
 
@@ -52,8 +52,8 @@ class ChatsController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required',
-            'firebase_key' => 'required',
+            'room_name' => 'required',
+            'room_id' => 'required',
             'created_by' => 'required',
             'receivers' => 'required'
         ]);
@@ -61,8 +61,8 @@ class ChatsController extends Controller
         try {
             DB::beginTransaction();
             $chat = Chats::create([
-                'title' => $request->input('title'),
-                'firebase_key' => $request->input('firebase_key'),
+                'room_name' => $request->input('room_name'),
+                'room_id' => $request->input('room_id'),
                 'start_chat' => Carbon::now(),
                 'created_by' => $request->input('created_by')
             ]);
@@ -74,7 +74,7 @@ class ChatsController extends Controller
                 foreach ($receivers as $receiver) {
                     ChatsReceivers::create([
                         'role_id' => $receiver,
-                        'chat_id' => $chat->id
+                        'room_id' => $chat->id
                     ]);
                 }
                 DB::commit();
@@ -147,7 +147,7 @@ class ChatsController extends Controller
             
             if($chat)
             {
-                ChatsReceivers::where('chat_id', $id)->delete();
+                ChatsReceivers::where('room_id', $id)->delete();
             }
 
             if(!$chat->delete())

@@ -11,6 +11,8 @@ class Chats extends Model
 
     protected $guarded = [];
 
+    protected $table = 'rooms';
+
     public function user()
     {
         return $this->belongsTo(Roles::class, 'created_by', 'id');
@@ -18,6 +20,6 @@ class Chats extends Model
 
     public function receivers()
     {
-        return $this->belongsToMany(Roles::class, 'chats_receivers', 'chat_id', 'role_id');
+        return $this->belongsToMany(Roles::class, 'chats_receivers', 'room_id', 'role_id');
     }
 }

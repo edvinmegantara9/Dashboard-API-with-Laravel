@@ -13,7 +13,7 @@ class CreateChatsReceiversTable extends Migration
      */
     public function up()
     {
-        Schema::create('chats_receivers', function (Blueprint $table) {
+        Schema::create('room_receivers', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ class CreateChatsReceiversTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chats_receivers');
+        Schema::dropIfExists('room_receivers');
     }
 }

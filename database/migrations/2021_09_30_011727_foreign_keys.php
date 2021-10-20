@@ -27,13 +27,13 @@ class ForeignKeys extends Migration
             $table->foreignId('document_type')->constrained('document_types')->onDelete('cascade');
         });
 
-        Schema::table('chats', function (Blueprint $table) {
+        Schema::table('rooms', function (Blueprint $table) {
             $table->foreignId('created_by')->constrained('roles')->onDelete('cascade');
         });
 
-        Schema::table('chats_receivers', function (Blueprint $table) {
+        Schema::table('room_receivers', function (Blueprint $table) {
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
-            $table->foreignId('chat_id')->constrained('chats')->onDelete('cascade');
+            $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
         });
 
         Schema::table('messages', function (Blueprint $table) {

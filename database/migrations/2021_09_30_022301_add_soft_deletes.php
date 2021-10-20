@@ -49,11 +49,11 @@ class AddSoftDeletes extends Migration
             $table->softDeletes();
         });
 
-        Schema::table('chats', function (Blueprint $table) {
+        Schema::table('rooms', function (Blueprint $table) {
             $table->softDeletes();
         });
 
-        Schema::table('chats_receivers', function (Blueprint $table) {
+        Schema::table('room_receivers', function (Blueprint $table) {
             $table->softDeletes();
         });
 
@@ -122,11 +122,11 @@ class AddSoftDeletes extends Migration
             $table->dropSoftDeletes();
         });
 
-        Schema::table('chats', function (Blueprint $table) {
+        Schema::table('rooms', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
 
-        Schema::table('chats_receivers', function (Blueprint $table) {
+        Schema::table('room_receivers', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
 

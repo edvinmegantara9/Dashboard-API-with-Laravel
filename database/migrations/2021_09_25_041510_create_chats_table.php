@@ -13,10 +13,10 @@ class CreateChatsTable extends Migration
      */
     public function up()
     {
-        Schema::create('chats', function (Blueprint $table) {
+        Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('firebase_key')->unique();
+            $table->string('room_name');
+            $table->string('room_id')->unique();
             $table->dateTime('start_chat');
             $table->dateTime('end_chat')->nullable();
             $table->integer('rating')->nullable();
@@ -32,6 +32,6 @@ class CreateChatsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chats');
+        Schema::dropIfExists('rooms');
     }
 }
