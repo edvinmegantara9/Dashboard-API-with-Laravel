@@ -48,8 +48,6 @@ class ChatsController extends Controller
                 array_push($data, $chat_receiver->room);
             }
 
-            dd($data);
-
             if ($chat) {
                 $response = [
                     'status' => 200,
