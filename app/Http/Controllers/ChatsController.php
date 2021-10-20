@@ -38,8 +38,12 @@ class ChatsController extends Controller
                 })
                 ->get();
 
+            $data = [];
+
+            dd($chat);
+
             foreach ($chat_receivers as $chat_receiver) {
-                array_push($chat, $chat_receiver->room);
+                array_push($data, $chat_receiver->room);
             }
 
             if ($chat) {
