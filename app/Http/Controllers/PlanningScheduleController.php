@@ -27,7 +27,22 @@ class PlanningScheduleController extends Controller
                     return $query
                         ->where('planning_schedules.plan', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('planning_schedules.schedule', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })
+                ->when($row, function($query) use ($row) {
+                    return $query
+                        ->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
 
             if ($planning_schedules) {
                 $response = [

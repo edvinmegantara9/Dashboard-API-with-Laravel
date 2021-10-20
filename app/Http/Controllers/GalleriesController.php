@@ -24,7 +24,14 @@ class GalleriesController extends Controller
                     return $query
                         ->where('galleries.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('galleries.file', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
 
 
             if ($galleries) {

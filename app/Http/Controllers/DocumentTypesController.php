@@ -25,7 +25,14 @@ class DocumentTypesController extends Controller
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('document_types.name', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
 
 
             if ($documentType) {

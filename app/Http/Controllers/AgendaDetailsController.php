@@ -25,7 +25,14 @@ class AgendaDetailsController extends Controller
                     return $query
                         ->where('agenda_details.agenda_type', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('agenda_details.schedule', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
 
 
             if ($agendaDetails) {

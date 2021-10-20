@@ -23,7 +23,14 @@ class CitizenReportController extends Controller
                     return $query
                         ->where('citizen_reports.name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('citizen_reports.address', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
 
             if ($citizen_reports) {
                 $response = [

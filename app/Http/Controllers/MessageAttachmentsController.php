@@ -24,7 +24,22 @@ class MessageAttachmentsController extends Controller
                     return $query
                         ->where('message_attachments.message.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('message_attachments.message.content', 'LIKE', '%' . $keyword . '%');
-                })->paginate($row);
+                })
+                ->when($row, function($query) use ($row) {
+                    return $query
+                        ->when($row, function($query) use ($row) {
+                    return $query
+                        ->paginate($row);
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
+                })
+                ->when(!$row, function ($query) use ($row) {
+                    return $query
+                        ->get();
+                });
 
 
             if ($message_attachments) {
