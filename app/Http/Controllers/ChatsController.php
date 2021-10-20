@@ -38,19 +38,19 @@ class ChatsController extends Controller
                 })
                 ->get();
 
-            $data = [];
-
-            dd($chat);
+            $data = [$chat];
 
             foreach ($chat_receivers as $chat_receiver) {
                 array_push($data, $chat_receiver->room);
             }
 
+            dd($data);
+
             if ($chat) {
                 $response = [
                     'status' => 200,
                     'message' => 'chat data has been retrieved',
-                    'data' => $chat
+                    'data' => $data
                 ];
 
                 return response()->json($response, 200);
