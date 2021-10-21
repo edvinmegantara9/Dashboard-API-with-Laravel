@@ -52,14 +52,8 @@ class DailyReportController extends Controller
                         ->orWhere('daily_reports.nip', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('daily_reports.position', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('daily_reports.role', 'LIKE', '%' . $keyword . '%');
-                })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
                 })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
 
             if ($dailyReport) {
