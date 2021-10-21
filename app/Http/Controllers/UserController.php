@@ -33,14 +33,8 @@ class UserController extends Controller
                         ->orWhere('users.nip', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('users.position', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('users.group', 'LIKE', '%' . $keyword . '%');
-                })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
                 })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
             if ($users) {
                 $response = [
