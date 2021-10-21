@@ -31,21 +31,7 @@ class MessagesController extends Controller
                         ->where('messages.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('messages.content', 'LIKE', '%' . $keyword . '%');
                 })
-                ->when($row, function($query) use ($row) {
-                    return $query
-                        ->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
 
             if ($message) {
@@ -201,14 +187,7 @@ class MessagesController extends Controller
                 return $query
                     ->where('messages.title', 'LIKE', '%' . $keyword . '%')
                     ->orWhere('messages.content', 'LIKE', '%' . $keyword . '%');
-            })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+            })->paginate($row);
 
             if ($outbox) {
                 $response = [
@@ -251,14 +230,7 @@ class MessagesController extends Controller
                     return $query
                         ->where('message_receivers.message.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('message_receivers.messages.content', 'LIKE', '%' . $keyword . '%');
-                })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                })->paginate($row);
 
             if ($inbox) {
                 foreach ($inbox as $_inbox) {

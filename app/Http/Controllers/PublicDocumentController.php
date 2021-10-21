@@ -24,21 +24,7 @@ class PublicDocumentController extends Controller
                     return $query
                         ->where('public_documents.title', 'LIKE', '%' . $keyword . '%');
                 })
-                ->when($row, function($query) use ($row) {
-                    return $query
-                        ->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
 
             if ($publicDocuments) {

@@ -27,21 +27,7 @@ class MessageReceiversController extends Controller
                         ->orWhere('message_receivers.message.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('message_receivers.message.content', 'LIKE', '%' . $keyword . '%');
                 })
-                ->when($row, function($query) use ($row) {
-                    return $query
-                        ->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
-                })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
 
             if ($message) {
