@@ -48,7 +48,7 @@ class RoleController extends Controller
                     return $query
                         ->paginate($row);
                 })
-                ->when(!$row == '', function ($query) {
+                ->when($row == '', function ($query) {
                     return $query
                         ->get();
                 });
