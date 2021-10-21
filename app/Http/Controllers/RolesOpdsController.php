@@ -33,14 +33,8 @@ class RolesOpdsController extends Controller
                     return $query
                         ->where('roles_opds.role.name', 'LIKE', '%' . $keyword . '%')
                         ->where('roles_opds.opd.name', 'LIKE', '%' . $keyword . '%');
-                })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
                 })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
                 
             if ($opds) {
                 $response = [
