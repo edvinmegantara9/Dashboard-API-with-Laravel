@@ -41,7 +41,7 @@ class DailyReportController extends Controller
 
 
             $dailyReport = DailyReport::orderBy('daily_reports.' . $sortby, $sorttype)
-                ->when(!$is_opd, function($query) use ($role_name) {
+                ->when($is_opd, function($query) use ($role_name) {
                     return $query
                         ->where('daily_reports.role', $role_name);
                 })
