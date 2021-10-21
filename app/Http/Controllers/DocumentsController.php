@@ -44,14 +44,8 @@ class DocumentsController extends Controller
                         ->where('documents.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('documents.uploader.name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('documents.document_type.name', 'LIKE', '%' . $keyword . '%');
-                })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
                 })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
 
             if ($documents) {

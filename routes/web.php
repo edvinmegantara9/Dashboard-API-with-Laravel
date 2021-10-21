@@ -19,13 +19,6 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
 
     $router->get('me', 'AuthController@me');
 
-    $router->group(['prefix' => 'gallery'], function () use ($router) {
-        $router->get('', 'GalleriesController@get');
-        $router->post('', 'GalleriesController@create');
-        $router->put('update/{id}', 'GalleriesController@update');
-        $router->delete('delete/{id}', 'GalleriesController@delete');
-    });
-
     $router->group(['prefix' => 'agenda'], function () use ($router) {
         $router->get('', 'AgendasController@get');
         $router->post('', 'AgendasController@create');
@@ -136,4 +129,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->put('update/{id}', 'RoleController@update');
         $router->delete('delete/{id}', 'RoleController@delete');
     });
+
+    $router->group(['prefix' => 'gallery'], function () use ($router) {
+        $router->get('', 'GalleriesController@get');
+        $router->post('', 'GalleriesController@create');
+        $router->put('update/{id}', 'GalleriesController@update');
+        $router->delete('delete/{id}', 'GalleriesController@delete');
+    });
+
 });
