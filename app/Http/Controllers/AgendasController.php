@@ -26,14 +26,8 @@ class AgendasController extends Controller
                     return $query
                         ->where('agendas.title', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('agendas.content', 'LIKE', '%' . $keyword . '%');
-                })->when($row, function($query) use ($row) {
-                    return $query
-                        ->paginate($row);
                 })
-                ->when(!$row, function ($query) use ($row) {
-                    return $query
-                        ->get();
-                });
+                ->paginate($row);
 
 
             if ($agendas) {
