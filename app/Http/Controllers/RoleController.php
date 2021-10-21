@@ -32,6 +32,7 @@ class RoleController extends Controller
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
         if ($type == 'null') $type = '';
+        if($row == 'null') $row = '';
 
         try {
             $role = Roles::with(['opd'])->orderBy('roles.' . $sortby, $sorttype)
@@ -43,11 +44,11 @@ class RoleController extends Controller
                     return $query
                         ->where('roles.name', 'LIKE', '%' . $keyword . '%');
                 })
-                ->when($row, function($query) use ($row) {
+                ->when($row != '', function($query) use ($row) {
                     return $query
                         ->paginate($row);
                 })
-                ->when(!$row, function ($query) use ($row) {
+                ->when(!$row == '', function ($query) use ($row) {
                     return $query
                         ->get();
                 });
