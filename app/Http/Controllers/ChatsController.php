@@ -33,7 +33,6 @@ class ChatsController extends Controller
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
-                ->where('end_chat', !null)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
@@ -48,6 +47,8 @@ class ChatsController extends Controller
             }
 
             foreach ($chat_receivers as $chat_receiver) {
+                $room = $chat_receiver->room;
+                if(!$room->end_chat) continue;
                 array_push($data, $chat_receiver->room);
             }
 
@@ -92,7 +93,6 @@ class ChatsController extends Controller
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
-                ->where('end_chat', null)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
@@ -107,6 +107,8 @@ class ChatsController extends Controller
             }
 
             foreach ($chat_receivers as $chat_receiver) {
+                $room = $chat_receiver->room;
+                if($room->end_chat) continue;
                 array_push($data, $chat_receiver->room);
             }
 
