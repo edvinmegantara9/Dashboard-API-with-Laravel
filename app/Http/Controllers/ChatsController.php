@@ -10,6 +10,66 @@ use Illuminate\Support\Facades\DB;
 
 class ChatsController extends Controller
 {
+
+    public function history(Request $request)
+    {
+        // $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+        $role_id = $request->input('role_id');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
+        try {
+
+            $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
+                ->where('end_time', !null)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('rooms.user.name', 'LIKE', '%' . $keyword . '%');
+                })->get();
+
+            $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
+                ->where('end_time', !null)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('room_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
+                })
+                ->get();
+
+            $data = [];
+
+            foreach ($chat as $chat_sender) {
+                array_push($data, $chat_sender);
+            }
+
+            foreach ($chat_receivers as $chat_receiver) {
+                array_push($data, $chat_receiver->room);
+            }
+
+            if ($chat) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'chat data has been retrieved',
+                    'data' => $data
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving chat data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
     public function get(Request $request)
     {
         // $row = $request->input('row');
@@ -24,6 +84,7 @@ class ChatsController extends Controller
         try {
 
             $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
+                ->where('end_time', null)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
@@ -31,6 +92,7 @@ class ChatsController extends Controller
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
+                ->where('end_time', null)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')

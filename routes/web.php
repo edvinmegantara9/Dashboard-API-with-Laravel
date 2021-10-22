@@ -28,6 +28,7 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
 
     $router->group(['prefix' => 'chat'], function () use ($router) {
         $router->get('', 'ChatsController@get');
+        $router->get('history', 'ChatsController@history');
         $router->post('', 'ChatsController@create');
         $router->put('endchat/{id}', 'ChatsController@endchat');
         $router->delete('delete/{id}', 'ChatsController@delete');
