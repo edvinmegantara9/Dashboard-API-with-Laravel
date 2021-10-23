@@ -25,7 +25,7 @@ class ChatsController extends Controller
         try {
 
             $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
-                ->where('end_chat', !null)
+                ->whereNotNull('end_chat')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
@@ -85,7 +85,7 @@ class ChatsController extends Controller
         try {
 
             $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
-                ->where('end_chat', null)
+                ->whereNull('end_chat')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
