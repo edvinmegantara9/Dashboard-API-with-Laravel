@@ -104,7 +104,7 @@ class ChatsController extends Controller
                         });
                 })->get();
 
-            $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
+            $chat_receivers = ChatsReceivers::with(['room.user', 'room.receivers'])->where('role_id', $role_id)
                 ->whereHas('room', function ($query){
                     return $query->whereNull('end_chat');
                 })
