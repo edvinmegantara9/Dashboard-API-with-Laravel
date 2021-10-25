@@ -6,9 +6,47 @@ use App\Models\DailyReport;
 use App\Models\Roles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DailyReportController extends Controller
 {
+    public function downloadSummary(){
+
+        Excel::create('Summary Laporan Harian SILAPER' . Carbon::now(), function($excel) {
+
+            $excel->sheet('Sheet1', function($sheet) {
+                $reports = DailyReport::all();
+
+                $arr =array();
+                $counter = 1;
+                foreach($reports as $report) {
+                        $data =  array($counter, 
+                                $report->email, 
+                                $report->name, 
+                                $report->nip, 
+                                $report->position, 
+                                $report->role, 
+                                $report->date, 
+                                $report->$report, 
+                                $report->created_at);
+                        array_push($arr, $data);
+                        $counter++;
+
+                }
+
+                //set the titles
+                $sheet->fromArray($arr,null,'A1',false,false)->prependRow(array(
+                        'No', 'Email', 'Nama', 'NIP', 'Jabatan',
+                        'Bidang', 'Tanggal Laporan', 'Laporan', 'Tanggal dibuat'
+                    )
+
+                );
+
+            });
+
+        })->export('xls');
+    }
+
     public function get(Request $request)
     {
         $row = $request->input('row');
