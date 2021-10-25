@@ -226,17 +226,56 @@ class ChatsController extends Controller
         }
     }
 
-    public function endChat(Request $request, $id)
+    public function rateChat(Request $request, $id)
     {
         $this->validate($request, [
+            'role_id' => 'required',
             'rating' => 'required'
         ]);
+
+        $role_id = $request->input('role_id');
+        $rating = $request->input('rating');
+
+        try {
+            $receiver = ChatsReceivers::where('role_id', $role_id)->where('room_id', $id)->first();
+
+            if($receiver)
+            {
+                $receiver->rating = $rating;
+                $receiver->save();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'chat instance has been rated',
+                    'data' => $receiver
+                ];
+
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'chat data not found',
+            ];
+            return response()->json($response, 404);
+
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on updating chat data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function endChat($id)
+    {
 
         try {
             $chat = Chats::find($id);
             if ($chat) {
                 $chat->end_chat = Carbon::now();
-                $chat->rating = $request->input('rating');
                 $chat->save();
 
                 $response = [

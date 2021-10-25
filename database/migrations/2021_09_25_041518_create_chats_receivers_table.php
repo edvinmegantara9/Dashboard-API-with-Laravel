@@ -15,6 +15,7 @@ class CreateChatsReceiversTable extends Migration
     {
         Schema::create('room_receivers', function (Blueprint $table) {
             $table->id();
+            $table->smallInteger('rating')->nullable();
             $table->timestamps();
         });
         
