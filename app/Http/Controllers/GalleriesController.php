@@ -51,6 +51,7 @@ class GalleriesController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
+            'description' => 'required',
             'file' => 'required'
         ]);
 
@@ -58,7 +59,8 @@ class GalleriesController extends Controller
             $galleries = Galleries::create(
                 [
                     'title' => $request->input('title'),
-                    'file' => $request->input('file')
+                    'file' => $request->input('file'),
+                    'description' => $request->input('description')
                 ]
             );
 
@@ -84,7 +86,8 @@ class GalleriesController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'title' => 'required'
+            'title' => 'required',
+            'description' => 'required'
         ]);
 
         try {
@@ -92,6 +95,7 @@ class GalleriesController extends Controller
 
             if ($galleries) {
                 $galleries->title = $request->input('title');
+                $galleries->description = $request->input('description');
                 if ($request->input('file'))
                     $galleries->file = $request->input('file');
                 $galleries->save();
