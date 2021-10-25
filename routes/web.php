@@ -30,7 +30,8 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->get('', 'ChatsController@get');
         $router->get('history', 'ChatsController@history');
         $router->post('', 'ChatsController@create');
-        $router->put('endchat/{id}', 'ChatsController@endchat');
+        $router->put('endchat/{id}', 'ChatsController@endChat');
+        $router->put('ratechat/{id}', 'ChatsController@rateChat');
         $router->delete('delete/{id}', 'ChatsController@delete');
     });
 

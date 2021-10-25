@@ -187,8 +187,43 @@ class ChatsController extends Controller
             return response()->json($response, 400);
         }
     }
+    
+    public function endChat($id)
+    {
+        try {
+            $chat = Chats::find($id);
+            if($chat)
+            {
+                $chat->end_chat = Carbon::now();
+                $chat->save();
 
-    public function endChat(Request $request, $id)
+                $response = [
+                    'status' => 200,
+                    'message' => 'chat instance has been ended',
+                    'data' => $chat
+                ];
+
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'chat data not found',
+            ];
+            return response()->json($response, 404);
+
+
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on updating chat data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function rateChat(Request $request, $id)
     {
         $this->validate($request, [
             'rating' => 'required'
@@ -197,13 +232,12 @@ class ChatsController extends Controller
         try {
             $chat = Chats::find($id);
             if ($chat) {
-                $chat->end_chat = Carbon::now();
                 $chat->rating = $request->input('rating');
                 $chat->save();
 
                 $response = [
                     'status' => 200,
-                    'message' => 'chat instance has been ended',
+                    'message' => 'chat instance has been rated',
                     'data' => $chat
                 ];
 
