@@ -42,8 +42,14 @@ class DocumentsController extends Controller
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('documents.title', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.uploader.name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.document_type.name', 'LIKE', '%' . $keyword . '%');
+                        ->orWhereHas('uploader', function ($query) use ($keyword) {
+                            return $query
+                            ->where('name', 'LIKE', '%' . $keyword . '%');
+                        })
+                        ->orWhereHas('document_type', function ($query) use ($keyword) {
+                            return $query
+                            ->where('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })
                 ->paginate($row);
 
