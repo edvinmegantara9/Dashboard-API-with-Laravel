@@ -25,7 +25,7 @@ class PublicDocumentController extends Controller
         try {
 
             $publicDocuments = PublicDocument::orderBy('public_documents.' . $sortby, $sorttype)
-                ->whereIn('type', $type)
+                ->whereIn('document_type', $type)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('public_documents.title', 'LIKE', '%' . $keyword . '%');
