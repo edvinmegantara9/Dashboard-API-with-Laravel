@@ -24,19 +24,28 @@ class ChatsController extends Controller
 
         try {
 
-            $chat = Chats::with(['receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
+            $chat = Chats::with(['receivers', 'user'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
                 ->whereNotNull('end_chat')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('rooms.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->orWhereHas('user', function ($query) use ($keyword) {
+                            return $query
+                                ->where('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })->get();
 
-            $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
+            $chat_receivers = ChatsReceivers::with(['room.user'])->where('role_id', $role_id)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('room_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->whereHas('room', function ($query) use ($keyword) {
+                            return $query
+                            ->where('room_name', 'LIKE', '%' . $keyword . '%');
+                        })
+                        ->orWhereHas('room.user', function ($query) use ($keyword) {
+                            return $query
+                            ->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })
                 ->get();
 
@@ -48,7 +57,7 @@ class ChatsController extends Controller
 
             foreach ($chat_receivers as $chat_receiver) {
                 $room = $chat_receiver->room;
-                if(!$room->end_chat) continue;
+                if (!$room->end_chat) continue;
                 array_push($data, $chat_receiver->room);
             }
 
@@ -108,7 +117,7 @@ class ChatsController extends Controller
 
             foreach ($chat_receivers as $chat_receiver) {
                 $room = $chat_receiver->room;
-                if($room->end_chat) continue;
+                if ($room->end_chat) continue;
                 array_push($data, $chat_receiver->room);
             }
 
@@ -151,8 +160,8 @@ class ChatsController extends Controller
 
             if ($chat) {
                 $receivers = $request->input('receivers');
-                if(gettype($receivers) == 'string')
-                $receivers = (array) json_decode($receivers);
+                if (gettype($receivers) == 'string')
+                    $receivers = (array) json_decode($receivers);
                 foreach ($receivers as $receiver) {
                     ChatsReceivers::create([
                         'role_id' => $receiver,
@@ -178,7 +187,7 @@ class ChatsController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating chat data',
@@ -187,14 +196,18 @@ class ChatsController extends Controller
             return response()->json($response, 400);
         }
     }
-    
-    public function endChat($id)
+
+    public function endChat(Request $request, $id)
     {
+        $this->validate($request, [
+            'rating' => 'required'
+        ]);
+
         try {
             $chat = Chats::find($id);
-            if($chat)
-            {
+            if ($chat) {
                 $chat->end_chat = Carbon::now();
+                $chat->rating = $request->input('rating');
                 $chat->save();
 
                 $response = [
@@ -211,45 +224,6 @@ class ChatsController extends Controller
                 'message' => 'chat data not found',
             ];
             return response()->json($response, 404);
-
-
-        } catch (\Exception $e) {
-            $response = [
-                'status' => 400,
-                'message' => 'error occured on updating chat data',
-                'error' => $e->getMessage()
-            ];
-            return response()->json($response, 400);
-        }
-    }
-
-    public function rateChat(Request $request, $id)
-    {
-        $this->validate($request, [
-            'rating' => 'required'
-        ]);
-
-        try {
-            $chat = Chats::find($id);
-            if ($chat) {
-                $chat->rating = $request->input('rating');
-                $chat->save();
-
-                $response = [
-                    'status' => 200,
-                    'message' => 'chat instance has been rated',
-                    'data' => $chat
-                ];
-
-                return response()->json($response, 200);
-            }
-
-            $response = [
-                'status' => 404,
-                'message' => 'chat data not found',
-            ];
-            return response()->json($response, 404);
-
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
@@ -265,14 +239,12 @@ class ChatsController extends Controller
         try {
             DB::beginTransaction();
             $chat = Chats::findOrFail($id);
-            
-            if($chat)
-            {
+
+            if ($chat) {
                 ChatsReceivers::where('room_id', $id)->delete();
             }
 
-            if(!$chat->delete())
-            {
+            if (!$chat->delete()) {
                 $response = [
                     'status' => 404,
                     'message' => 'chat data not found',
@@ -285,7 +257,6 @@ class ChatsController extends Controller
                 'message' => 'chat data has been deleted',
             ];
             return response()->json($response, 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             $response = [
