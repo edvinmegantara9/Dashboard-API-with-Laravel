@@ -40,11 +40,11 @@ class ChatsController extends Controller
                     return $query
                         ->whereHas('room', function ($query) use ($keyword) {
                             return $query
-                            ->where('room_name', 'LIKE', '%' . $keyword . '%');
+                                ->where('room_name', 'LIKE', '%' . $keyword . '%');
                         })
                         ->orWhereHas('room.user', function ($query) use ($keyword) {
                             return $query
-                            ->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                                ->orWhere('name', 'LIKE', '%' . $keyword . '%');
                         });
                 })
                 ->get();
@@ -98,14 +98,23 @@ class ChatsController extends Controller
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('rooms.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->orWhereHas('user', function ($query) use ($keyword) {
+                            return $query
+                                ->where('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room'])->where('role_id', $role_id)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('room_receivers.room.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('room_receivers.room.user.name', 'LIKE', '%' . $keyword . '%');
+                        ->whereHas('room', function ($query) use ($keyword) {
+                            return $query
+                                ->where('room_name', 'LIKE', '%' . $keyword . '%');
+                        })
+                        ->orWhereHas('room.user', function ($query) use ($keyword) {
+                            return $query
+                                ->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })
                 ->get();
 
