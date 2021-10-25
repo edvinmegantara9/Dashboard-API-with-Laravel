@@ -13,13 +13,19 @@ class PublicDocumentController extends Controller
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
+        $type = $request->input('type');
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
+        if ($type == 'null') $type = [];
+
+        if (gettype($type) == 'string') $type = (array) json_decode($type);
+
         try {
 
             $publicDocuments = PublicDocument::orderBy('public_documents.' . $sortby, $sorttype)
+                ->whereIn('type', $type)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('public_documents.title', 'LIKE', '%' . $keyword . '%');
