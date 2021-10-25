@@ -29,9 +29,12 @@ class ChatsController extends Controller
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
         $role_id = $request->input('role_id');
+        $page = $request->input('page');
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
+
+        if ($page == 'null') $page = null;
 
         try {
 
@@ -72,7 +75,7 @@ class ChatsController extends Controller
                 array_push($data, $chat_receiver->room);
             }
 
-            $data = $this->paginate($data, $row);
+            $data = $this->paginate($data, $row, $page);
 
             if ($data) {
                 $response = [
