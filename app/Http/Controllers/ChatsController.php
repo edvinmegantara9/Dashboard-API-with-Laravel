@@ -75,7 +75,8 @@ class ChatsController extends Controller
                 array_push($data, $chat_receiver->room);
             }
 
-            $data = $this->paginate($data, $row, $page);
+            
+            if($data != []) $data = $this->paginate($data, $row, $page);
 
             if ($data) {
                 $response = [
