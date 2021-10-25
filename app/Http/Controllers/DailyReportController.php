@@ -6,46 +6,60 @@ use App\Models\DailyReport;
 use App\Models\Roles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Facades\Excel;
+
+class DailyReportExport implements FromCollection
+{
+    public function collection()
+    {
+        return DailyReport::all();
+    }
+}
 
 class DailyReportController extends Controller
 {
-    public function downloadSummary(){
-
-        Excel::create('Summary Laporan Harian SILAPER' . Carbon::now(), function($excel) {
-
-            $excel->sheet('Sheet1', function($sheet) {
-                $reports = DailyReport::all();
-
-                $arr =array();
-                $counter = 1;
-                foreach($reports as $report) {
-                        $data =  array($counter, 
-                                $report->email, 
-                                $report->name, 
-                                $report->nip, 
-                                $report->position, 
-                                $report->role, 
-                                $report->date, 
-                                $report->$report, 
-                                $report->created_at);
-                        array_push($arr, $data);
-                        $counter++;
-
-                }
-
-                //set the titles
-                $sheet->fromArray($arr,null,'A1',false,false)->prependRow(array(
-                        'No', 'Email', 'Nama', 'NIP', 'Jabatan',
-                        'Bidang', 'Tanggal Laporan', 'Laporan', 'Tanggal dibuat'
-                    )
-
-                );
-
-            });
-
-        })->export('xls');
+    public function downloadSummary() {
+        return Excel::download(new DailyReport, 'Summary Laporan Harian SILAPER' . Carbon::now());
     }
+
+
+    // public function downloadSummary(){
+
+    //     Excel::create('Summary Laporan Harian SILAPER' . Carbon::now(), function($excel) {
+
+    //         $excel->sheet('Sheet1', function($sheet) {
+    //             $reports = DailyReport::all();
+
+    //             $arr =array();
+    //             $counter = 1;
+    //             foreach($reports as $report) {
+    //                     $data =  array($counter, 
+    //                             $report->email, 
+    //                             $report->name, 
+    //                             $report->nip, 
+    //                             $report->position, 
+    //                             $report->role, 
+    //                             $report->date, 
+    //                             $report->$report, 
+    //                             $report->created_at);
+    //                     array_push($arr, $data);
+    //                     $counter++;
+
+    //             }
+
+    //             //set the titles
+    //             $sheet->fromArray($arr,null,'A1',false,false)->prependRow(array(
+    //                     'No', 'Email', 'Nama', 'NIP', 'Jabatan',
+    //                     'Bidang', 'Tanggal Laporan', 'Laporan', 'Tanggal dibuat'
+    //                 )
+
+    //             );
+
+    //         });
+
+    //     })->export('xls');
+    // }
 
     public function get(Request $request)
     {
@@ -64,12 +78,10 @@ class DailyReportController extends Controller
             $role = Roles::find($role_id);
             $is_opd = 1;
             $role_name = "";
-            if($role)
-            {
+            if ($role) {
                 $is_opd = $role->is_opd;
                 $role_name = $role->name;
-            }
-            else {
+            } else {
                 $response = [
                     'status' => 404,
                     'message' => 'role not found, make sure role id is valid',
@@ -79,7 +91,7 @@ class DailyReportController extends Controller
 
 
             $dailyReport = DailyReport::orderBy('daily_reports.' . $sortby, $sorttype)
-                ->when($is_opd && $role->name != 'ADMIN', function($query) use ($role_name) {
+                ->when($is_opd && $role->name != 'ADMIN', function ($query) use ($role_name) {
                     return $query
                         ->where('daily_reports.role', $role_name);
                 })
