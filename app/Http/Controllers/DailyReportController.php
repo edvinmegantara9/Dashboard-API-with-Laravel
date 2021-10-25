@@ -20,7 +20,7 @@ class DailyReportExport implements FromCollection
 class DailyReportController extends Controller
 {
     public function downloadSummary() {
-        return Excel::download(new DailyReport, 'Summary Laporan Harian SILAPER' . Carbon::now());
+        return Excel::download(new DailyReport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
     }
 
 
