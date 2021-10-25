@@ -7,13 +7,23 @@ use App\Models\ChatsReceivers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ChatsController extends Controller
 {
 
+    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
     public function history(Request $request)
     {
-        // $row = $request->input('row');
+        $row = $request->input('row');
         $keyword = $request->input('keyword');
         $sortby = $request->input('sortby');
         $sorttype = $request->input('sorttype');
@@ -60,6 +70,8 @@ class ChatsController extends Controller
                 if (!$room->end_chat) continue;
                 array_push($data, $chat_receiver->room);
             }
+
+            $chat = $this->paginate($chat, $row);
 
             if ($chat) {
                 $response = [
