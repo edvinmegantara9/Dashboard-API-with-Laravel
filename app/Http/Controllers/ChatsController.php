@@ -7,6 +7,7 @@ use App\Models\ChatsReceivers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -71,9 +72,9 @@ class ChatsController extends Controller
                 array_push($data, $chat_receiver->room);
             }
 
-            $chat = $this->paginate($chat, $row);
+            $data = $this->paginate($data, $row);
 
-            if ($chat) {
+            if ($data) {
                 $response = [
                     'status' => 200,
                     'message' => 'chat data has been retrieved',
