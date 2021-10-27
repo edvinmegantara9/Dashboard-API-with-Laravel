@@ -78,7 +78,7 @@ class ChatsController extends Controller
             
             if($data != []) $data = $this->paginate($data, $row, $page);
 
-            if ($data) {
+            if ($chat) {
                 $response = [
                     'status' => 200,
                     'message' => 'chat data has been retrieved',
@@ -87,6 +87,8 @@ class ChatsController extends Controller
 
                 return response()->json($response, 200);
             }
+
+
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
