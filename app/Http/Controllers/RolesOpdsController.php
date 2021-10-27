@@ -31,8 +31,14 @@ class RolesOpdsController extends Controller
             $opds = RolesOpds::with(['role','opd'])->orderBy('roles_opds.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('roles_opds.role.name', 'LIKE', '%' . $keyword . '%')
-                        ->where('roles_opds.opd.name', 'LIKE', '%' . $keyword . '%');
+                        ->whereHas('role', function($query) use ($keyword) {
+                            return $query
+                            ->where('name', 'LIKE', '%' . $keyword . '%');
+                        })
+                        ->orWhereHas('opd', function($query) use ($keyword) {
+                            return $query
+                            ->where('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })
                 ->paginate($row);
                 
