@@ -54,14 +54,18 @@ class AgendasController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'content' => 'required',
-            'agenda_detail' => 'required'
+            'agenda_detail' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required'
         ]);
 
         try {
             DB::beginTransaction();
             $agendas = Agendas::create([
                 'title' => $request->input('title'),
-                'content' => $request->input('content')
+                'content' => $request->input('content'),
+                'start_date' => $request->input('start_date'),
+                'end_date' => $request->input('end_date')
             ]);
 
             if ($agendas) {
@@ -102,7 +106,9 @@ class AgendasController extends Controller
 
         $this->validate($request, [
             'title' => 'required',
-            'content' => 'required'
+            'content' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required'
         ]);
 
         try {
@@ -112,6 +118,9 @@ class AgendasController extends Controller
             if ($agendas) {
                 $agendas->title = $request->input('title');
                 $agendas->content = $request->input('content');
+                $agendas->start_date = $request->input('start_date');
+                $agendas->end_date = $request->input('end_date');
+
                 if ($request->input('agenda_detail')) {
                     AgendaDetails::where('agenda_id', $id)->delete();
                     $agenda_details = $request->input('agenda_detail');
