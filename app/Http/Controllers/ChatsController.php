@@ -71,7 +71,7 @@ class ChatsController extends Controller
 
             foreach ($chat_receivers as $chat_receiver) {
                 $room = $chat_receiver->room;
-                if (!$room->end_chat) continue;
+                if ($room->end_chat == null) continue;
                 array_push($data, $chat_receiver->room);
             }
 
@@ -152,7 +152,7 @@ class ChatsController extends Controller
 
             foreach ($chat_receivers as $chat_receiver) {
                 $room = $chat_receiver->room;
-                if ($room->end_chat) continue;
+                if ($room->end_chat != null) continue;
                 array_push($data, $chat_receiver->room);
             }
 
