@@ -10,4 +10,9 @@ class PublicDocument extends Model
     use SoftDeletes;
 
     protected $guarded = [];
+
+    public function document_type()
+    {
+        return $this->belongsTo(DocumentTypes::class, 'sub_document_type', 'id');
+    }
 }

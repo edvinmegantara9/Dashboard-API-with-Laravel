@@ -24,7 +24,7 @@ class PublicDocumentController extends Controller
 
         try {
 
-            $publicDocuments = PublicDocument::orderBy('public_documents.' . $sortby, $sorttype)
+            $publicDocuments = PublicDocument::with(['document_type'])->orderBy('public_documents.' . $sortby, $sorttype)
                 ->whereIn('document_type', $type)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
@@ -57,14 +57,16 @@ class PublicDocumentController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'file' => 'required',
-            'document_type' => 'required'
+            'document_type' => 'required',
+            'sub_document_type' => 'required'
         ]);
 
         try {
             $publicDocuments = PublicDocument::create([
                 'title' => $request->input('title'),
                 'file' => $request->input('file'),
-                'document_type' => $request->input('document_type')
+                'document_type' => $request->input('document_type'),
+                'sub_document_type' => $request->input('sub_document_type')
             ]);
 
             if ($publicDocuments) {
@@ -91,7 +93,8 @@ class PublicDocumentController extends Controller
         $this->validate($request, [
             'title' => 'required',
             'file' => 'required',
-            'document_type' => 'required'
+            'document_type' => 'required',
+            'sub_document_type' => 'required'
         ]);
 
         try {
@@ -101,6 +104,7 @@ class PublicDocumentController extends Controller
                 $publicDocuments->title = $request->input('title');
                 $publicDocuments->file = $request->input('file');
                 $publicDocuments->document_type = $request->input('document_type');
+                $publicDocuments->sub_document_type = $request->input('sub_document_type');
                 $publicDocuments->save();
 
                 $response = [

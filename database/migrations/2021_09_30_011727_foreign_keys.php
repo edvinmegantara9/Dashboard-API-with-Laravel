@@ -27,6 +27,10 @@ class ForeignKeys extends Migration
             $table->foreignId('document_type')->constrained('document_types')->onDelete('cascade');
         });
 
+        Schema::table('public_documents', function (Blueprint $table) {
+            $table->foreignId('sub_document_type')->constrained('document_types')->onDelete('cascade');
+        });
+
         Schema::table('rooms', function (Blueprint $table) {
             $table->foreignId('created_by')->constrained('roles')->onDelete('cascade');
         });
