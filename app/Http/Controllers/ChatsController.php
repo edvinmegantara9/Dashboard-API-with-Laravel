@@ -54,6 +54,7 @@ class ChatsController extends Controller
                     return $query
                         ->whereHas('room', function ($query) use ($keyword) {
                             return $query
+                                ->whereNotNull('end_chat')
                                 ->where('room_name', 'LIKE', '%' . $keyword . '%');
                         })
                         ->orWhereHas('room.user', function ($query) use ($keyword) {
@@ -71,7 +72,6 @@ class ChatsController extends Controller
 
             foreach ($chat_receivers as $chat_receiver) {
                 $room = $chat_receiver->room;
-                if ($room->end_chat == null) continue;
                 array_push($data, $chat_receiver->room);
             }
 
@@ -131,6 +131,7 @@ class ChatsController extends Controller
                     return $query
                         ->whereHas('room', function ($query) use ($keyword) {
                             return $query
+                                ->whereNull('end_chat')
                                 ->where('room_name', 'LIKE', '%' . $keyword . '%');
                         })
                         ->orWhereHas('room.user', function ($query) use ($keyword) {
