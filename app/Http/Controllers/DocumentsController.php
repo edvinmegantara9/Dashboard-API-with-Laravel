@@ -23,7 +23,7 @@ class DocumentsController extends Controller
             $role = Roles::with(['opd'])->where('id', $role_id)->first();
             $is_opd = $role->is_opd;
             $opdIds = [];
-            if (!$is_opd) {
+            if ($is_opd == 0) {
                 $opds = $role->opd;
                 foreach ($opds as $opd) {
                     array_push($opdIds, $opd->id);
@@ -31,11 +31,11 @@ class DocumentsController extends Controller
             }
 
             $documents = Documents::with(['uploader', 'document_type'])->orderBy('documents.' . $sortby, $sorttype)
-                ->when($is_opd && $role->name != 'ADMIN', function ($query) use ($role_id) {
+                ->when($is_opd == 1 && $role->name != 'ADMIN', function ($query) use ($role_id) {
                     return $query
                         ->where('documents.upload_by', $role_id);
                 })
-                ->when(!$is_opd && $role->name != 'ADMIN', function ($query) use ($opdIds) {
+                ->when($is_opd == 0 && $role->name != 'ADMIN', function ($query) use ($opdIds) {
                     return $query
                         ->whereIn('documents.upload_by', $opdIds);
                 })
