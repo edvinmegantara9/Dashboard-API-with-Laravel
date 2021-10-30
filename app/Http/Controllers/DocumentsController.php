@@ -23,6 +23,9 @@ class DocumentsController extends Controller
 
         try {
             $role = Roles::with(['opd'])->where('id', $role_id)->first();
+
+            dd($role);
+
             $arrayRole = (array) $role;
 
             if($arrayRole.isEmpty())
