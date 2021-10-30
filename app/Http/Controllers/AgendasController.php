@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AgendaDetails;
 use App\Models\Agendas;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,9 +20,11 @@ class AgendasController extends Controller
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
 
+        $currentDate = Carbon::now()->format('Y-m-d');
         try {
 
             $agendas = Agendas::with(['schedules'])->orderBy('agendas.' . $sortby, $sorttype)
+                ->where('agendas.end_date', '>', $currentDate)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('agendas.title', 'LIKE', '%' . $keyword . '%')
