@@ -23,8 +23,9 @@ class DocumentsController extends Controller
 
         try {
             $role = Roles::with(['opd'])->where('id', $role_id)->first();
+            $arrayRole = (array) $role;
 
-            if($role.isEmpty())
+            if($arrayRole.isEmpty())
             {
                 $response = [
                     'status' => 404,
