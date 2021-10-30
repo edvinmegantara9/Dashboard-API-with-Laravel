@@ -6,6 +6,8 @@ use App\Models\Documents;
 use App\Models\Roles;
 use Illuminate\Http\Request;
 
+use function PHPUnit\Framework\isEmpty;
+
 class DocumentsController extends Controller
 {
     public function get(Request $request)
@@ -21,6 +23,17 @@ class DocumentsController extends Controller
 
         try {
             $role = Roles::with(['opd'])->where('id', $role_id)->first();
+
+            if($role.isEmpty())
+            {
+                $response = [
+                    'status' => 404,
+                    'message' => 'documents data not found',
+                ];
+
+                return response()->json($response, 404);
+            }
+
             $is_opd = $role->is_opd;
             $opdIds = [];
             if ($is_opd == 0) {
