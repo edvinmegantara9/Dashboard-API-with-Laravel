@@ -81,12 +81,13 @@ class ChatsController extends Controller
             $items = $data->items();
             $data_fix = json_decode($data->toJson());
             $data_fix->data = array_values($items);
+            $data_fix = json_encode($data_fix);
 
             if ($chat) {
                 $response = [
                     'status' => 200,
                     'message' => 'chat data has been retrieved',
-                    'data' => json_encode($data_fix)
+                    'data' => $data_fix
                 ];
 
                 return response()->json($response, 200);
