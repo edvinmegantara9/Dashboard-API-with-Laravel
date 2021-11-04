@@ -78,7 +78,7 @@ class ChatsController extends Controller
             
             if($data != []) $data = $this->paginate($data, $row, $page);
 
-            $data->data = (array) $data->data;
+            $data = $data->toArray();
 
             if ($chat) {
                 $response = [
