@@ -76,16 +76,17 @@ class ChatsController extends Controller
                 array_push($data, $chat_receiver->room);
             }
 
-            
             if($data != []) $data = $this->paginate($data, $row, $page);
 
-            $data = $data->toArray();
+            $items = $data->items();
+            $data_fix = json_decode($data->toJson());
+            $data_fix->data = array_values($items);
 
             if ($chat) {
                 $response = [
                     'status' => 200,
                     'message' => 'chat data has been retrieved',
-                    'data' => $data
+                    'data' => json_encode($data_fix)
                 ];
 
                 return response()->json($response, 200);
