@@ -81,7 +81,7 @@ class ChatsController extends Controller
             $items = $data->items();
             $data_fix = json_decode($data->toJson());
             $data_fix->data = array_values($items);
-            $data_fix = $data_fix->toJson();
+            
 
             if ($chat) {
                 $response = [
