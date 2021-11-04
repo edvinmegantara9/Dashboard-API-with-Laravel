@@ -19,6 +19,7 @@ class CreateCitizenReportsTable extends Migration
             $table->string("address");
             $table->string("phone_number");
             $table->text("report");
+            $table->string("file");
             $table->timestamps();
         });
     }

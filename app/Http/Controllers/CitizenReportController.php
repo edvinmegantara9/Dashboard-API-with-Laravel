@@ -51,7 +51,8 @@ class CitizenReportController extends Controller
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
-            'report' => 'required'
+            'report' => 'required',
+            'file' => 'required'
         ]);
 
         try {
@@ -60,7 +61,8 @@ class CitizenReportController extends Controller
                 'name' => $request->input('name'),
                 'address' => $request->input('address'),
                 'phone_number' => $request->input('phone_number'),
-                'report' => $request->input('report')
+                'report' => $request->input('report'),
+                'file' => $request->input('file')
             ]);
 
             if ($citizen_reports) {
@@ -100,6 +102,10 @@ class CitizenReportController extends Controller
                 $citizen_reports->address = $request->input('address');
                 $citizen_reports->phone_number = $request->input('phone_number');
                 $citizen_reports->report = $request->input('report');
+                if($request->input('file'))
+                {
+                    $citizen_reports->file = $request->input('file');
+                }
                 $citizen_reports->save();
 
                 $response = [
