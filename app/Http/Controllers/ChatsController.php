@@ -78,6 +78,8 @@ class ChatsController extends Controller
             
             if($data != []) $data = $this->paginate($data, $row, $page);
 
+            $data->data = (array) $data->data;
+
             if ($chat) {
                 $response = [
                     'status' => 200,
