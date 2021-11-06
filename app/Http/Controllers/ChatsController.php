@@ -173,7 +173,7 @@ class ChatsController extends Controller
             $key = false;
 
             foreach ($chat as $chat_sender) {
-                if (!$data.isEmpty())
+                if (count($data) > 0)
                     foreach ($data as $_data) {
                         $key = $chat->id == $_data['id'];
                         if ($key)
@@ -187,7 +187,7 @@ class ChatsController extends Controller
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                if (!$data.isEmpty())
+                if (count($data) > 0)
                     foreach ($data as $_data) {
                         $key = $chat->id == $_data['id'];
                         if ($key)
