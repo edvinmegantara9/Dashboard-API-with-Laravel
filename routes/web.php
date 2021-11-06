@@ -95,6 +95,7 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
     $router->group(['prefix' => 'daily_report'], function () use ($router) {
         $router->get('', 'DailyReportController@get');
         $router->get('download', 'DailyReportController@downloadSummary');
+        $router->get('get_by_date', 'DailyReportController@getByDate');
         $router->post('', 'DailyReportController@create');
         $router->put('update/{id}', 'DailyReportController@update');
         $router->delete('delete/{id}', 'DailyReportController@delete');

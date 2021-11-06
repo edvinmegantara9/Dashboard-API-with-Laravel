@@ -19,9 +19,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class DailyReportController extends Controller
 {
-    public function downloadSummary() {
-        return Excel::download(new DailyReportExport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
-    }
+    // public function downloadSummary() {
+    //     return Excel::download(new DailyReportExport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
+    // }
 
 
     // public function downloadSummary(){
@@ -60,6 +60,46 @@ class DailyReportController extends Controller
 
     //     })->export('xls');
     // }
+
+    public function getByDate(Request $request)
+    {
+        $this->validate($request, [
+            'date' => 'required'
+        ]);
+
+        try {
+            $date = $request->input('date');
+
+            $dailyReport = DailyReport::where('date', $date)->get();
+
+            if($dailyReport)
+            {
+                $response = [
+                    'status' => 200,
+                    'message' => 'daily report has been retrieved',
+                    'data' => $dailyReport
+                ];
+
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'daily report data not found',
+            ];
+
+            return response()->json($response, 404);
+
+
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving daily report',
+            ];
+
+            return response()->json($response, 400);
+        }
+    }
 
     public function get(Request $request)
     {
