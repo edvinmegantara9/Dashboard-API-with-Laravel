@@ -9,19 +9,19 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Facades\Excel;
 
-class DailyReportExport implements FromCollection
-{
-    public function collection()
-    {
-        return DailyReport::all();
-    }
-}
+// class DailyReportExport implements FromCollection
+// {
+//     public function collection()
+//     {
+//         return DailyReport::all();
+//     }
+// }
 
 class DailyReportController extends Controller
 {
-    public function downloadSummary() {
-        return Excel::download(new DailyReport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
-    }
+    // public function downloadSummary() {
+    //     return Excel::download(new DailyReport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
+    // }
 
 
     // public function downloadSummary(){
