@@ -173,8 +173,8 @@ class ChatsController extends Controller
             foreach ($chat as $chat_sender) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $obj = (object) $_data;
-                        $key = $chat->id == $obj->id;
+                        dd($_data);
+                        $key = $chat->id == $_data->id;
                         if ($key)
                             break;
                     }
@@ -188,7 +188,6 @@ class ChatsController extends Controller
             foreach ($chat_receivers as $chat_receiver) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $obj = (object) $_data;
                         $key = $chat->id == $obj->id;
                         if ($key)
                             break;
