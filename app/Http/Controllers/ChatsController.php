@@ -165,7 +165,7 @@ class ChatsController extends Controller
                                 ->orWhere('name', 'LIKE', '%' . $keyword . '%');
                         });
                 })
-                ->get();
+                ->get->values();
 
             $data = [];
             $key = false;
@@ -173,13 +173,12 @@ class ChatsController extends Controller
             foreach ($chat as $chat_sender) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        dd($data);
-                        $key = $chat->id == $_data->id;
+                        $key = $chat->id == $_data['id'];
                         if ($key)
                             break;
                     }
                         if(!$key)
-                            array_push($data, $chat_sender);
+                            array_push($data, (array) $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
@@ -188,7 +187,7 @@ class ChatsController extends Controller
             foreach ($chat_receivers as $chat_receiver) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $key = $chat->id == $_data->id;
+                        $key = $chat->id == $_data['id'];
                         if ($key)
                             break;
                     }
