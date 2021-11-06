@@ -6,8 +6,6 @@ use App\Models\Documents;
 use App\Models\Roles;
 use Illuminate\Http\Request;
 
-use function PHPUnit\Framework\isEmpty;
-
 class DocumentsController extends Controller
 {
     public function get(Request $request)
