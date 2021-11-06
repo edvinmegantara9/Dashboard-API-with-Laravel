@@ -68,12 +68,15 @@ class ChatsController extends Controller
             $data = [];
 
             foreach ($chat as $chat_sender) {
-                array_push($data, $chat_sender);
+                $key = array_search($chat->id, array_column($data, 'id'));
+                if(!$key)
+                    array_push($data, $chat_sender);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                $room = $chat_receiver->room;
-                array_push($data, $chat_receiver->room);
+                $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
+                if(!$key)
+                    array_push($data, $chat_receiver->room);
             }
 
             if($data != []) $data = $this->paginate($data, $row, $page);
@@ -153,13 +156,15 @@ class ChatsController extends Controller
             $data = [];
 
             foreach ($chat as $chat_sender) {
-                array_push($data, $chat_sender);
+                $key = array_search($chat->id, array_column($data, 'id'));
+                if(!$key)
+                    array_push($data, $chat_sender);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                $room = $chat_receiver->room;
-                if ($room->end_chat != null) continue;
-                array_push($data, $chat_receiver->room);
+                $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
+                if(!$key)
+                    array_push($data, $chat_receiver->room);
             }
 
             if ($chat) {
