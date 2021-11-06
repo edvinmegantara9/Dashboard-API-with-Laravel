@@ -68,14 +68,20 @@ class ChatsController extends Controller
             $data = [];
 
             foreach ($chat as $chat_sender) {
-                $key = array_search($chat->id, array_column($data, 'id'));
-                if(!$key)
+                if($data != [])
+                    $key = array_search($chat->id, array_column($data, 'id'));
+                    if(!$key)
+                        array_push($data, $chat_sender);
+                else
                     array_push($data, $chat_sender);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
-                if(!$key)
+                if($data != [])
+                    $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
+                    if(!$key)
+                        array_push($data, $chat_receiver->room);
+                else
                     array_push($data, $chat_receiver->room);
             }
 
@@ -156,14 +162,20 @@ class ChatsController extends Controller
             $data = [];
 
             foreach ($chat as $chat_sender) {
-                $key = array_search($chat->id, array_column($data, 'id'));
-                if(!$key)
+                if($data != [])
+                    $key = array_search($chat->id, array_column($data, 'id'));
+                    if(!$key)
+                        array_push($data, $chat_sender);
+                else
                     array_push($data, $chat_sender);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
-                if(!$key)
+                if($data != [])
+                    $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
+                    if(!$key)
+                        array_push($data, $chat_receiver->room);
+                else
                     array_push($data, $chat_receiver->room);
             }
 
