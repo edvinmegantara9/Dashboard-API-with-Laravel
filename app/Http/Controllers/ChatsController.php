@@ -74,6 +74,7 @@ class ChatsController extends Controller
                         array_push($data, $chat_sender);
                 else
                     array_push($data, $chat_sender);
+                    dd($data);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
@@ -83,6 +84,7 @@ class ChatsController extends Controller
                         array_push($data, $chat_receiver->room);
                 else
                     array_push($data, $chat_receiver->room);
+                    dd($data);
             }
 
             if($data != []) $data = $this->paginate($data, $row, $page);
