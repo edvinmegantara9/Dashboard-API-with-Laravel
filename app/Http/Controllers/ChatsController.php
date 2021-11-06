@@ -173,7 +173,7 @@ class ChatsController extends Controller
             foreach ($chat as $chat_sender) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        (array_values($data));
+                        dd(array_values($data));
                         $key = $chat->id == $_data->id;
                         if ($key)
                             break;
