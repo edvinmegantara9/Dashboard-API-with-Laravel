@@ -39,7 +39,7 @@ class ChatsController extends Controller
 
         try {
 
-            $chat = Chats::with(['receivers', 'user'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
+            $chat = Chats::with(['receivers', 'user', 'room_receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
                 ->whereNotNull('end_chat')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
@@ -50,7 +50,7 @@ class ChatsController extends Controller
                     // });
                 })->get();
 
-            $chat_receivers = ChatsReceivers::with(['room.user'])->where('role_id', $role_id)
+            $chat_receivers = ChatsReceivers::with(['room.user', 'room.room_receivers'])->where('role_id', $role_id)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->whereHas('room', function ($query) use ($keyword) {
@@ -134,7 +134,7 @@ class ChatsController extends Controller
 
         try {
 
-            $chat = Chats::with(['receivers', 'user'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
+            $chat = Chats::with(['receivers', 'user', 'room_receivers'])->where('created_by', $role_id)->orderBy('rooms.' . $sortby, $sorttype)
                 // ->whereNull('end_chat')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
@@ -145,7 +145,7 @@ class ChatsController extends Controller
                         });
                 })->get();
 
-            $chat_receivers = ChatsReceivers::with(['room', 'room.user', 'room.receivers'])->where('role_id', $role_id)
+            $chat_receivers = ChatsReceivers::with(['room', 'room.user', 'room.receivers', 'room.room_receivers'])->where('role_id', $role_id)
                 ->whereNull('rating')
                 // ->whereHas('room', function ($query) {
                 //     return $query->whereNull('end_chat');
