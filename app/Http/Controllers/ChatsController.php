@@ -188,7 +188,7 @@ class ChatsController extends Controller
             foreach ($chat_receivers as $chat_receiver) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $key = $chat->id == $obj->id;
+                        $key = $chat->id == $_data->id;
                         if ($key)
                             break;
                     }
