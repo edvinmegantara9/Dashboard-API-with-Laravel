@@ -181,7 +181,7 @@ class ChatsController extends Controller
                             break;
                     }
                         if(!$key)
-                            array_push($data, (array) $chat_sender);
+                            array_push($data, $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
