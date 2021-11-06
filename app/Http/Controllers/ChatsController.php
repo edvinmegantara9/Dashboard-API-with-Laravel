@@ -174,14 +174,14 @@ class ChatsController extends Controller
 
             foreach ($chat as $chat_sender) {
                 if (count($data) > 0)
-                    return $data;
-                    // foreach ($data as $_data) {
-                    //     $key = $chat->id == json_encode($_data)['id'];
-                    //     if ($key)
-                    //         break;
-                    // }
-                    //     if(!$key)
-                    //         array_push($data, $chat_sender);
+                    foreach ($data as $_data) {
+                        $key = $chat->id == $_data->id;
+                        return $key;
+                        if ($key)
+                            break;
+                    }
+                        if(!$key)
+                            array_push($data, $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
