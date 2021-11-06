@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DailyReportExport;
 use App\Models\DailyReport;
 use App\Models\Roles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Facades\Excel;
 
 // class DailyReportExport implements FromCollection
@@ -19,9 +19,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class DailyReportController extends Controller
 {
-    // public function downloadSummary() {
-    //     return Excel::download(new DailyReport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
-    // }
+    public function downloadSummary() {
+        return Excel::download(new DailyReportExport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
+    }
 
 
     // public function downloadSummary(){
