@@ -44,10 +44,10 @@ class ChatsController extends Controller
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%');
-                        // ->orWhereHas('user', function ($query) use ($keyword) {
-                        //     return $query
-                        //         ->where('name', 'LIKE', '%' . $keyword . '%');
-                        // });
+                    // ->orWhereHas('user', function ($query) use ($keyword) {
+                    //     return $query
+                    //         ->where('name', 'LIKE', '%' . $keyword . '%');
+                    // });
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room.user'])->where('role_id', $role_id)
@@ -58,39 +58,45 @@ class ChatsController extends Controller
                                 ->whereNotNull('end_chat')
                                 ->where('room_name', 'LIKE', '%' . $keyword . '%');
                         });
-                        // ->orWhereHas('room.user', function ($query) use ($keyword) {
-                        //     return $query
-                        //         ->orWhere('name', 'LIKE', '%' . $keyword . '%');
-                        // });
+                    // ->orWhereHas('room.user', function ($query) use ($keyword) {
+                    //     return $query
+                    //         ->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                    // });
                 })
                 ->get();
 
             $data = [];
             $key = false;
+
             foreach ($chat as $chat_sender) {
-                if($data != [])
-                    $key = array_search($chat->id, array_column($data, 'id'));
-                    if(!$key)
-                        array_push($data, $chat_sender);
+                if ($data != [])
+                    foreach ($data as $_data) {
+                        $key = array_search($chat->id, array_column($_data, 'id'));
+                        if (!$key)
+                            array_push($data, $chat_sender);
+                    }
+
                 else
                     array_push($data, $chat_sender);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                if($data != [])
-                    $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
-                    if(!$key)
-                        array_push($data, $chat_receiver->room);
+                if ($data != [])
+                    foreach ($data as $_data) {
+                        $key = array_search($chat->id, array_column($_data, 'id'));
+                        if (!$key)
+                            array_push($data, $chat_receiver->room);
+                    }
                 else
                     array_push($data, $chat_receiver->room);
             }
 
-            if($data != []) $data = $this->paginate($data, $row, $page);
+            if ($data != []) $data = $this->paginate($data, $row, $page);
 
             $items = $data->items();
             $data_fix = json_decode($data->toJson());
             $data_fix->data = array_values($items);
-            
+
 
             if ($chat) {
                 $response = [
@@ -101,8 +107,6 @@ class ChatsController extends Controller
 
                 return response()->json($response, 200);
             }
-
-
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
@@ -138,7 +142,7 @@ class ChatsController extends Controller
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room', 'room.user', 'room.receivers'])->where('role_id', $role_id)
-                ->whereHas('room', function ($query){
+                ->whereHas('room', function ($query) {
                     return $query->whereNull('end_chat');
                 })
                 ->when($keyword, function ($query) use ($keyword) {
@@ -163,23 +167,27 @@ class ChatsController extends Controller
             $key = false;
 
             foreach ($chat as $chat_sender) {
-                // if($data != [])
-                //     $key = array_search($chat->id, array_column($data, 'id'));
-                //     if(!$key)
-                        array_push($data, $chat_sender);
-                // else
-                //     array_push($data, $chat_sender);
+                if ($data != [])
+                    foreach ($data as $_data) {
+                        $key = array_search($chat->id, array_column($_data, 'id'));
+                        if (!$key)
+                            array_push($data, $chat_sender);
+                    }
+
+                else
+                    array_push($data, $chat_sender);
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                // if($data != [])
-                //     $key = array_search($chat_receiver->room->id, array_column($data, 'id'));
-                //     if(!$key)
-                        array_push($data, $chat_receiver->room);
-                // else
-                //     array_push($data, $chat_receiver->room);
+                if ($data != [])
+                    foreach ($data as $_data) {
+                        $key = array_search($chat->id, array_column($_data, 'id'));
+                        if (!$key)
+                            array_push($data, $chat_receiver->room);
+                    }
+                else
+                    array_push($data, $chat_receiver->room);
             }
-            dd($data);
 
             if ($chat) {
                 $response = [
@@ -270,8 +278,7 @@ class ChatsController extends Controller
         try {
             $receiver = ChatsReceivers::where('role_id', $role_id)->where('room_id', $id)->first();
 
-            if($receiver)
-            {
+            if ($receiver) {
                 $receiver->rating = $rating;
                 $receiver->save();
 
@@ -289,7 +296,6 @@ class ChatsController extends Controller
                 'message' => 'chat data not found',
             ];
             return response()->json($response, 404);
-
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
