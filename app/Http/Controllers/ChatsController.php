@@ -43,11 +43,11 @@ class ChatsController extends Controller
                 ->whereNotNull('end_chat')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhereHas('user', function ($query) use ($keyword) {
-                            return $query
-                                ->where('name', 'LIKE', '%' . $keyword . '%');
-                        });
+                        ->where('rooms.room_name', 'LIKE', '%' . $keyword . '%');
+                        // ->orWhereHas('user', function ($query) use ($keyword) {
+                        //     return $query
+                        //         ->where('name', 'LIKE', '%' . $keyword . '%');
+                        // });
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room.user'])->where('role_id', $role_id)
@@ -57,11 +57,11 @@ class ChatsController extends Controller
                             return $query
                                 ->whereNotNull('end_chat')
                                 ->where('room_name', 'LIKE', '%' . $keyword . '%');
-                        })
-                        ->orWhereHas('room.user', function ($query) use ($keyword) {
-                            return $query
-                                ->orWhere('name', 'LIKE', '%' . $keyword . '%');
                         });
+                        // ->orWhereHas('room.user', function ($query) use ($keyword) {
+                        //     return $query
+                        //         ->orWhere('name', 'LIKE', '%' . $keyword . '%');
+                        // });
                 })
                 ->get();
 
