@@ -12,6 +12,8 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ChatsController extends Controller
 {
 
@@ -171,7 +173,7 @@ class ChatsController extends Controller
             $key = false;
 
             foreach ($chat as $chat_sender) {
-                if ($data != [])
+                if (!$data.isEmpty())
                     foreach ($data as $_data) {
                         $key = $chat->id == $_data['id'];
                         if ($key)
@@ -185,7 +187,7 @@ class ChatsController extends Controller
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                if ($data != [])
+                if (!$data.isEmpty())
                     foreach ($data as $_data) {
                         $key = $chat->id == $_data['id'];
                         if ($key)
