@@ -146,14 +146,14 @@ class ChatsController extends Controller
                 })->get();
 
             $chat_receivers = ChatsReceivers::with(['room', 'room.user', 'room.receivers'])->where('role_id', $role_id)
-                ->whereHas('room', function ($query) {
-                    return $query->whereNull('end_chat');
-                })
+                // ->whereHas('room', function ($query) {
+                //     return $query->whereNull('end_chat');
+                // })
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->whereHas('room', function ($query) use ($keyword) {
                             return $query
-                                ->whereNull('end_chat')
+                                // ->whereNull('end_chat')
                                 ->where('room_name', 'LIKE', '%' . $keyword . '%');
                         })
                         ->orWhereHas('room.user', function ($query) use ($keyword) {
