@@ -165,7 +165,7 @@ class ChatsController extends Controller
                                 ->orWhere('name', 'LIKE', '%' . $keyword . '%');
                         });
                 })
-                ->get->values();
+                ->get();
 
             $data = [];
             $key = false;
