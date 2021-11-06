@@ -63,9 +63,6 @@ class DailyReportController extends Controller
 
     public function getByDate(Request $request)
     {
-        $this->validate($request, [
-            'date' => 'required'
-        ]);
 
         try {
             $date = $request->input('date');
