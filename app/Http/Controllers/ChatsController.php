@@ -175,8 +175,7 @@ class ChatsController extends Controller
             foreach ($chat as $chat_sender) {
                 if (count($data) > 0)
                     foreach ($data as $_data) {
-                        $key = $chat->id == $_data->id;
-                        return $key;
+                        return $_data;
                         if ($key)
                             break;
                     }
