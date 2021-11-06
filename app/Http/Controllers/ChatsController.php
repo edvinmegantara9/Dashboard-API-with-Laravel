@@ -69,9 +69,9 @@ class ChatsController extends Controller
             $key = false;
 
             foreach ($chat as $chat_sender) {
-                if ($data != [])
+                if (count($data) > 0)
                     foreach ($data as $_data) {
-                        $key = $chat->id == $_data->id;
+                        $key = $chat_sender['id'] == $_data['id'];
                         if ($key)
                             break;
                     }
@@ -83,9 +83,9 @@ class ChatsController extends Controller
             }
 
             foreach ($chat_receivers as $chat_receiver) {
-                if ($data != [])
+                if (count($data) > 0)
                     foreach ($data as $_data) {
-                        $key = $chat->id == $_data->id;
+                        $key = $chat_receiver->room['id'] == $_data['id'];
                         if ($key)
                             break;
                     }
