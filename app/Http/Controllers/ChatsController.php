@@ -71,11 +71,12 @@ class ChatsController extends Controller
             foreach ($chat as $chat_sender) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        dd($_data);
-                        $key = array_search($chat->id, array_column($_data, 'id'));
-                        if (!$key)
-                            array_push($data, $chat_sender);
+                        $key = $chat->id == $_data->id;
+                        if ($key)
+                            break;
                     }
+                        if(!$key)
+                            array_push($data, $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
@@ -84,10 +85,12 @@ class ChatsController extends Controller
             foreach ($chat_receivers as $chat_receiver) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $key = array_search($chat->id, array_column($_data, 'id'));
-                        if (!$key)
-                            array_push($data, $chat_receiver->room);
+                        $key = $chat->id == $_data->id;
+                        if ($key)
+                            break;
                     }
+                    if (!$key)
+                            array_push($data, $chat_receiver->room);
                 else
                     array_push($data, $chat_receiver->room);
             }
@@ -170,10 +173,12 @@ class ChatsController extends Controller
             foreach ($chat as $chat_sender) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $key = array_search($chat->id, array_column($_data, 'id'));
-                        if (!$key)
-                            array_push($data, $chat_sender);
+                        $key = $chat->id == $_data->id;
+                        if ($key)
+                            break;
                     }
+                        if(!$key)
+                            array_push($data, $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
@@ -182,10 +187,12 @@ class ChatsController extends Controller
             foreach ($chat_receivers as $chat_receiver) {
                 if ($data != [])
                     foreach ($data as $_data) {
-                        $key = array_search($chat->id, array_column($_data, 'id'));
-                        if (!$key)
-                            array_push($data, $chat_receiver->room);
+                        $key = $chat->id == $_data->id;
+                        if ($key)
+                            break;
                     }
+                    if (!$key)
+                            array_push($data, $chat_receiver->room);
                 else
                     array_push($data, $chat_receiver->room);
             }
