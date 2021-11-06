@@ -66,7 +66,7 @@ class ChatsController extends Controller
                 ->get();
 
             $data = [];
-
+            $key = false;
             foreach ($chat as $chat_sender) {
                 if($data != [])
                     $key = array_search($chat->id, array_column($data, 'id'));
@@ -160,6 +160,7 @@ class ChatsController extends Controller
                 ->get();
 
             $data = [];
+            $key = false;
 
             foreach ($chat as $chat_sender) {
                 if($data != [])
