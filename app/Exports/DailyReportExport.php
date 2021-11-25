@@ -3,8 +3,9 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class DailyReportExport implements FromCollection
+class DailyReportExport implements FromCollection, WithHeadings
 {
 
     protected $dailyreport;
