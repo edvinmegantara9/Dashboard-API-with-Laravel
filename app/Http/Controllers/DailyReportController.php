@@ -20,9 +20,11 @@ use Maatwebsite\Excel\Facades\Excel;
 class DailyReportController extends Controller
 {
 
-    public function downloadSummary()
+    public function downloadSummary(Request $request)
     {
-        $dailyReport = DailyReport::where('date', Carbon::now()->toDateString())->get();
+        $firstdate = $request->input('firstdate');
+        $lastdate = $request->input('lastdate');
+        $dailyReport = DailyReport::where('date','>=', DATE($firstdate))->where('date','<=', DATE($lastdate))->get();
         Excel::store(new DailyReportExport($dailyReport), 'daily_report.xlsx');
         return response()->download(storage_path("app/daily_report.xlsx"), "daily_report.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
     }
