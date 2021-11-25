@@ -16,7 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 //         return DailyReport::all();
 //     }
 // }
-
+// fix excel lib
 class DailyReportController extends Controller
 {
 
