@@ -19,47 +19,13 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class DailyReportController extends Controller
 {
-    // public function downloadSummary() {
-    //     return Excel::download(new DailyReportExport, 'Summary Laporan Harian SILAPER ' . Carbon::now() . '.xlsx');
-    // }
 
-
-    // public function downloadSummary(){
-
-    //     Excel::create('Summary Laporan Harian SILAPER' . Carbon::now(), function($excel) {
-
-    //         $excel->sheet('Sheet1', function($sheet) {
-    //             $reports = DailyReport::all();
-
-    //             $arr =array();
-    //             $counter = 1;
-    //             foreach($reports as $report) {
-    //                     $data =  array($counter, 
-    //                             $report->email, 
-    //                             $report->name, 
-    //                             $report->nip, 
-    //                             $report->position, 
-    //                             $report->role, 
-    //                             $report->date, 
-    //                             $report->$report, 
-    //                             $report->created_at);
-    //                     array_push($arr, $data);
-    //                     $counter++;
-
-    //             }
-
-    //             //set the titles
-    //             $sheet->fromArray($arr,null,'A1',false,false)->prependRow(array(
-    //                     'No', 'Email', 'Nama', 'NIP', 'Jabatan',
-    //                     'Bidang', 'Tanggal Laporan', 'Laporan', 'Tanggal dibuat'
-    //                 )
-
-    //             );
-
-    //         });
-
-    //     })->export('xls');
-    // }
+    public function downloadSummary()
+    {
+        $dailyReport = DailyReport::where('date', Carbon::now()->toDateString())->get();
+        Excel::store(new DailyReportExport($dailyReport), 'daily_report.xlsx');
+        return response()->download(storage_path("app/daily_report.xlsx"), "daily_report.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+    }
 
     public function getByDate(Request $request)
     {
@@ -69,8 +35,7 @@ class DailyReportController extends Controller
 
             $dailyReport = DailyReport::where('date', $date)->get();
 
-            if($dailyReport)
-            {
+            if ($dailyReport) {
                 $response = [
                     'status' => 200,
                     'message' => 'daily report has been retrieved',
@@ -86,8 +51,6 @@ class DailyReportController extends Controller
             ];
 
             return response()->json($response, 404);
-
-
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
