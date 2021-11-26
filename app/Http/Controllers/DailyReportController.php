@@ -39,9 +39,10 @@ class DailyReportController extends Controller
     {
 
         try {
-            $date = $request->input('date');
+            $firstdate = $request->input('firstdate');
+            $lastdate = $request->input('lastdate');
 
-            $dailyReport = DailyReport::where('date', $date)->get();
+            $dailyReport = DailyReport::where('date', '>=' , DATE($firstdate))->where('date', '<=' , DATE($lastdate))->get();
 
             if ($dailyReport) {
                 $response = [
