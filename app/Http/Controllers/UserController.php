@@ -15,6 +15,8 @@ class UserController extends Controller
         $this->middleware('auth:api');
     }
 
+    
+
     public function get(Request $request)
     {
         $row = $request->input('row');
@@ -66,7 +68,7 @@ class UserController extends Controller
             $users = Users::find($id);
             if($users)
             {
-                $users->password = app('mash')->make($request->input('password'));
+                $users->password = app('hash')->make($request->input('password'));
                 $users->save();
 
                 $response = [
