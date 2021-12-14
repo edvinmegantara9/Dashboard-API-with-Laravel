@@ -17,7 +17,7 @@ class CreateGalleriesTable extends Migration
             $table->id();
             $table->string('title');
             $table->longText('description')->nullable();
-            $table->string('file');
+            $table->longText('file');
             $table->timestamps();
         });
     }

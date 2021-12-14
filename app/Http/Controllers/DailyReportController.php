@@ -31,6 +31,9 @@ class DailyReportController extends Controller
         'role',
         'date',
         'report')->where('date','>=', DATE($firstdate))->where('date','<=', DATE($lastdate))->get();
+        foreach ($dailyReport as $report) {
+            $report->nip = "`" . $report->nip;
+        }
         Excel::store(new DailyReportExport($dailyReport), 'daily_report.xlsx');
         return response()->download(storage_path("app/daily_report.xlsx"), "daily_report.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
     }
@@ -42,7 +45,7 @@ class DailyReportController extends Controller
             $firstdate = $request->input('firstdate');
             $lastdate = $request->input('lastdate');
 
-            $dailyReport = DailyReport::where('date', '>=' , DATE($firstdate))->where('date', '<=' , DATE($lastdate))->get();
+            $dailyReport = DailyReport::with("user")->where('date', '>=' , DATE($firstdate))->where('date', '<=' , DATE($lastdate))->get();
 
             if ($dailyReport) {
                 $response = [
