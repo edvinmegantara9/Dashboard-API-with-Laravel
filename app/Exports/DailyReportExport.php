@@ -6,7 +6,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class DailyReportExport implements FromCollection, WithHeadings, WithColumnFormatting
 {
@@ -21,7 +21,7 @@ class DailyReportExport implements FromCollection, WithHeadings, WithColumnForma
     public function columnFormats(): array
     {
         return [
-            'C' => "@"
+            'C' => NumberFormat::FORMAT_TEXT
         ];
     }
 
