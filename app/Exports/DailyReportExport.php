@@ -3,9 +3,12 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
 
-class DailyReportExport implements FromCollection, WithHeadings
+class DailyReportExport implements FromCollection, WithHeadings, WithColumnFormatting
 {
 
     protected $dailyreport;
@@ -13,6 +16,13 @@ class DailyReportExport implements FromCollection, WithHeadings
     public function __construct($dailyreport_)
     {
         $this->dailyreport = $dailyreport_;
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'C' => DataType::TYPE_STRING
+        ];
     }
 
     public function headings(): array
