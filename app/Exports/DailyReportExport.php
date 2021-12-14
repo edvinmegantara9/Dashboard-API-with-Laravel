@@ -21,7 +21,7 @@ class DailyReportExport implements FromCollection, WithHeadings, WithColumnForma
     public function columnFormats(): array
     {
         return [
-            'C' => DataType::TYPE_STRING
+            'C' => "@"
         ];
     }
 

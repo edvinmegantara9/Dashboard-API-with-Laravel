@@ -8,6 +8,8 @@ use App\Models\Roles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat\NumberFormatter;
 
 // class DailyReportExport implements FromCollection
 // {
@@ -24,16 +26,16 @@ class DailyReportController extends Controller
     {
         $firstdate = $request->input('firstdate');
         $lastdate = $request->input('lastdate');
-        $dailyReport = DailyReport::select('email',
-        'name',
-        'nip',
-        'position',
-        'role',
-        'date',
-        'report')->where('date','>=', DATE($firstdate))->where('date','<=', DATE($lastdate))->get();
-        foreach ($dailyReport as $report) {
-            $report->nip = "". $report->nip . "";
-        }
+        $dailyReport = DailyReport::select(
+            'email',
+            'name',
+            'nip',
+            'position',
+            'role',
+            'date',
+            'report'
+        )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
+
         Excel::store(new DailyReportExport($dailyReport), 'daily_report.xlsx');
         return response()->download(storage_path("app/daily_report.xlsx"), "daily_report.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
     }
@@ -45,7 +47,7 @@ class DailyReportController extends Controller
             $firstdate = $request->input('firstdate');
             $lastdate = $request->input('lastdate');
 
-            $dailyReport = DailyReport::with("user")->where('date', '>=' , DATE($firstdate))->where('date', '<=' , DATE($lastdate))->get();
+            $dailyReport = DailyReport::with("user")->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
 
             if ($dailyReport) {
                 $response = [
