@@ -28,7 +28,11 @@ class PublicDocumentController extends Controller
                 ->whereIn('document_type', $type)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('public_documents.title', 'LIKE', '%' . $keyword . '%');
+                        ->where('public_documents.title', 'LIKE', '%' . $keyword . '%')
+                        ->orWhereHas('document_type', function ($query) use ($keyword) {
+                            return $query
+                            ->where('name', 'LIKE', '%' . $keyword . '%');
+                        });
                 })
                 ->paginate($row);
 
