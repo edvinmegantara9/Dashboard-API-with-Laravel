@@ -99,7 +99,8 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            // 'nip' => 'required|string|unique:users',
+            // 'nip' => 'required|string|unique:users',,
+            'email' => 'required',
             'full_name' => 'required',
             'position' => 'required',
             'group' => 'required',
@@ -114,6 +115,7 @@ class UserController extends Controller
                 $users->position = $request->input('position');
                 $users->full_name = $request->input('full_name');
                 $users->group    = $request->input('group');
+                $users->email = $request->input('email');
                 $users->role_id  = $request->input('role_id');
                 $users->save();
 
