@@ -120,6 +120,6 @@ class AuthController extends BaseController
      */	 	
     public function me()
     {
-        return response()->json(auth()->user());
+        return response()->json(auth()->user()->with('role'));
     }
 }
