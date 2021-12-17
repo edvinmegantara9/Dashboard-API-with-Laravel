@@ -119,7 +119,8 @@ class AuthController extends BaseController
      * @return Response
      */	 	
     public function me()
-    {
-        return response()->json(auth()->user()->with('role'));
+    {   
+        $user = User::find(Auth::id)->with('role');
+        return response()->json($user);
     }
 }
