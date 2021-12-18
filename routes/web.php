@@ -45,6 +45,7 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->get('', 'UserController@get');
         $router->put('update/{id}', 'UserController@update');
+        $router->put('change-password/{id}', 'UserController@changepassword');
         $router->delete('delete/{id}', 'UserController@delete');
     });
 

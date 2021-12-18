@@ -15,6 +15,8 @@ class UserController extends Controller
         $this->middleware('auth:api');
     }
 
+    
+
     public function get(Request $request)
     {
         $row = $request->input('row');
@@ -66,7 +68,7 @@ class UserController extends Controller
             $users = Users::find($id);
             if($users)
             {
-                $users->password = app('mash')->make($request->input('password'));
+                $users->password = app('hash')->make($request->input('password'));
                 $users->save();
 
                 $response = [
@@ -97,7 +99,8 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            // 'nip' => 'required|string|unique:users',
+            // 'nip' => 'required|string|unique:users',,
+            'email' => 'required',
             'full_name' => 'required',
             'position' => 'required',
             'group' => 'required',
@@ -112,6 +115,7 @@ class UserController extends Controller
                 $users->position = $request->input('position');
                 $users->full_name = $request->input('full_name');
                 $users->group    = $request->input('group');
+                $users->email = $request->input('email');
                 $users->role_id  = $request->input('role_id');
                 $users->save();
 
