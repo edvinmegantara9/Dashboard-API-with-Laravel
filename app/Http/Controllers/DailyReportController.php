@@ -28,7 +28,7 @@ class DailyReportController extends Controller
         $lastdate = $request->input('lastdate');
         // $reports = DailyReport::with('user')->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
         $dailyReport = DailyReport::select(
-            'email',
+            'created_at',
             'name',
             'nip',
             'position',
