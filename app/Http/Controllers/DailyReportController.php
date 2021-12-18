@@ -24,7 +24,7 @@ class DailyReportController extends Controller
     {
         $firstdate = $request->input('firstdate');
         $lastdate = $request->input('lastdate');
-        $dailyReport = DailyReport::select('email',
+        $dailyReport = DailyReport::select('created_at',
         'name',
         'nip',
         'position',
