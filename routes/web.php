@@ -56,10 +56,10 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
     });
 
     $router->group(['prefix' => 'message_receivers'], function () use ($router) {
-        $router->get('', 'MessageReceivers@get');
-        $router->put('update/{id}', 'MessageReceivers@update');
-        $router->delete('delete/{id}', 'MessageReceivers@delete');
-        $router->put('read_message', 'MessageReceivers@read_message');
+        $router->get('', 'MessageReceiversController@get');
+        $router->put('update/{id}', 'MessageReceiversController@update');
+        $router->delete('delete/{id}', 'MessageReceiversController@delete');
+        $router->put('read_message', 'MessageReceiversController@read_message');
     });
 
     $router->group(['prefix' => 'message'], function () use ($router) {
