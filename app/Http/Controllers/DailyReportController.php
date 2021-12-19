@@ -37,6 +37,10 @@ class DailyReportController extends Controller
             // 'date',
             // 'report'
         // )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
+
+        // condition retriev data
+        return auth()->user();
+
         $dailyReport = DB::table('daily_reports')
         ->select(
             DB::raw('CONVERT(daily_reports.created_at, DATE) as date'),
