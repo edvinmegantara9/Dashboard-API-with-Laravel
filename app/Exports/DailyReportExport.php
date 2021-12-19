@@ -39,13 +39,6 @@ class DailyReportExport implements FromCollection, WithHeadings, WithColumnForma
 
     public function collection()
     {
-        return [
-            $this->dailyreport->created_at,
-            $this->dailyreport->name,
-            $this->dailyreport->nip,
-            $this->dailyreport->user->position,
-            $this->dailyreport->user->group,
-            $this->dailyreport->report
-        ];
+        return $this->dailyreport;
     }
 }
