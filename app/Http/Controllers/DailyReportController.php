@@ -100,7 +100,25 @@ class DailyReportController extends Controller
             $firstdate = $request->input('firstdate');
             $lastdate = $request->input('lastdate');
 
-            $dailyReport = DailyReport::with("user")->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
+            $role_id = auth()->user()->role_id;
+            $role = Roles::find($role_id);
+            $role_name = "";
+            if ($role) {
+                $role_name = $role->name;
+            } else {
+                $response = [
+                    'status' => 404,
+                    'message' => 'role not found, make sure role id is valid',
+                ];
+                return response()->json($response, 404);
+            }
+
+            $dailyReport = DailyReport::with("user")->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
+            ->when($role->name != 'ADMIN', function ($query) use ($role_name) {
+                return $query
+                    ->where('daily_reports.role', $role_name);
+            })
+            ->get();
 
             if ($dailyReport) {
                 $response = [
