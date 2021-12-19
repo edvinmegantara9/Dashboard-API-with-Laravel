@@ -29,6 +29,7 @@ class DailyReportExport implements FromCollection, WithHeadings, WithColumnForma
     {
         return [
             'tanggal',
+            'jam',
             'nama',
             'nip',
             'pangkat',

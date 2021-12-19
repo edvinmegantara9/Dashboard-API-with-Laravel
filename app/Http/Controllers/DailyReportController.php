@@ -40,6 +40,7 @@ class DailyReportController extends Controller
         $dailyReport = DB::table('daily_reports')
         ->select(
             'daily_reports.created_at',
+            'daily_reports.created_at',
             'daily_reports.name',
             'daily_reports.nip',
             'users.position',
