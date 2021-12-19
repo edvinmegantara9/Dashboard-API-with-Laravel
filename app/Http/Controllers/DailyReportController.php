@@ -39,10 +39,10 @@ class DailyReportController extends Controller
         // )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
         $dailyReport = DB::table('daily_reports')
         ->select(
-            'daily_reports.created_at',
-            'daily_reports.created_at',
+            'CONVERT(daily_reports.created_at, DATE) as date',
+            'CONVERT(daily_reports.created_at, TIME) as time',
             'daily_reports.name',
-            'daily_reports.nip',
+            'CONVERT(daily_reports.nip, NCHAR) as nip',
             'users.position',
             'users.group',
             'daily_reports.report'
