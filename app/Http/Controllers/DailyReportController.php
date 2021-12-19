@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\NumberFormatter;
+use Illuminate\Support\Facades\DB;
 
 // class DailyReportExport implements FromCollection
 // {
@@ -26,16 +27,27 @@ class DailyReportController extends Controller
     {
         $firstdate = $request->input('firstdate');
         $lastdate = $request->input('lastdate');
-        $dailyReport = DailyReport::with('user')->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
+        // $dailyReport = DailyReport::with('user')->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
         // $dailyReport = DailyReport::select(
-        //     'created_at',
-        //     'name',
-        //     'nip',
-        //     'position',
-        //     'role',
-        //     'date',
-        //     'report'
+            // 'created_at',
+            // 'name',
+            // 'nip',
+            // 'position',
+            // 'role',
+            // 'date',
+            // 'report'
         // )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
+        $dailyReport = DB::table('daily_reports')
+        ->select(
+            'daily_reports.created_at',
+            'daily_reports.name',
+            'daily_reports.nip',
+            'users.position',
+            'users.group',
+            'daily_reports.report'
+        )
+        ->join('users', 'daily_reports.nip', '=', 'users.nip')
+        ->get();
         // foreach ($dailyReport as $report) {
         //     $report->created_at = substr($report->created_at,0, 10);
         // }
