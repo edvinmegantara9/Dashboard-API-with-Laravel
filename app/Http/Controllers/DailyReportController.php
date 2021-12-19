@@ -52,6 +52,8 @@ class DailyReportController extends Controller
             return response()->json($response, 404);
         }
 
+        return $role_name;
+
         if ($role_name == 'ADMIN') {
             $dailyReport = DB::table('daily_reports')
             ->select(
