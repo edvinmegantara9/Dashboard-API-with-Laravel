@@ -39,21 +39,52 @@ class DailyReportController extends Controller
         // )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
 
         // condition retriev data
-        return auth()->user();
+        $user = auth()->user();
+        $role = Roles::find($user->role_id);
+        $role_name = "";
+        if ($role) {
+            $role_name = $role->name;
+        } else {
+            $response = [
+                'status' => 404
+                'message' => 'role not found, make sure role id is valid',
+            ];
+            return response()->json($response, 404);
+        }
 
-        $dailyReport = DB::table('daily_reports')
-        ->select(
-            DB::raw('CONVERT(daily_reports.created_at, DATE) as date'),
-            DB::raw('CONVERT(daily_reports.created_at, TIME) as time'),
-            'daily_reports.name',
-            // DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
-            'daily_reports.nip',
-            'users.position',
-            'users.group',
-            'daily_reports.report'
-        )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
-        ->join('users', 'daily_reports.nip', '=', 'users.nip')
-        ->get();
+        if ($role_name == 'ADMIN') {
+            $dailyReport = DB::table('daily_reports')
+            ->select(
+                DB::raw('CONVERT(daily_reports.created_at, DATE) as date'),
+                DB::raw('CONVERT(daily_reports.created_at, TIME) as time'),
+                'daily_reports.name',
+                // DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
+                'daily_reports.nip',
+                'users.position',
+                'users.group',
+                'daily_reports.report'
+            )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
+            ->join('users', 'daily_reports.nip', '=', 'users.nip')
+            ->get();
+        } else {
+            $dailyReport = DB::table('daily_reports')
+            ->select(
+                DB::raw('CONVERT(daily_reports.created_at, DATE) as date'),
+                DB::raw('CONVERT(daily_reports.created_at, TIME) as time'),
+                'daily_reports.name',
+                // DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
+                'daily_reports.nip',
+                'users.position',
+                'users.group',
+                'daily_reports.report'
+            )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
+            ->where('roles.name', '=', $role_name)
+            ->join('users', 'daily_reports.nip', '=', 'users.nip')
+            ->join('roles', 'users.role_id', '=', 'roles.id')
+            ->get();
+        }
+
+        
         // foreach ($dailyReport as $report) {
         //     $report->date = Carbon::createFromFormat('Y-m-d H:i:s', $report->date)->format('Y.m.d');
         //     $report->time = Carbon::createFromFormat('Y-m-d H:i:s', $report->time)->format('H:i:s');
