@@ -4,11 +4,12 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class DailyReportExport implements FromCollection, WithHeadings, WithColumnFormatting
+class DailyReportExport implements FromCollection, WithHeadings, WithColumnFormatting, ShouldAutoSize
 {
 
     protected $dailyreport;
