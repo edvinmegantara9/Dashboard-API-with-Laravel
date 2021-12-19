@@ -234,7 +234,8 @@ class MessagesController extends Controller
 
             if ($inbox) {
                 foreach ($inbox as $_inbox) {
-                    $_inbox->message->sender;
+                    if($_inbox->message->sender)
+                        $_inbox->message->sender;
                     $_inbox->message->attachments;
                 }
 
