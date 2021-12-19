@@ -39,8 +39,8 @@ class DailyReportController extends Controller
         // )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))->get();
         $dailyReport = DB::table('daily_reports')
         ->select(
-            'CONVERT(daily_reports.created_at, DATE) as date',
-            'CONVERT(daily_reports.created_at, TIME) as time',
+            'daily_reports.created_at, DATE as date',
+            'daily_reports.created_at, TIME as time',
             'daily_reports.name',
             'CONVERT(daily_reports.nip, NCHAR) as nip',
             'users.position',
@@ -49,9 +49,10 @@ class DailyReportController extends Controller
         )
         ->join('users', 'daily_reports.nip', '=', 'users.nip')
         ->get();
-        // foreach ($dailyReport as $report) {
-        //     $report->created_at = substr($report->created_at,0, 10);
-        // }
+        foreach ($dailyReport as $report) {
+            $report->date = Carbon::createFromFormat('Y-m-d H:i:s', $report->date)->format('Y.m.d');
+            $report->time = Carbon::createFromFormat('Y-m-d H:i:s', $report->time)->format('H:i:s');
+        }
         Excel::store(new DailyReportExport($dailyReport), 'daily_report.xlsx');
         return response()->download(storage_path("app/daily_report.xlsx"), "daily_report.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
     }
