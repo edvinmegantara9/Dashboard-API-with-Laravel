@@ -256,7 +256,8 @@ class MessagesController extends Controller
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving inbox message data',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'data' => $inbox
             ];
             return response()->json($response, 400);
         }
