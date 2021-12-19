@@ -47,7 +47,7 @@ class DailyReportController extends Controller
             'users.position',
             'users.group',
             'daily_reports.report'
-        )
+        )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
         ->join('users', 'daily_reports.nip', '=', 'users.nip')
         ->get();
         // foreach ($dailyReport as $report) {
