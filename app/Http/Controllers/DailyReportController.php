@@ -42,7 +42,8 @@ class DailyReportController extends Controller
             DB::raw('CONVERT(daily_reports.created_at, DATE) as date'),
             DB::raw('CONVERT(daily_reports.created_at, TIME) as time'),
             'daily_reports.name',
-            DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
+            // DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
+            'daily_reports.nip',
             'users.position',
             'users.group',
             'daily_reports.report'
