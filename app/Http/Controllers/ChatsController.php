@@ -75,8 +75,8 @@ class ChatsController extends Controller
                         if ($key)
                             break;
                     }
-                        if(!$key)
-                            array_push($data, $chat_sender);
+                if (!$key)
+                    array_push($data, $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
@@ -89,17 +89,21 @@ class ChatsController extends Controller
                         if ($key)
                             break;
                     }
-                    if (!$key)
-                            array_push($data, $chat_receiver->room);
+                if (!$key)
+                    array_push($data, $chat_receiver->room);
                 else
                     array_push($data, $chat_receiver->room);
             }
 
-            if ($data != []) $data = $this->paginate($data, $row, $page);
-
-            $items = $data->items();
-            $data_fix = json_decode($data->toJson());
-            $data_fix->data = array_values($items);
+            if ($data != []) {
+                $data = $this->paginate($data, $row, $page);
+                $items = $data->items();
+                $data_fix = json_decode($data->toJson());
+                $data_fix->data = array_values($items);
+            }
+            else {
+                $data_fix = [];
+            }
 
 
             if ($chat) {
@@ -178,8 +182,8 @@ class ChatsController extends Controller
                         if ($key)
                             break;
                     }
-                        if(!$key)
-                            array_push($data, $chat_sender);
+                if (!$key)
+                    array_push($data, $chat_sender);
 
                 else
                     array_push($data, $chat_sender);
@@ -192,8 +196,8 @@ class ChatsController extends Controller
                         if ($key)
                             break;
                     }
-                    if (!$key)
-                            array_push($data, $chat_receiver->room);
+                if (!$key)
+                    array_push($data, $chat_receiver->room);
                 else
                     array_push($data, $chat_receiver->room);
             }
