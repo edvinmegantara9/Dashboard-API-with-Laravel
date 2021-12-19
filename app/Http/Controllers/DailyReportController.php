@@ -46,8 +46,8 @@ class DailyReportController extends Controller
             $role_name = $role->name;
         } else {
             $response = [
-                'status' => 404
-                'message' => 'role not found, make sure role id is valid',
+                'status' => 404,
+                'message' => 'role not found, make sure role id is valid'
             ];
             return response()->json($response, 404);
         }
