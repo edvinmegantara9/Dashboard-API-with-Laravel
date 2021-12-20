@@ -60,8 +60,8 @@ class DailyReportController extends Controller
                 'daily_reports.name',
                 // DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
                 'daily_reports.nip',
-                'users.position',
                 'users.group',
+                'users.position',
                 'daily_reports.report'
             )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
             ->join('users', 'daily_reports.nip', '=', 'users.nip')
@@ -74,8 +74,8 @@ class DailyReportController extends Controller
                 'daily_reports.name',
                 // DB::raw('CONCAT(CONVERT(daily_reports.nip, NCHAR), " " ) as nip'),
                 'daily_reports.nip',
-                'users.position',
                 'users.group',
+                'users.position',
                 'daily_reports.report'
             )->where('date', '>=', DATE($firstdate))->where('date', '<=', DATE($lastdate))
             ->where('roles.name', '=', $role_name)
