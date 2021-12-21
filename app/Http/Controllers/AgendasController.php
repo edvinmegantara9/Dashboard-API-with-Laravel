@@ -24,7 +24,7 @@ class AgendasController extends Controller
         try {
 
             $agendas = Agendas::with(['schedules'])->orderBy('agendas.' . $sortby, $sorttype)
-                ->where('agendas.end_date', '>', $currentDate)
+                ->where('agendas.end_date', '>=', $currentDate)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('agendas.title', 'LIKE', '%' . $keyword . '%')
