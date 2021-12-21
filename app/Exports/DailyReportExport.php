@@ -48,7 +48,7 @@ class DailyReportExport extends DefaultValueBinder implements FromCollection, Wi
             'jam',
             'nama',
             'nip',
-            'pangkat',
+            'golongan',
             'jabatan',
             'laporan'
         ];
