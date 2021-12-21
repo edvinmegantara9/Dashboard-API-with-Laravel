@@ -316,8 +316,7 @@ class MessagesController extends Controller
         try {
             DB::beginTransaction();
             $messages = Messages::findOrFail($id);
-            if($messages)
-            {
+            if ($messages) {
                 $messages->is_deleted_by_sender = true;
                 $messages->save();
 
@@ -329,9 +328,7 @@ class MessagesController extends Controller
                 ];
 
                 return response()->json($response, 200);
-            }
-
-            else {
+            } else {
                 DB::rollBack();
 
                 $response = [
@@ -364,7 +361,7 @@ class MessagesController extends Controller
             DB::beginTransaction();
             $messages = Messages::findOrFail($id);
             if ($messages) {
-                if (!MessageReceivers::where('receiver_id', $request->input('receiver_id'))->delete()) {
+                if (!MessageReceivers::where('receiver_id', $request->input('receiver_id'))->where('message_id', $id)->delete()) {
                     $response = [
                         'status' => 404,
                         'message' => 'message data not found'
