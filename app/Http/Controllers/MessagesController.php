@@ -321,6 +321,8 @@ class MessagesController extends Controller
                 $messages->is_deleted_by_sender = true;
                 $messages->save();
 
+                DB::commit();
+
                 $response = [
                     'status' => 200,
                     'message' => 'outbox message has been deleted'
@@ -328,7 +330,10 @@ class MessagesController extends Controller
 
                 return response()->json($response, 200);
             }
+
             else {
+                DB::rollBack();
+
                 $response = [
                     'status' => 404,
                     'message' => 'message data not found'
@@ -377,6 +382,7 @@ class MessagesController extends Controller
 
                 return response()->json($response, 200);
             } else {
+                DB::rollBack();
                 $response = [
                     'status' => 404,
                     'message' => 'message data not found'
