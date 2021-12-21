@@ -177,6 +177,7 @@ class MessagesController extends Controller
 
         try {
             $outbox = Messages::with(['user', 'sender', 'receivers', 'attachments'])->orderBy('messages.' . $sortby, $sorttype)->where('sender_id', $id)
+                ->where('is_deleted', 0)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('messages.title', 'LIKE', '%' . $keyword . '%')
