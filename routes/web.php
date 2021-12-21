@@ -70,6 +70,8 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->get('receiver/{id}', 'MessagesController@receiver');
         $router->get('inbox/{id}', 'MessagesController@inbox');
         $router->get('outbox/{id}', 'MessagesController@outbox');
+        $router->put('delete_outbox/{id}', 'MessagesController@deleteOutbox');
+        $router->delete('delete_inbox/{id}', 'MessagesController@deleteInbox');
     });
 
     $router->group(['prefix' => 'document_type'], function () use ($router) {

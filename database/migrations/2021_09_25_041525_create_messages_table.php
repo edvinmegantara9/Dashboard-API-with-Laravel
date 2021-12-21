@@ -17,6 +17,7 @@ class CreateMessagesTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('content');
+            $table->unsignedTinyInteger('is_deleted')->default(0);
             $table->timestamps();
         });
 

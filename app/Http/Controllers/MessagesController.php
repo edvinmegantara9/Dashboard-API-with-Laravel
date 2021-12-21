@@ -9,6 +9,7 @@ use App\Models\Roles;
 use App\Models\RolesOpds;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Mime\Message;
 
 class MessagesController extends Controller
 {
@@ -124,24 +125,19 @@ class MessagesController extends Controller
         try {
             $role = Roles::with(['opd'])->where('id', $id)->first();
 
-            if($role)
-            {
+            if ($role) {
                 $receivers = [];
                 $is_opd = $role->is_opd;
 
-                if($is_opd)
-                {
+                if ($is_opd) {
                     $related_roles = RolesOpds::with(['role'])->where('opd_id', $role->id)->get();
 
-                    if($related_roles)
-                    {
+                    if ($related_roles) {
                         foreach ($related_roles as $related_role) {
                             array_push($receivers, $related_role->role);
                         }
                     }
-                    
-                }
-                else {
+                } else {
                     $receivers = $role->opd;
                 }
 
@@ -151,7 +147,6 @@ class MessagesController extends Controller
                     'data' => $receivers
                 ];
                 return response()->json($response, 200);
-
             }
 
             $response = [
@@ -160,7 +155,6 @@ class MessagesController extends Controller
             ];
 
             return response()->json($response, 404);
-
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
@@ -183,11 +177,11 @@ class MessagesController extends Controller
 
         try {
             $outbox = Messages::with(['user', 'sender', 'receivers', 'attachments'])->orderBy('messages.' . $sortby, $sorttype)->where('sender_id', $id)
-            ->when($keyword, function ($query) use ($keyword) {
-                return $query
-                    ->where('messages.title', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('messages.content', 'LIKE', '%' . $keyword . '%');
-            })->paginate($row);
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('messages.title', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('messages.content', 'LIKE', '%' . $keyword . '%');
+                })->paginate($row);
 
             if ($outbox) {
                 $response = [
@@ -234,7 +228,7 @@ class MessagesController extends Controller
 
             if ($inbox) {
                 foreach ($inbox as $_inbox) {
-                    if($_inbox->message->sender)
+                    if ($_inbox->message->sender)
                         $_inbox->message->sender;
                     $_inbox->message->attachments;
                 }
@@ -312,6 +306,95 @@ class MessagesController extends Controller
         }
     }
 
+
+    public function deleteOutbox($id, Request $request)
+    {
+        $this->validate($request, [
+            'sender_id' => 'required'
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $messages = Messages::findOrFail($id);
+            if($messages)
+            {
+                $messages->is_deleted_by_sender = true;
+                $messages->save();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'outbox message has been deleted'
+                ];
+
+                return response()->json($response, 200);
+            }
+            else {
+                $response = [
+                    'status' => 404,
+                    'message' => 'message data not found'
+                ];
+
+                return response()->json($response, 404);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on deleting message',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function deleteInbox($id, Request $request)
+    {
+        $this->validate($request, [
+            'receiver_id' => 'required'
+        ]);
+
+        try {
+
+            DB::beginTransaction();
+            $messages = Messages::findOrFail($id);
+            if ($messages) {
+                if (!MessageReceivers::where('receiver_id', $request->input('receiver_id'))->delete()) {
+                    $response = [
+                        'status' => 404,
+                        'message' => 'message data not found'
+                    ];
+
+                    return response()->json($response, 404);
+                }
+
+                DB::commit();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'inbox message has been deleted'
+                ];
+
+                return response()->json($response, 200);
+            } else {
+                $response = [
+                    'status' => 404,
+                    'message' => 'message data not found'
+                ];
+
+                return response()->json($response, 404);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on deleting message',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
 
     public function delete($id)
     {
