@@ -318,7 +318,7 @@ class MessagesController extends Controller
             DB::beginTransaction();
             $messages = Messages::findOrFail($id);
             if ($messages) {
-                $messages->is_deleted_by_sender = true;
+                $messages->is_deleted = true;
                 $messages->save();
 
                 DB::commit();
