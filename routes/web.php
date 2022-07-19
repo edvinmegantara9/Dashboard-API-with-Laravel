@@ -144,4 +144,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->delete('delete/{id}', 'GalleriesController@delete');
     });
 
+    $router->group(['prefix' => 'paket_pekerjaan'], function () use ($router) {
+        $router->get('', 'PaketPekerjaanController@get');
+        $router->post('', 'PaketPekerjaanController@create');
+        $router->put('update/{id}', 'PaketPekerjaanController@update');
+        $router->delete('delete/{id}', 'PaketPekerjaanController@delete');
+    });
+
 });

@@ -13,13 +13,13 @@ class CreatePlanningSchedulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('planning_schedules', function (Blueprint $table) {
-            $table->id();
-            $table->string('plan');
-            $table->string('schedule');
-            $table->smallInteger('type'); // 0 = APBD Induk, 1 = APBD Perubahan
-            $table->timestamps();
-        });
+        // Schema::create('planning_schedules', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('plan');
+        //     $table->string('schedule');
+        //     $table->smallInteger('type'); // 0 = APBD Induk, 1 = APBD Perubahan
+        //     $table->timestamps();
+        // });
     }
 
     /**

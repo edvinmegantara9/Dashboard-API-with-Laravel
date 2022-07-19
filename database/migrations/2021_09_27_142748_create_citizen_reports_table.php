@@ -13,15 +13,15 @@ class CreateCitizenReportsTable extends Migration
      */
     public function up()
     {
-        Schema::create('citizen_reports', function (Blueprint $table) {
-            $table->id();
-            $table->string("name");
-            $table->string("address");
-            $table->string("phone_number");
-            $table->text("report");
-            $table->string("file");
-            $table->timestamps();
-        });
+        // Schema::create('citizen_reports', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string("name");
+        //     $table->string("address");
+        //     $table->string("phone_number");
+        //     $table->text("report");
+        //     $table->string("file");
+        //     $table->timestamps();
+        // });
     }
 
     /**

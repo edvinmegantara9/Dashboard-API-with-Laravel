@@ -13,10 +13,10 @@ class CreateRolesOpdsTable extends Migration
      */
     public function up()
     {
-        Schema::create('roles_opds', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        // Schema::create('roles_opds', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->timestamps();
+        // });
     }
 
     /**
