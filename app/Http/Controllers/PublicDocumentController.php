@@ -62,7 +62,9 @@ class PublicDocumentController extends Controller
             'title' => 'required',
             'file' => 'required',
             'document_type' => 'required',
-            'sub_document_type' => 'required'
+            'sub_document_type' => 'required',
+            'image' => 'required',
+            'tahun' => 'required'
         ]);
 
         try {
@@ -70,7 +72,9 @@ class PublicDocumentController extends Controller
                 'title' => $request->input('title'),
                 'file' => $request->input('file'),
                 'document_type' => $request->input('document_type'),
-                'sub_document_type' => $request->input('sub_document_type')
+                'sub_document_type' => $request->input('sub_document_type'),
+                'image' => $request->input('image'),
+                'tahun' => $request->input('tahun')
             ]);
 
             if ($publicDocuments) {
@@ -98,7 +102,9 @@ class PublicDocumentController extends Controller
             'title' => 'required',
             'file' => 'required',
             'document_type' => 'required',
-            'sub_document_type' => 'required'
+            'sub_document_type' => 'required',
+            'image' => 'required',
+            'tahun' => 'required'
         ]);
 
         try {
@@ -109,6 +115,8 @@ class PublicDocumentController extends Controller
                 $publicDocuments->file = $request->input('file');
                 $publicDocuments->document_type = $request->input('document_type');
                 $publicDocuments->sub_document_type = $request->input('sub_document_type');
+                $publicDocuments->image = $request->input('image');
+                $publicDocuments->tahun = $request->input('tahun');
                 $publicDocuments->save();
 
                 $response = [

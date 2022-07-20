@@ -151,4 +151,32 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->delete('delete/{id}', 'PaketPekerjaanController@delete');
     });
 
+    $router->group(['prefix' => 'potensi_pasar'], function () use ($router) {
+        $router->get('', 'PotensiPasarController@get');
+        $router->post('', 'PotensiPasarController@create');
+        $router->put('update/{id}', 'PotensiPasarController@update');
+        $router->delete('delete/{id}', 'PotensiPasarController@delete');
+    });
+
+    $router->group(['prefix' => 'quarry'], function () use ($router) {
+        $router->get('', 'QuarryController@get');
+        $router->post('', 'QuarryController@create');
+        $router->put('update/{id}', 'QuarryController@update');
+        $router->delete('delete/{id}', 'QuarryController@delete');
+    });
+
+    $router->group(['prefix' => 'lab'], function () use ($router) {
+        $router->get('', 'LabController@get');
+        $router->post('', 'LabController@create');
+        $router->put('update/{id}', 'LabController@update');
+        $router->delete('delete/{id}', 'LabController@delete');
+    });
+
+    $router->group(['prefix' => 'alat_kontruksi'], function () use ($router) {
+        $router->get('', 'AlatKontruksiController@get');
+        $router->post('', 'AlatKontruksiController@create');
+        $router->put('update/{id}', 'AlatKontruksiController@update');
+        $router->delete('delete/{id}', 'AlatKontruksiController@delete');
+    });
+
 });

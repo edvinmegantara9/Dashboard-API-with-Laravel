@@ -92,7 +92,9 @@ class DocumentsController extends Controller
                 'title' => 'required',
                 'file' => 'required',
                 'upload_by' => 'required',
-                'document_type' => 'required'
+                'document_type' => 'required',
+                'image' => 'required',
+                'tahun' => 'required'
             ]
         );
 
@@ -102,7 +104,9 @@ class DocumentsController extends Controller
                 'title' => $request->input('title'),
                 'file' => $request->input('file'),
                 'upload_by' => $request->input('upload_by'),
-                'document_type' => $request->input('document_type')
+                'document_type' => $request->input('document_type'),
+                'image' => $request->input('image'),
+                'tahun' => $request->input('tahun')
             ]);
 
             if ($documents) {
@@ -130,7 +134,8 @@ class DocumentsController extends Controller
             [
                 'title' => 'required',
                 'upload_by' => 'required',
-                'document_type' => 'required'
+                'document_type' => 'required',
+                'tahun' => 'required'
             ]
 
         );
@@ -142,6 +147,9 @@ class DocumentsController extends Controller
                 $documents->file = $request->input('file');
             $documents->upload_by = $request->input('upload_by');
             $documents->document_type = $request->input('document_type');
+            $documents->tahun = $request->input('tahun');
+            if ($request->input('image'))
+            $documents->file = $request->input('image');
             $documents->save();
 
             if ($documents) {
