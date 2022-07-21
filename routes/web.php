@@ -179,4 +179,25 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->delete('delete/{id}', 'AlatKontruksiController@delete');
     });
 
+    $router->group(['prefix' => 'sbu'], function () use ($router) {
+        $router->get('', 'SbuController@get');
+        $router->post('', 'SbuController@create');
+        $router->put('update/{id}', 'SbuController@update');
+        $router->delete('delete/{id}', 'SbuController@delete');
+    });
+
+    $router->group(['prefix' => 'ska'], function () use ($router) {
+        $router->get('', 'SkaController@get');
+        $router->post('', 'SkaController@create');
+        $router->put('update/{id}', 'SkaController@update');
+        $router->delete('delete/{id}', 'SkaController@delete');
+    });
+
+    $router->group(['prefix' => 'skt'], function () use ($router) {
+        $router->get('', 'SktController@get');
+        $router->post('', 'SktController@create');
+        $router->put('update/{id}', 'SktController@update');
+        $router->delete('delete/{id}', 'SktController@delete');
+    });
+
 });
