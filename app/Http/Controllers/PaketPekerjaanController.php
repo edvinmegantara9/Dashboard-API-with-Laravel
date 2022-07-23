@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\PaketPekerjaan;
+use App\Models\PaketPekerjaanAfter;
+use App\Models\PaketPekerjaanBefore;
+use App\Models\PaketPekerjaanProcess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaketPekerjaanController extends Controller
 {
@@ -20,7 +24,7 @@ class PaketPekerjaanController extends Controller
         try {
 
             $paket_pekerjaans = PaketPekerjaan::orderBy('paket_pekerjaans.' . $sortby, $sorttype)
-                ->with('user', 'role')
+                ->with('user', 'role', 'paket_pekerjaan_afters', 'paket_pekerjaan_processes', 'paket_pekerjaan_befores')
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('paket_pekerjaans.nama_paket', 'LIKE', '%' . $keyword . '%')
@@ -75,6 +79,8 @@ class PaketPekerjaanController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
+            
             $paket_pekerjaans = PaketPekerjaan::create(
                 [
                     'user_id' => $request->input('user_id'),
@@ -92,7 +98,31 @@ class PaketPekerjaanController extends Controller
                 ]
             );
 
+            foreach ($request->get('paket_pekerjaan_afters') as $d) {
+                $detail = new PaketPekerjaanAfter;
+                $detail->paket_pekerjaan_id = $paket_pekerjaans->id;
+                $detail->image = $d['image'];
+                $detail->save();
+            }
+
+            foreach ($request->get('paket_pekerjaan_processes') as $d) {
+                $detail = new PaketPekerjaanProcess;
+                $detail->paket_pekerjaan_id = $paket_pekerjaans->id;
+                $detail->image = $d['image'];
+                $detail->save();
+            }
+
+            foreach ($request->get('paket_pekerjaan_befores') as $d) {
+                $detail = new PaketPekerjaanBefore;
+                $detail->paket_pekerjaan_id = $paket_pekerjaans->id;
+                $detail->image = $d['image'];
+                $detail->save();
+            }
+
             if ($paket_pekerjaans) {
+
+                DB::commit();
+
                 $response = [
                     'status' => 201,
                     'message' => 'paket pekerjaan data has been created',
@@ -102,6 +132,7 @@ class PaketPekerjaanController extends Controller
                 return response()->json($response, 201);
             }
         } catch (\Exception $e) {
+            DB::rollBack();
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',
@@ -129,6 +160,7 @@ class PaketPekerjaanController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
             $paket_pekerjaans = PaketPekerjaan::find($id);
 
             if ($paket_pekerjaans) {
@@ -146,6 +178,32 @@ class PaketPekerjaanController extends Controller
                 $paket_pekerjaans->latitude = $request->input('latitude');
                 $paket_pekerjaans->save();
 
+                PaketPekerjaanAfter::where("paket_pekerjaan_id", $paket_pekerjaans->id)->delete();
+                foreach ($request->get('paket_pekerjaan_afters') as $d) {
+					$detail = new PaketPekerjaanAfter;
+					$detail->paket_pekerjaan_id = $paket_pekerjaans->id;
+					$detail->image = $d['image'];
+					$detail->save();
+				}
+
+                PaketPekerjaanProcess::where("paket_pekerjaan_id", $paket_pekerjaans->id)->delete();
+                foreach ($request->get('paket_pekerjaan_processes') as $d) {
+					$detail = new PaketPekerjaanProcess;
+					$detail->paket_pekerjaan_id = $paket_pekerjaans->id;
+					$detail->image = $d['image'];
+					$detail->save();
+				}
+
+                PaketPekerjaanBefore::where("paket_pekerjaan_id", $paket_pekerjaans->id)->delete();
+                foreach ($request->get('paket_pekerjaan_befores') as $d) {
+					$detail = new PaketPekerjaanBefore;
+					$detail->paket_pekerjaan_id = $paket_pekerjaans->id;
+					$detail->image = $d['image'];
+					$detail->save();
+				}
+
+                DB::commit();
+
                 $response = [
                     'status' => 200,
                     'message' => 'paket pekerjaan data has been updated',
@@ -161,6 +219,7 @@ class PaketPekerjaanController extends Controller
 
             return response()->json($response, 404);
         } catch (\Exception $e) {
+            DB::rollBack();
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',

@@ -30,4 +30,19 @@ class PaketPekerjaan extends Model
     {
         return $this->belongsTo(Roles::class, 'opd_id', 'id');
     }
+
+    public function paket_pekerjaan_afters()
+    {
+        return $this->hasMany(PaketPekerjaanAfter::class, 'paket_pekerjaan_id', 'id');
+    }
+
+    public function paket_pekerjaan_processes()
+    {
+        return $this->hasMany(PaketPekerjaanProcess::class, 'paket_pekerjaan_id', 'id');
+    }
+
+    public function paket_pekerjaan_befores()
+    {
+        return $this->hasMany(PaketPekerjaanBefore::class, 'paket_pekerjaan_id', 'id');
+    }
 }
