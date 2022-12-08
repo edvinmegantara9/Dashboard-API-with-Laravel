@@ -15,9 +15,10 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
+$router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], function ($router) {
 
     $router->get('me', 'AuthController@me');
+    $router->post('/email/request-verification', ['as' => 'email.request.verification', 'uses' => 'AuthController@emailRequestVerification']);
 
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->get('', 'UserController@get');
@@ -37,9 +38,17 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function ($router) {
         $router->get('selected_action/export_pdf', 'CategoryController@selectedExportPdf');
         $router->post('selected_action/import_excel', 'CategoryController@importExcel');
     });
+
+    $router->group(['prefix' => 'product'], function () use ($router) {
+        $router->get('', 'ProductController@get');
+        $router->post('create', 'ProductController@create');
+        $router->put('update/{id}', 'ProductController@update');
+        $router->delete('delete/{id}', 'ProductController@delete');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('register', 'AuthController@register');
     $router->post('login', 'AuthController@login');
+    $router->get('/email/verify', ['as' => 'email.verify', 'uses' => 'AuthController@emailVerify']);
 });

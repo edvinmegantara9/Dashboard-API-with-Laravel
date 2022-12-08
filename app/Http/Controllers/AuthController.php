@@ -25,38 +25,38 @@ class AuthController extends BaseController
     {
         //validate incoming request 
         $this->validate($request, [
-            'nip' => 'required|string|unique:users',
-            'password' => 'required',
-            'position' => 'required',
-            'group' => 'required',
-            'role_id' => 'required',
-            'email' => 'required'
+            'full_name'     => 'required',
+            'email'         => 'required|string|email|unique:users', 
+            'password'      => 'required|confirmed|min:6',
+            'nik'           => 'required|string|unique:users',
+            'phone_number'  => 'required',
+            'age'           => 'required|integer',
+            'work'          => 'required',
+            'address'       => 'required'
         ]);
 
-        try 
-        {
+        try {
             $user = new Users;
-            $user->nip= $request->input('nip');
-            $user->full_name = $request->input('full_name');
-            $user->password = app('hash')->make($request->input('password'));
-            $user->position = $request->input('position');
-            $user->group = $request->input('group');
-            $user->email = $request->input('email');
-            $user->role_id = $request->input('role_id');
+            $user->full_name    = $request->input('full_name');
+            $user->email        = $request->input('email');
+            $user->password     = app('hash')->make($request->input('password'));
+            $user->nik          = $request->input('nik');
+            $user->phone_number = $request->input('phone_number');
+            $user->age          = $request->input('age');
+            $user->work         = $request->input('work');
+            $user->address      = $request->input('address');
             $user->save();
 
             return response()->json( [
-                        'entity' => 'user', 
-                        'action' => 'create', 
-                        'result' => 'success'
+                        'status'  => '201', 
+                        'message' => 'success'
             ], 201);
 
         } 
-        catch (\Exception $e) 
+          catch (\Exception $e) 
         {
             return response()->json( [
-                       'entity' => 'user', 
-                       'action' => 'create', 
+                       'status' => 409,
                        'result' => 'failed',
                        'message' => $e
             ], 409);
@@ -73,24 +73,17 @@ class AuthController extends BaseController
     {
           //validate incoming request 
         $this->validate($request, [
-            'nip' => 'required|string',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        $credentials = $request->only(['nip', 'password']);
-        $nip = $request->input('nip');
+        $credentials = $request->only(['email', 'password']);
+        $email = $request->input('email');
         $password = $request->input('password');
-        $user = Users::with('role')->where('nip', $nip)->first();
+        $user = Users::where('email', $email)->first();
     
         if ($user) {
           if (Hash::check($password, $user->password)) {
-            // // $data = [
-            // //   'id' => $user->id,
-            // //   'email' => $user->email,
-            // //   'type' => $user->type,
-            // //   'exp' => Carbon::now()->addDays(7)->timestamp
-            // // ];
-            $user->role->opd;
             if (!$token = Auth::attempt($credentials)) {
               return response()->json(
                 [ 'status' => 401,
@@ -111,6 +104,18 @@ class AuthController extends BaseController
           ], 400);
         }
     }
+
+    public function respondWithToken($token, $user)
+    {
+        return response()->json([
+            'status' => 200,
+            'message' => 'login successful',
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => null,
+            // 'user' => $user
+        ], 200);
+    }
 	
      /**
      * Get user details.
@@ -120,7 +125,64 @@ class AuthController extends BaseController
      */	 	
     public function me()
     {   
-        $user = Users::with('role')->find(Auth::id());
+        $user = Users::find(Auth::id());
         return response()->json($user);
+    }
+
+    /**
+    * Request an email verification email to be sent.
+    *
+    * @param  Request  $request
+    * @return Response
+    */
+    public function emailRequestVerification(Request $request)
+    {
+      if ( $request->user()->hasVerifiedEmail() ) {
+          return response()->json([
+            'status'  => 200,
+            'message' => 'Email address is already verified.'
+          ]);
+      }
+      
+      $request->user()->sendEmailVerificationNotification();
+      
+      return response()->json([
+        'status'  => 200,
+        'message' => 'Email request verification sent to '. Auth::user()->email
+      ]);
+    }
+
+  /**
+  * Verify an email using email and token from email.
+  *
+  * @param  Request  $request
+  * @return Response
+  */
+  public function emailVerify(Request $request)
+  {
+    $this->validate($request, [
+      'token' => 'required|string',
+    ]);
+
+    \Tymon\JWTAuth\Facades\JWTAuth::getToken();
+    \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
+    if (!$request->user() ) {
+        return response()->json([
+          'status'  => 401,
+          'message' => 'Invalid token',
+        ], 401);
+      }
+      
+      if ( $request->user()->hasVerifiedEmail() ) {
+        return response()->json([
+          'status' => 200, 
+          'message' => 'Email address '.$request->user()->getEmailForVerification().' is already verified.'
+        ], 200);
+      }
+      $request->user()->markEmailAsVerified();
+      return response()->json([
+        'status'  => 201,
+        'message' => 'Email address '. $request->user()->email.' successfully verified.'
+      ], 201);
     }
 }

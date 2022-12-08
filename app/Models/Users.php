@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\MustVerifyEmail;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class Users extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable;
+    use Authenticatable, Authorizable, Notifiable, MustVerifyEmail, SoftDeletes;
     // use SoftDeletes;
     /**
      * The attributes that are mass assignable.
@@ -31,6 +33,15 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
      */
     protected $hidden = [
         'password',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
     ];
 	
      /**
@@ -53,9 +64,17 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
         return [];
     }
 
-    public function role()
+    protected static function boot()
     {
-        return $this->belongsTo(Roles::class, 'role_id', 'id');
+        parent::boot();
+        static::saved(function ($model) {
+            /**
+            * If user email have changed email verification is required
+            */
+            if ( $model->isDirty('email') ) {
+                $model->setAttribute('email_verified_at', null);
+                $model->sendEmailVerificationNotification();
+            }
+        });
     }
-
 }
