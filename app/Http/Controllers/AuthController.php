@@ -7,12 +7,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Users;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends BaseController
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm']]);
     }
 
     /**
@@ -148,14 +151,23 @@ class AuthController extends BaseController
       ]);
     }
 
+    public function emailForgetPassword(Request $request)
+    {      
+      $request->user()->sendForgetPasswordNotification();
+      
+      return response()->json([
+        'status'  => 200,
+        'message' => 'Email permintaan reset password dikirim ke '. Auth::user()->email
+      ]);
+    }
+
   /**
   * Verify an email using email and token from email.
   *
   * @param  Request  $request
   * @return Response
   */
-  public function emailVerify(Request $request)
-  {
+  public function emailVerify(Request $request) {
     $this->validate($request, [
       'token' => 'required|string',
     ]);
@@ -181,4 +193,24 @@ class AuthController extends BaseController
         'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
       ], 201);
     }
+
+    public function emailResetPassword(Request $request) {
+      $this->validate($request, [
+        'token' => 'required|string',
+      ]);
+
+      \Tymon\JWTAuth\Facades\JWTAuth::getToken();
+      \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
+      if (!$request->user() ) {
+          return response()->json([
+            'status'  => 401,
+            'message' => 'Invalid token',
+          ], 401);
+        }
+
+        return response()->json([
+          'status'  => 201,
+          'message' => 'nanti muncul form reset disni.'
+        ], 201);
+      }
 }

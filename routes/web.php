@@ -65,4 +65,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', 'AuthController@login');
     $router->get('email/verify', ['as' => 'email.verify', 'uses' => 'AuthController@emailVerify']);
     $router->post('transaction/callback', 'ProductPaymentController@callback');
+    $router->post('email/forget-password', ['as' => 'email.forget.password', 'uses' => 'AuthController@emailForgetPassword']);
+    $router->get('email/reset-password', ['as' => 'email.reset.password', 'uses' => 'AuthController@emailResetPassword']);
 });
