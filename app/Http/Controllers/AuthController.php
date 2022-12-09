@@ -28,11 +28,9 @@ class AuthController extends BaseController
             'full_name'     => 'required',
             'email'         => 'required|string|email|unique:users', 
             'password'      => 'required|confirmed|min:6',
-            'nik'           => 'required|string|unique:users',
-            'phone_number'  => 'required',
-            'age'           => 'required|integer',
-            'work'          => 'required',
-            'address'       => 'required'
+            'phone_number'  => 'required|string|unique:users',
+        ],[
+          'required' => 'Data :attribute harus diisi'
         ]);
 
         try {
@@ -40,16 +38,12 @@ class AuthController extends BaseController
             $user->full_name    = $request->input('full_name');
             $user->email        = $request->input('email');
             $user->password     = app('hash')->make($request->input('password'));
-            $user->nik          = $request->input('nik');
             $user->phone_number = $request->input('phone_number');
-            $user->age          = $request->input('age');
-            $user->work         = $request->input('work');
-            $user->address      = $request->input('address');
             $user->save();
 
             return response()->json( [
                         'status'  => '201', 
-                        'message' => 'success'
+                        'message' => 'Anda berhasil mendaftar, selanjutnya akan mengarahkan ke halaman login'
             ], 201);
 
         } 
@@ -57,7 +51,7 @@ class AuthController extends BaseController
         {
             return response()->json( [
                        'status' => 409,
-                       'result' => 'failed',
+                       'result' => 'Anda gagal mendaftar',
                        'message' => $e
             ], 409);
         }
@@ -75,6 +69,8 @@ class AuthController extends BaseController
         $this->validate($request, [
             'email' => 'required|string|email',
             'password' => 'required|string',
+        ],[
+          'required' => 'Data :attribute harus diisi'
         ]);
 
         $credentials = $request->only(['email', 'password']);
@@ -94,13 +90,13 @@ class AuthController extends BaseController
           } else {
             return response()->json([
               'status' => 400,
-              'message' => 'Login Fail!'
+              'message' => 'Login gagal, pastikan email & password benar'
             ], 400);
           }
         } else {
           return response()->json([
             'status' => 400,
-            'message' => 'Login Fail!',
+            'message' => 'Login gagal, pastikan email & password benar',
           ], 400);
         }
     }
@@ -109,11 +105,11 @@ class AuthController extends BaseController
     {
         return response()->json([
             'status' => 200,
-            'message' => 'login successful',
+            'message' => 'login berhasil',
             'token' => $token,
             'token_type' => 'bearer',
             'expires_in' => null,
-            // 'user' => $user
+            'user' => $user
         ], 200);
     }
 	
@@ -140,7 +136,7 @@ class AuthController extends BaseController
       if ( $request->user()->hasVerifiedEmail() ) {
           return response()->json([
             'status'  => 200,
-            'message' => 'Email address is already verified.'
+            'message' => 'Email sudah terverifikasi'
           ]);
       }
       
@@ -148,7 +144,7 @@ class AuthController extends BaseController
       
       return response()->json([
         'status'  => 200,
-        'message' => 'Email request verification sent to '. Auth::user()->email
+        'message' => 'Email permintaan verifikasi dikirim ke '. Auth::user()->email
       ]);
     }
 
@@ -176,13 +172,13 @@ class AuthController extends BaseController
       if ( $request->user()->hasVerifiedEmail() ) {
         return response()->json([
           'status' => 200, 
-          'message' => 'Email address '.$request->user()->getEmailForVerification().' is already verified.'
+          'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.'
         ], 200);
       }
       $request->user()->markEmailAsVerified();
       return response()->json([
         'status'  => 201,
-        'message' => 'Email address '. $request->user()->email.' successfully verified.'
+        'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
       ], 201);
     }
 }

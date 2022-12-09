@@ -9,11 +9,13 @@
         "chuckrincon/lumen-config-discover": "^1.0",
         "flipbox/lumen-generator": "^8.2",
         "fruitcake/laravel-cors": "^2.0",
+        "guzzlehttp/guzzle": "^7.5",
         "illuminate/mail": "^8.0",
         "illuminate/notifications": "^8.0",
         "laravel/lumen-framework": "^8.0",
         "league/flysystem": "^1.0",
         "maatwebsite/excel": "^3.1",
+        "midtrans/midtrans-php": "^2.5",
         "phpoffice/phpspreadsheet": "^1.18",
         "tymon/jwt-auth": "dev-develop"
     },
@@ -32,6 +34,9 @@
     "autoload-dev": {
         "classmap": [
             "tests/"
+        ],
+        "files": [
+            "app/Helpers/Helper.php"
         ]
     },
     "config": {

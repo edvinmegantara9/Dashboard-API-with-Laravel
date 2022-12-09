@@ -25,7 +25,8 @@ class CategoryController extends Controller
             $data = Category::orderBy('categories.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('categories.name', 'LIKE', '%' . $keyword . '%');
+                        ->where('categories.name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('categories.amount', 'LIKE', '%' . $keyword . '%');
                 })
                 ->paginate($row);
 
@@ -41,7 +42,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             $response = [
                 'status' => 400,
-                'message' => 'error occured on retrieving quarry data',
+                'message' => 'error occured on retrieving categorie data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -50,12 +51,19 @@ class CategoryController extends Controller
 
     public function create(Request $request)
     {
+        $this->validate($request, [
+            'name'         => 'required',
+            'amount'       => 'required',
+            'is_active'    => 'required',
+        ]);
 
         try {
             DB::beginTransaction();
 
             $category = new Category;
-			$category->name = $request->input('name');
+			$category->name      = $request->input('name');
+            $category->amount    = $request->input('amount');
+            $category->is_active = $request->input('is_active');
             $category->save();
 
             DB::commit();
@@ -80,13 +88,21 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->validate($request, [
+            'name'         => 'required',
+            'amount'       => 'required',
+            'is_active'    => 'required',
+        ]);
+
         try {
             DB::beginTransaction();
 
             $category = Category::find($id);
 
             if ($category) {
-                $category->name = $request->input('name');
+                $category->name      = $request->input('name');
+                $category->amount    = $request->input('amount');
+                $category->is_active = $request->input('is_active');
                 $category->save();
 
                 DB::commit();

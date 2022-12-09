@@ -18,7 +18,7 @@ $router->get('/', function () use ($router) {
 $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], function ($router) {
 
     $router->get('me', 'AuthController@me');
-    $router->post('/email/request-verification', ['as' => 'email.request.verification', 'uses' => 'AuthController@emailRequestVerification']);
+    $router->post('email/request-verification', ['as' => 'email.request.verification', 'uses' => 'AuthController@emailRequestVerification']);
 
     $router->group(['prefix' => 'user'], function () use ($router) {
         $router->get('', 'UserController@get');
@@ -45,10 +45,24 @@ $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], functi
         $router->put('update/{id}', 'ProductController@update');
         $router->delete('delete/{id}', 'ProductController@delete');
     });
+
+    $router->group(['prefix' => 'product-payment'], function () use ($router) {
+        $router->get('', 'ProductPaymentController@get');
+        $router->post('create', 'ProductPaymentController@create');
+        $router->get('snap', 'ProductPaymentController@snapPayment');
+        $router->get('check-status/{no_transaction}', 'ProductPaymentController@checkStatus');
+    });
+
+    $router->group(['prefix' => 'product-result'], function () use ($router) {
+        $router->get('', 'ProductResultController@get');
+        $router->post('create', 'ProductResultController@create');
+        $router->put('update/{id}', 'ProductResultController@update');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('register', 'AuthController@register');
     $router->post('login', 'AuthController@login');
-    $router->get('/email/verify', ['as' => 'email.verify', 'uses' => 'AuthController@emailVerify']);
+    $router->get('email/verify', ['as' => 'email.verify', 'uses' => 'AuthController@emailVerify']);
+    $router->post('transaction/callback', 'ProductPaymentController@callback');
 });

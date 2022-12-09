@@ -20,7 +20,7 @@ class ProductController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = Product::with('product_detail')->orderBy('products.' . $sortby, $sorttype)
+            $data = Product::orderBy('products.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('products.name', 'LIKE', '%' . $keyword . '%');
@@ -49,9 +49,10 @@ class ProductController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'name'         => 'required',
-            'amount'       => 'required',
-            'expired_time' => 'required|integer',
+            'name'            => 'required',
+            'expired_time'    => 'required|integer',
+            'expired_result'  => 'required|integer',
+            'max_point_result'=> 'required|integer',
             'product_details' => 'required|array|min:1',
             'product_details.*.question'   => 'required',
             'product_details.*.answer_correct' => 'required',
@@ -62,9 +63,10 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $product = new Product;
-			$product->name         = $request->input('name');
-            $product->amount       = $request->input('amount');
-            $product->expired_time = $request->input('expired_time');
+			$product->name             = $request->input('name');
+            $product->expired_time     = $request->input('expired_time');
+            $product->expired_result   = $request->input('expired_result');
+            $product->max_point_result = $request->input('max_point_result');
 
             if ($product->save()) {
 				foreach ($request->get('product_details') as $d) {
@@ -105,9 +107,11 @@ class ProductController extends Controller
             $product = Product::find($id);
 
             if ($product) {
-                $product->name         = !empty($request->input('name')) ? $request->input('name') : $product->name;
-                $product->amount       = !empty($request->input('amount')) ? $request->input('amount') : $product->amount;
-                $product->expired_time = !empty($request->input('expired_time')) ? $request->input('expired_time') : $product->expired_time;
+                $product->name             = !empty($request->input('name')) ? $request->input('name') : $product->name;
+                $product->amount           = !empty($request->input('amount')) ? $request->input('amount') : $product->amount;
+                $product->expired_time     = !empty($request->input('expired_time')) ? $request->input('expired_time') : $product->expired_time;
+                $product->expired_result   = !empty($request->input('expired_result')) ? $request->input('expired_result') : $product->expired_result;
+                $product->max_point_result = !empty($request->input('max_point_result')) ? $request->input('max_point_result') : $product->max_point_result;
 
                 if ($product->save()) {
                     ProductDetails::where("product_id", $product->id)->delete();

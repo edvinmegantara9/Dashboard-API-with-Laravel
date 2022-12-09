@@ -16,8 +16,9 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->decimal('amount');
-            $table->integer('expired_time');
+            $table->integer('expired_time'); // hitungan hari
+            $table->integer('expired_result'); // hitungan hari
+            $table->integer('max_point_result');
             $table->softDeletes();
             $table->timestamps();
         });
