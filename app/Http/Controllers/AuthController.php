@@ -161,38 +161,38 @@ class AuthController extends BaseController
       ]);
     }
 
-  /**
-  * Verify an email using email and token from email.
-  *
-  * @param  Request  $request
-  * @return Response
-  */
-  public function emailVerify(Request $request) {
-    $this->validate($request, [
-      'token' => 'required|string',
-    ]);
+      /**
+      * Verify an email using email and token from email.
+      *
+      * @param  Request  $request
+      * @return Response
+      */
+      public function emailVerify(Request $request) {
+        $this->validate($request, [
+          'token' => 'required|string',
+        ]);
 
-    \Tymon\JWTAuth\Facades\JWTAuth::getToken();
-    \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
-    if (!$request->user() ) {
-        return response()->json([
-          'status'  => 401,
-          'message' => 'Invalid token',
-        ], 401);
-      }
+        \Tymon\JWTAuth\Facades\JWTAuth::getToken();
+        \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
+        if (!$request->user() ) {
+          return response()->json([
+            'status'  => 401,
+            'message' => 'Invalid token',
+          ], 401);
+        }
       
-      if ( $request->user()->hasVerifiedEmail() ) {
+        if ( $request->user()->hasVerifiedEmail() ) {
+          return response()->json([
+            'status' => 200, 
+            'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.'
+          ], 200);
+        }
+        $request->user()->markEmailAsVerified();
         return response()->json([
-          'status' => 200, 
-          'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.'
-        ], 200);
+          'status'  => 201,
+          'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
+        ], 201);
       }
-      $request->user()->markEmailAsVerified();
-      return response()->json([
-        'status'  => 201,
-        'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
-      ], 201);
-    }
 
     public function emailResetPassword(Request $request) {
       $this->validate($request, [
@@ -202,15 +202,15 @@ class AuthController extends BaseController
       \Tymon\JWTAuth\Facades\JWTAuth::getToken();
       \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
       if (!$request->user() ) {
-          return response()->json([
-            'status'  => 401,
-            'message' => 'Invalid token',
-          ], 401);
-        }
-
         return response()->json([
-          'status'  => 201,
-          'message' => 'nanti muncul form reset disni.'
-        ], 201);
+          'status'  => 401,
+          'message' => 'Invalid token',
+        ], 401);
       }
+
+      return response()->json([
+        'status'  => 201,
+        'message' => 'nanti muncul form reset disni.'
+      ], 201);
+    }
 }
