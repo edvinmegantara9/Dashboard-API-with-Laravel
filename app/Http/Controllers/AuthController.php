@@ -104,16 +104,56 @@ class AuthController extends BaseController
         }
     }
 
-    public function respondWithToken($token, $user)
-    {
-        return response()->json([
-            'status' => 200,
-            'message' => 'login berhasil',
-            'token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => null,
-            'user' => $user
-        ], 200);
+    /**
+     * Fungsi untuk merubah password
+     */
+    public function changePassword(Request $request) {
+
+      $this->validate($request, [
+          'old_password' => 'required',
+          'password' => 'required|confirmed|min:6',
+      ],[
+          'required' => 'Data :attribute harus diisi'
+      ]);
+
+      $old_password = $request->input('old_password');
+      $new_password = $request->input('password');
+
+      $auth = Auth::user()->id;
+      $user = Users::where('id', $auth)->first();
+      if ($user) {
+          if (Hash::check($old_password, $user->password)) {
+              $password = Hash::make($new_password);
+              $user->password = $password;
+              if (!$user->update()) {
+                  return response()->json([
+                      'status' => 404,
+                      'message' => 'Error during update'
+                  ], 404);
+              }
+
+              $response = [
+                  'status' => 201,
+                  'message' => 'Password berhasil diganti!',
+              ];
+
+              return response()->json($response, 201);
+
+          } else {
+              return response()->json([
+                  'status'  => 400,
+                  'success' => false,
+                  'message' => 'Password lama tidak sesuai!',
+              ], 400);
+          }
+      } else {
+          return response()->json([
+              'status'  => 404,
+              'success' => false,
+              'message' => 'User tidak ditemukan!',
+              'data' => ''
+          ], 404);
+      }
     }
 	
      /**
@@ -151,6 +191,9 @@ class AuthController extends BaseController
       ]);
     }
 
+    /**
+     * Fungsi mengirim email untuk reset password
+     */
     public function emailForgetPassword(Request $request)
     {      
       $request->user()->sendForgetPasswordNotification();
@@ -161,39 +204,70 @@ class AuthController extends BaseController
       ]);
     }
 
-      /**
-      * Verify an email using email and token from email.
-      *
-      * @param  Request  $request
-      * @return Response
-      */
-      public function emailVerify(Request $request) {
-        $this->validate($request, [
-          'token' => 'required|string',
-        ]);
+    /**
+     * Fungsi untuk membuat password baru dari token yang di kirim melalui email
+     */
+    public function submitEmailResetPassword(Request $request) {
+      $this->validate($request, [
+        'token' => 'required|string',
+        'password' => 'required|confirmed|min:6',
+      ]);
 
-        \Tymon\JWTAuth\Facades\JWTAuth::getToken();
-        \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
-        if (!$request->user() ) {
-          return response()->json([
-            'status'  => 401,
-            'message' => 'Invalid token',
-          ], 401);
-        }
-      
-        if ( $request->user()->hasVerifiedEmail() ) {
-          return response()->json([
-            'status' => 200, 
-            'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.'
-          ], 200);
-        }
-        $request->user()->markEmailAsVerified();
+      \Tymon\JWTAuth\Facades\JWTAuth::getToken();
+      \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
+      if (!$request->user() ) {
         return response()->json([
-          'status'  => 201,
-          'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
-        ], 201);
+          'status'  => 401,
+          'message' => 'Invalid token',
+        ], 401);
       }
 
+      $user = Users::where('id', Auth::user()->id)->first();
+      $user->password     = app('hash')->make($request->input('password'));
+      $user->save();
+
+      return response()->json([
+        'status'  => 201,
+        'message' => 'Berhasil mereset password, silahkan login ulang'
+      ], 201);
+    }
+
+    /**
+    * Verify an email using email and token from email.
+    *
+    * @param  Request  $request
+    * @return Response
+    */
+    public function emailVerify(Request $request) {
+      $this->validate($request, [
+        'token' => 'required|string',
+      ]);
+
+      \Tymon\JWTAuth\Facades\JWTAuth::getToken();
+      \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate();
+      if (!$request->user() ) {
+        return response()->json([
+          'status'  => 401,
+          'message' => 'Invalid token',
+        ], 401);
+      }
+    
+      if ( $request->user()->hasVerifiedEmail() ) {
+        return response()->json([
+          'status' => 200, 
+          'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.'
+        ], 200);
+      }
+      $request->user()->markEmailAsVerified();
+      return response()->json([
+        'status'  => 201,
+        'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
+      ], 201);
+    }
+
+    /**
+     * Fungsi untuk memanggil link form untuk mereset password dengan mengirimkan token
+     */
     public function emailResetPassword(Request $request) {
       $this->validate($request, [
         'token' => 'required|string',
@@ -210,7 +284,19 @@ class AuthController extends BaseController
 
       return response()->json([
         'status'  => 201,
-        'message' => 'nanti muncul form reset disni.'
+        'message' => 'nanti muncul link form reset disni.'
       ], 201);
+    }
+
+    public function respondWithToken($token, $user)
+    {
+        return response()->json([
+            'status' => 200,
+            'message' => 'login berhasil',
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => null,
+            'user' => $user
+        ], 200);
     }
 }

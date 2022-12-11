@@ -18,6 +18,7 @@ $router->get('/', function () use ($router) {
 $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], function ($router) {
 
     $router->get('me', 'AuthController@me');
+    $router->post('change-password', 'AuthController@changePassword');
     $router->post('email/request-verification', ['as' => 'email.request.verification', 'uses' => 'AuthController@emailRequestVerification']);
 
     $router->group(['prefix' => 'user'], function () use ($router) {
@@ -67,4 +68,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('transaction/callback', 'ProductPaymentController@callback');
     $router->post('email/forget-password', ['as' => 'email.forget.password', 'uses' => 'AuthController@emailForgetPassword']);
     $router->get('email/reset-password', ['as' => 'email.reset.password', 'uses' => 'AuthController@emailResetPassword']);
+    $router->post('reset-password', ['uses' => 'AuthController@submitEmailResetPassword']);
 });
