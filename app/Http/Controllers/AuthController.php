@@ -5,11 +5,7 @@ use App\Http\Controllers\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 use App\Models\Users;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class AuthController extends BaseController
 {
