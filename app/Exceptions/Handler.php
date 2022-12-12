@@ -51,13 +51,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        // if ($exception instanceof NotFoundHttpException) {
-        //     $exception = new NotFoundHttpException('HTTP_NOT_FOUND', $exception);
-        //     return response()->json(['status' => Response::HTTP_NOT_FOUND,'message' => $exception->getMessage()], 404);
-        // } else {
-        //     return parent::render($request, $exception);
-        // }
+        if ($exception instanceof NotFoundHttpException) {
+            $exception = new NotFoundHttpException('HTTP_NOT_FOUND', $exception);
+            return response()->json(['status' => Response::HTTP_NOT_FOUND,'message' => $exception->getMessage()], 404);
+        } else {
+            return parent::render($request, $exception);
+        }
 
-        return parent::render($request, $exception);
+        // return parent::render($request, $exception);
     }
 }
