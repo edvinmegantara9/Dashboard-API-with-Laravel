@@ -152,9 +152,9 @@ class ProductPaymentController extends Controller
         $serverKey    = env('MIDTRANS_SECRET_KEY'); 
         $fraud_status = !empty($request->fraud_status) ? $request->fraud_status : '';
         $signature    = hash('sha512', $order_id.$status_code.$gross_amount.$serverKey);
-
+     
         if ($signature == $request->signature_key) {
-            if ($status_code == 200) {
+            if ($status_code == 200 || $status_code == 201) {
                 $product_payment = ProductPayment::where('no_transaction', $order_id)->first();
 
                 if (!$product_payment) {
