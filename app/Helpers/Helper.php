@@ -28,6 +28,6 @@ if (!function_exists('autonumber')) {
         $current_year = date("Y");
         
 
-        return 'TEST-' . $current_month . $current_year .  $number;
+        return 'TESTING-' . $current_month . $current_year .  $number;
     }
 }

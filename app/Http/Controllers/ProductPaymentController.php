@@ -330,10 +330,10 @@ class ProductPaymentController extends Controller
                     }
     
                     $response = [
-                        'status' => 404,
+                        'status' => 201,
                         'message' => 'Berhasil berhasil singkronisasi!',
                     ];
-                    return response()->json($response, 404);
+                    return response()->json($response, 201);
                 }
             } else {
                 $response = [
@@ -346,7 +346,7 @@ class ProductPaymentController extends Controller
             
         } catch (\Exception $e) {
             $message = $e->getMessage();
-            return json_encode(array('statusCode' => '111', 'message' => $message));
+            return json_encode(array('status' => 400, 'message' => $message));
         }
     }
 }
