@@ -168,8 +168,8 @@ class ProductPaymentController extends Controller
                 $product_payment->payment_method  = $request->payment_type;
             
                 if ($request->va_numbers) {
-                    $product_payment->payment_channel = $request->va_numbers[0]->bank;
-                    $product_payment->note = $request->va_numbers[0]->va_number;
+                    $product_payment->payment_channel = $request->va_numbers[0]['bank'];
+                    $product_payment->note = $request->va_numbers[0]['va_number'];
                 } else if ($request->store) {
                     $product_payment->payment_channel = $request->store;
                     $product_payment->note = $request->payment_code; 
