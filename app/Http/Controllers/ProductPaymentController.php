@@ -24,7 +24,7 @@ class ProductPaymentController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = ProductPayment::orderBy('product_payments.' . $sortby, $sorttype)
+            $data = ProductPayment::with('product_result')->orderBy('product_payments.' . $sortby, $sorttype)
                 ->where('user_id', $user_id)
                 // ->whereIn('status', $status)
                 ->when($keyword, function ($query) use ($keyword) {
@@ -97,7 +97,7 @@ class ProductPaymentController extends Controller
 
             $response = [
                 'status' => 201,
-                'message' => 'product payment data has been created',
+                'message' => 'Transaksi pembayaran berhasil dibuat!',
                 'data' => $product_payment,
                 'snap_token' => $snap_token,
                 'payment_url' => env('MIDTRANS_URL') . 'snap/v2/vtweb/'. $snap_token,
@@ -108,7 +108,7 @@ class ProductPaymentController extends Controller
             DB::rollBack();
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating product data',
+                'message' => 'Gagal membuat transaksi pembayaran!',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -331,7 +331,7 @@ class ProductPaymentController extends Controller
     
                     $response = [
                         'status' => 201,
-                        'message' => 'Berhasil berhasil singkronisasi!',
+                        'message' => 'Berhasil singkronisasi!',
                     ];
                     return response()->json($response, 201);
                 }
@@ -347,6 +347,128 @@ class ProductPaymentController extends Controller
         } catch (\Exception $e) {
             $message = $e->getMessage();
             return json_encode(array('status' => 400, 'message' => $message));
+        }
+    }
+
+    public function  statusSnap(Request $request) {
+
+        $order_id     = $request->order_id;
+        $status_code  = $request->status_code;
+        $fraud_status = !empty($request->fraud_status) ? $request->fraud_status : '';
+     
+            if ($status_code == 200 || $status_code == 201) {
+                $product_payment = ProductPayment::where('no_transaction', $order_id)->first();
+
+                if (!$product_payment) {
+                    $response = [
+                        'status' => 404,
+                        'message' => 'Transaction tidak ditemukan!',
+                    ];
+                    return response()->json($response, 404);
+                }
+
+                $product_payment->payment_method  = $request->payment_type;
+            
+                if ($request->va_numbers) {
+                    $product_payment->payment_channel = $request->va_numbers[0]['bank'];
+                    $product_payment->note = $request->va_numbers[0]['va_number'];
+                } else if ($request->store) {
+                    $product_payment->payment_channel = $request->store;
+                    $product_payment->note = $request->payment_code; 
+                } else {
+                    $product_payment->payment_channel = "-";
+                    $product_payment->note = "-";
+                }
+               
+                switch ($request->transaction_status) {
+                    case 'capture':
+                        if ($fraud_status == 'challenge'){
+                            // TODO set transaction status on your database to 'challenge'
+                            // and response with 200 OK
+                            $product_payment->status = 'challenge';
+                            $product_payment->save();
+                        } else if ($fraud_status == 'accept'){
+                            // TODO set transaction status on your database to 'success'
+                            // and response with 200 OK
+                            $product_payment->status = 'success';
+                            $product_payment->save();
+                        }
+                        break;
+                    case 'settlement':
+                        $product_payment->status = 'success';
+                        $product_payment->save();
+                        break;
+                    case 'pending':
+                        $product_payment->status = 'pending';
+                        $product_payment->save();
+                        break;
+                    case 'cancel':
+                        $product_payment->status = 'cancel';
+                        $product_payment->save();
+                        break;
+                    case 'expire':
+                        $product_payment->status = 'expire';
+                        $product_payment->save();
+                        break;
+                    case 'refund':
+                        $product_payment->status = 'refund';
+                        $product_payment->save();
+                        break;
+                    case 'partial_refund':
+                        $product_payment->status = 'partial_refund';
+                        $product_payment->save();
+                        break;
+                    default:
+                        $product_payment->status = 'pending';
+                        $product_payment->save();
+                        break;
+                }
+
+                $response = [
+                    'status' => 201,
+                    'message' => 'Berhasil singkronisasi!',
+                ];
+                return response()->json($response, 201);
+            }
+    }
+
+    public function delete($id)
+    {
+        try {
+            DB::beginTransaction();
+            $product_payment = ProductPayment::findOrFail($id);
+            if (!$product_payment) {
+                $response = [
+                    'status' => 404,
+                    'message' => 'payment data not found',
+                ];
+                return response()->json($response, 404);
+            }
+
+            if (!$product_payment->delete()) {
+				DB::rollBack();
+				$response = [
+                    'status'  => 401,
+					'message' => 'Error during delete',
+				];
+				return response()->json($response, 401);
+			}
+
+            DB::commit();
+            
+            $response = [
+                'status' => 200,
+                'message' => 'payment data has been deleted',
+            ];
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on deleting payment data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
         }
     }
 }

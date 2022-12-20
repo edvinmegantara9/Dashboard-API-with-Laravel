@@ -6,12 +6,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Users;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm']]);
+        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm', 'emailForgetPassword']]);
     }
 
     /**
@@ -192,12 +193,27 @@ class AuthController extends BaseController
      */
     public function emailForgetPassword(Request $request)
     {      
-      $request->user()->sendForgetPasswordNotification();
-      
-      return response()->json([
-        'status'  => 200,
-        'message' => 'Email permintaan reset password dikirim ke '. Auth::user()->email
+      $this->validate($request, [
+        'email' => 'required|string|email',
+      ],[
+          'required' => 'Data :attribute harus diisi'
       ]);
+
+      $email = $request->input('email');
+      $user = Users::where('email', $email)->first();
+
+      if ($user) {
+        $user->sendForgetPasswordNotification();
+        return response()->json([
+          'status'  => 200,
+          'message' => 'Email permintaan reset password dikirim ke '. $user->email
+        ]);
+      } else {
+        return response()->json([
+          'status' => 400,
+          'message' => 'Email tidak terdaftar',
+        ], 400);
+      }
     }
 
     /**
@@ -251,14 +267,16 @@ class AuthController extends BaseController
       if ( $request->user()->hasVerifiedEmail() ) {
         return response()->json([
           'status' => 200, 
-          'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.'
+          'message' => 'Email '.$request->user()->getEmailForVerification().' sudah terverifikasi.',
+          'data' => Auth::user()
         ], 200);
       }
       $request->user()->markEmailAsVerified();
       return response()->json([
-        'status'  => 201,
-        'message' => 'Email '. $request->user()->email.' sukses terverifikasi.'
-      ], 201);
+        'status'  => 200,
+        'message' => 'Email '. $request->user()->email.' sukses terverifikasi.',
+        'data' => Auth::user()
+      ], 200);
     }
 
     /**

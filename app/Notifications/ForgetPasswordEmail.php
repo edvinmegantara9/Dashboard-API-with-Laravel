@@ -52,7 +52,7 @@ class ForgetPasswordEmail extends Notification
     protected function verificationUrl($notifiable)
     {
         $token = JWTAuth::fromUser($notifiable);
-        return route('email.reset.password', ['token' => $token], false);
+        return  env('FRONTEND_URL') . 'reset-password?token=' . $token; // route('email.reset.password', ['token' => $token], false);
     }
 
     /**

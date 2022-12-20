@@ -52,7 +52,7 @@ class VerifyEmail extends Notification
     protected function verificationUrl($notifiable)
     {
         $token = JWTAuth::fromUser($notifiable);
-        return route('email.verify', ['token' => $token], false);
+        return env('FRONTEND_URL') . 'email-verify?token=' . $token; // route('email.verify', ['token' => $token], false);
     }
 
     /**

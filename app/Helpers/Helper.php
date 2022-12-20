@@ -1,7 +1,8 @@
 <?php
 
-use App\Models\Complaint;
+
 use App\Models\ProductPayment;
+use Illuminate\Support\Str;
 
 if (!function_exists('autonumber')) {
     /**
@@ -28,6 +29,6 @@ if (!function_exists('autonumber')) {
         $current_year = date("Y");
         
 
-        return 'TESTING-' . $current_month . $current_year .  $number;
+        return Str::random(5) . $current_month . $current_year .  $number;
     }
 }

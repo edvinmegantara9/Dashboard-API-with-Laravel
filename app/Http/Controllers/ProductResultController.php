@@ -101,11 +101,11 @@ class ProductResultController extends Controller
 
             // menentukan gagal dan lolos dari test
             if ($request->input('total_point') > $product->max_point_result) {
-                $product_result->status = 'lolos';
+                $product_result->status = 'LULUS';
                 $message = 'Selamat Anda telah lulus dalam tes Psikotes!';
             } else {
-                $product_result->status = 'gagal';
-                $message = 'Mohon maaf, anda belum lulus test psikotes. namun anda bisa mengulanginya lagi sebelum 24 Jam';
+                $product_result->status = 'GAGAL';
+                $message = 'Mohon maaf, anda belum lulus test psikotes. namun anda bisa mengulanginya lagi sebelum 24 jam';
             }
                    
             $product_result->save(); 
@@ -133,14 +133,14 @@ class ProductResultController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'product_id'         => 'required|exists:products',
-            'product_payment_id' => 'required|exists:product_payments',
+            'product_id'         => 'required|integer',
+            'product_payment_id' => 'required|integer',
             'full_name'          => 'required|string',
-            'nik'                => 'required|string',
+            'nik'                => 'required',
             'age'                => 'required|integer',
             'work'               => 'required|string',
             'address'            => 'required|string',
-            'total_point'        => 'required|string',
+            'total_point'        => 'required',
             'sim_type'           => 'required|string',
             'needs'              => 'required|string',
         ]);
@@ -183,10 +183,10 @@ class ProductResultController extends Controller
 
             // menentukan gagal dan lolos dari test
             if ($request->input('total_point') > $product->max_point_result) {
-                $product_result->status = 'lolos';
+                $product_result->status = 'LULUS';
                 $message = 'Selamat Anda telah lulus dalam tes Psikotes!';
             } else {
-                $product_result->status = 'gagal';
+                $product_result->status = 'GAGAL';
                 $message = 'Mohon maaf, anda belum lulus test psikotes. namun anda bisa mengulanginya lagi sebelum 24 Jam';
             }
                    
@@ -210,6 +210,24 @@ class ProductResultController extends Controller
             ];
             return response()->json($response, 400);
         }
+    }
+
+    public function show($id) {
+        $result = ProductResult::where('id', $id)->first();
+    
+        if (!$result) {
+            $response = [
+                'status' => 404,
+                'message' => 'Hasil test tidak ditemukan!',
+            ];
+            return response()->json($response, 404);
+        }
+
+        $response = [
+            'status' => 200,
+            'data' => $result,
+        ];
+        return response()->json($response, 200);
     }
 
     public function generatePdf($id) {

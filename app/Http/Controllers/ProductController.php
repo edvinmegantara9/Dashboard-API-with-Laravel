@@ -195,4 +195,22 @@ class ProductController extends Controller
             return response()->json($response, 400);
         }
     }
+
+    public function show($id) {
+        $product = Product::with('product_detail')->where('id', $id)->first();
+    
+        if (!$product) {
+            $response = [
+                'status' => 404,
+                'message' => 'Product tidak ditemukan!',
+            ];
+            return response()->json($response, 404);
+        }
+
+        $response = [
+            'status' => 200,
+            'data' => $product,
+        ];
+        return response()->json($response, 200);
+    }
 }

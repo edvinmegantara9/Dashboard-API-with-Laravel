@@ -19,7 +19,7 @@ class EnsureEmailIsVerified
         {
             return response()->json(
                 [ 'status' => 403,
-                  'message' => 'Unauthorized, your email address '.$request->user()->email.' is not verified.']
+                  'message' => 'Silahkan periksa email '.$request->user()->email.' untuk melakukan aktivasi akun Anda. Pastikan memeriksa semua kotak masuk serta folder Spam pada email tersebut.']
                 , 403);
         }
         return $next($request);

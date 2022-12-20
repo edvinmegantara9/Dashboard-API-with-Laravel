@@ -45,19 +45,23 @@ $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], functi
         $router->post('create', 'ProductController@create');
         $router->put('update/{id}', 'ProductController@update');
         $router->delete('delete/{id}', 'ProductController@delete');
+        $router->get('{id}', 'ProductController@show');
     });
 
     $router->group(['prefix' => 'product-payment'], function () use ($router) {
         $router->get('', 'ProductPaymentController@get');
         $router->post('create', 'ProductPaymentController@create');
+        $router->delete('delete/{id}', 'ProductPaymentController@delete');
         $router->get('snap', 'ProductPaymentController@snapPayment');
         $router->get('check-status/{no_transaction}', 'ProductPaymentController@checkStatus');
+        $router->post('check-status-snap', 'ProductPaymentController@statusSnap'); 
     });
 
     $router->group(['prefix' => 'product-result'], function () use ($router) {
         $router->get('', 'ProductResultController@get');
         $router->post('create', 'ProductResultController@create');
         $router->put('update/{id}', 'ProductResultController@update');
+        $router->get('{id}', 'ProductResultController@show');
     });
 });
 
