@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductResult;
 use Illuminate\Http\Request;
@@ -213,7 +214,8 @@ class ProductResultController extends Controller
     }
 
     public function show($id) {
-        $result = ProductResult::where('id', $id)->first();
+        $result = ProductResult::with('payment')->where('id', $id)->first();
+        $result->category = Category::where('id', $result->payment->category_id)->first();
     
         if (!$result) {
             $response = [
