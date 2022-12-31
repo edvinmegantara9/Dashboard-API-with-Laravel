@@ -12,7 +12,7 @@ class AuthController extends BaseController
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm', 'emailForgetPassword']]);
+        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm', 'emailForgetPassword', 'loginAdmin']]);
     }
 
     /**
@@ -56,6 +56,7 @@ class AuthController extends BaseController
             ], 409);
         }
     }
+
 	
      /**
      * Get a JWT via given credentials.
@@ -312,5 +313,93 @@ class AuthController extends BaseController
             'expires_in' => null,
             'user' => $user
         ], 200);
+    }
+
+    /**
+     * Store a new user.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function registerAdmin(Request $request)
+    {
+        //validate incoming request 
+        $this->validate($request, [
+            'full_name'     => 'required',
+            'email'         => 'required|string|email|unique:users', 
+            'password'      => 'required|confirmed|min:6',
+            'phone_number'  => 'required|string|unique:users',
+        ],[
+          'required' => 'Data :attribute harus diisi'
+        ]);
+
+        try {
+            $user = new Users;
+            $user->full_name    = $request->input('full_name');
+            $user->email        = $request->input('email');
+            $user->password     = app('hash')->make($request->input('password'));
+            $user->phone_number = $request->input('phone_number');
+            $user->email_verified_at = date("Y-m-d h:i:s");
+            $user->is_admin     = 1;
+            $user->save();
+
+            return response()->json( [
+                        'status'  => '201', 
+                        'message' => 'Admin, Berhasil ditambahkan!'
+            ], 201);
+
+        } 
+          catch (\Exception $e) 
+        {
+            return response()->json( [
+                       'status' => 409,
+                       'result' => 'Anda gagal mendaftar',
+                       'message' => $e
+            ], 409);
+        }
+    }
+
+         /**
+     * Get a JWT via given credentials.
+     *
+     * @param  Request  $request
+     * @return Response
+     */	 
+    public function loginAdmin(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ],[
+          'required' => 'Data :attribute harus diisi'
+        ]);
+
+        $credentials = $request->only(['email', 'password']);
+        $email = $request->input('email');
+        $password = $request->input('password');
+        $user = Users::where('email', $email)->where('is_admin', true)->first();
+    
+        if ($user) {
+          if (Hash::check($password, $user->password)) {
+            if (!$token = Auth::attempt($credentials)) {
+              return response()->json(
+                [ 'status' => 401,
+                  'message' => 'Unauthorized']
+                , 401);
+            }
+            return $this->respondWithToken($token, $user);
+          } else {
+            return response()->json([
+              'status' => 400,
+              'message' => 'Login gagal, pastikan email & password benar'
+            ], 400);
+          }
+        } else {
+          return response()->json([
+            'status' => 400,
+            'message' => 'Login gagal, pastikan email & password benar',
+          ], 400);
+        }
     }
 }

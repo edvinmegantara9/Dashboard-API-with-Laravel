@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserExport;
 use App\Models\Messages;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -15,7 +17,44 @@ class UserController extends Controller
         $this->middleware('auth:api');
     }
 
-    
+    public function getAdmin(Request $request)
+    {
+        $row = $request->input('row');
+        $keyword = $request->input('keyword');
+        $sortby = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
+        try {
+            $users = Users::where('is_admin', true)->orderBy('users.' . $sortby, $sorttype)
+                ->where(function ($query) use ($keyword) {
+                    return $query
+                        ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.email', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.phone_number', 'LIKE', '%' . $keyword . '%');
+                })
+                ->paginate($row);
+
+            if ($users) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'admin data has been retrieved',
+                    'data' => $users
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving admin data',
+                'error' => $e
+            ];
+            return response()->json($response, 400);
+        }
+    }
 
     public function get(Request $request)
     {
@@ -28,17 +67,13 @@ class UserController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $users = Users::with(['role'])->orderBy('users.' . $sortby, $sorttype)
-                ->when($keyword, function ($query) use ($keyword) {
+            $users = Users::orderBy('users.' . $sortby, $sorttype)
+                ->where('is_admin', false)
+                ->where(function ($query) use ($keyword) {
                     return $query
                         ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.nip', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.position', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.group', 'LIKE', '%' . $keyword . '%')
-                        ->orWhereHas('role', function ($query) use ($keyword) {
-                            return $query
-                            ->where('name', 'LIKE', '%' . $keyword . '%');
-                        });
+                        ->orWhere('users.email', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.phone_number', 'LIKE', '%' . $keyword . '%');
                 })
                 ->paginate($row);
 
@@ -60,7 +95,6 @@ class UserController extends Controller
             return response()->json($response, 400);
         }
     }
-
 
     public function changepassword(Request $request, $id)
     {
@@ -103,24 +137,18 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            // 'nip' => 'required|string|unique:users',,
             'email' => 'required',
             'full_name' => 'required',
-            'position' => 'required',
-            'group' => 'required',
-            'role_id' => 'required'
+            'phone_number' => 'required',
         ]);
 
         try {
             $users = Users::find($id);
 
             if ($users) {
-                // $users->nip      = $request->input('nip');
-                $users->position = $request->input('position');
                 $users->full_name = $request->input('full_name');
-                $users->group    = $request->input('group');
                 $users->email = $request->input('email');
-                $users->role_id  = $request->input('role_id');
+                $users->phone_number = $request->input('phone_number');
                 $users->save();
 
                 $response = [
@@ -155,7 +183,7 @@ class UserController extends Controller
             $users = Users::findOrFail($id);
 
             if ($users) {
-                Messages::where('sender_id', $id)->delete();
+                Users::where('id', $id)->delete();
             }
 
             if(!$users->delete())
@@ -182,6 +210,79 @@ class UserController extends Controller
                 'status' => 400,
                 'message' => 'error occured on deleting user data',
                 'error' => $e
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedDelete(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = Users::whereIn('id', $request->input('data'));
+
+            if ($selected_delete->delete()) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'User data has been deleted',
+                ];
+    
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportExcel(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = Users::whereIn('id', $request->input('data'))->select(
+                'full_name', 'email', 'phone_number'
+            )->get();
+            Excel::store(new UserExport($selected_delete), 'User.xlsx');
+        return response()->download(storage_path("app/User.xlsx"), "User.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportPdf(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $product = Users::whereIn('id', $request->input('data'))->get();
+            if ($product) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'User data has been retrieved',
+                    'data' => $product
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating User data',
+                'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
         }

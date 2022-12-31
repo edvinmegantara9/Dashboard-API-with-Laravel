@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class CategoryExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithColumnFormatting, ShouldAutoSize, WithCustomValueBinder
+class ProductResultExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithColumnFormatting, ShouldAutoSize, WithCustomValueBinder
 {
 
     protected $dailyreport;
@@ -44,7 +44,7 @@ class CategoryExport extends DefaultValueBinder implements FromCollection, WithH
     public function headings(): array
     {
         return [
-            'NAMA', 'HARGA', 'AKTIV'
+            'KATEGORI','USER','PRODUCT', 'NO. TRANSAKSI', 'NAMA', 'NIK', 'UMUR', 'PEKERJAAN', 'ALAMAT', 'SIM', 'KEPERLUAN', 'POINT', 'STATUS', 'EXPIRED'
         ];
     }
 

@@ -9,7 +9,7 @@ class Product extends Model
 {
     use SoftDeletes;
 
-    public function product_detail()
+    public function product_details()
     {
         return $this->hasMany(ProductDetails::class, 'product_id', 'id');
     }

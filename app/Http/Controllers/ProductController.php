@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
 use App\Models\Product;
 use App\Models\ProductDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -20,7 +22,7 @@ class ProductController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = Product::orderBy('products.' . $sortby, $sorttype)
+            $data = Product::with('product_details')->orderBy('products.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('products.name', 'LIKE', '%' . $keyword . '%');
@@ -108,7 +110,6 @@ class ProductController extends Controller
 
             if ($product) {
                 $product->name             = !empty($request->input('name')) ? $request->input('name') : $product->name;
-                $product->amount           = !empty($request->input('amount')) ? $request->input('amount') : $product->amount;
                 $product->expired_time     = !empty($request->input('expired_time')) ? $request->input('expired_time') : $product->expired_time;
                 $product->expired_result   = !empty($request->input('expired_result')) ? $request->input('expired_result') : $product->expired_result;
                 $product->max_point_result = !empty($request->input('max_point_result')) ? $request->input('max_point_result') : $product->max_point_result;
@@ -197,7 +198,7 @@ class ProductController extends Controller
     }
 
     public function show($id) {
-        $product = Product::with('product_detail')->where('id', $id)->first();
+        $product = Product::with('product_details')->where('id', $id)->first();
     
         if (!$product) {
             $response = [
@@ -212,5 +213,82 @@ class ProductController extends Controller
             'data' => $product,
         ];
         return response()->json($response, 200);
+    }
+
+    public function selectedDelete(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = Product::whereIn('id', $request->input('data'));
+
+            foreach ($selected_delete as $key => $product) {
+                ProductDetails::where("product_id", $product->id)->delete();
+            }
+
+            if ($selected_delete->delete()) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'Product data has been deleted',
+                ];
+    
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportExcel(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = Product::whereIn('id', $request->input('data'))->select(
+                'name', 'expired_time', 'expired_result', 'max_point_result'
+            )->get();
+            Excel::store(new ProductExport($selected_delete), 'Product.xlsx');
+        return response()->download(storage_path("app/Product.xlsx"), "Product.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportPdf(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $product = Product::whereIn('id', $request->input('data'))->get();
+            if ($product) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'Product data has been retrieved',
+                    'data' => $product
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating Product data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
     }
 }

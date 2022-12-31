@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductPaymentExport;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductPaymentController extends Controller
 {
@@ -32,6 +34,58 @@ class ProductPaymentController extends Controller
                         ->where('product_payments.no_transaction', 'LIKE', '%' . $keyword . '%');
                 })
                 ->paginate($row);
+
+            if ($data) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'product_payments data has been retrieved',
+                    'data' => $data
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving product data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function getAdmin(Request $request)
+    {
+        $row      = $request->input('row');
+        $keyword  = $request->input('keyword');
+        $sortby   = $request->input('sortby');
+        $sorttype = $request->input('sorttype');
+        $firstdate = $request->input('firstdate');
+        $lastdate  = $request->input('lastdate');
+        $category  = $request->input('category');
+        $status    = $request->input('status');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
+        try {
+            $data = ProductPayment::with('product_result', 'user', 'category', 'product')
+                    ->whereBetween('product_payments.created_at', [date('Y-m-d 00:00:00', strtotime($firstdate)), date('Y-m-d 23:59:59', strtotime($lastdate))])
+                    ->orderBy('product_payments.' . $sortby, $sorttype);
+                
+            if ($category !== "") {
+                $data = $data->where('category_id', $category);
+            }
+
+            if ($status !== "") {
+                $data = $data->where('status', $status);
+            }
+            
+            $data = $data->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('product_payments.no_transaction', 'LIKE', '%' . $keyword . '%');
+                    })
+                    ->paginate($row);
 
             if ($data) {
                 $response = [
@@ -466,6 +520,90 @@ class ProductPaymentController extends Controller
             $response = [
                 'status' => 400,
                 'message' => 'error occured on deleting payment data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedDelete(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = ProductPayment::whereIn('id', $request->input('data'));
+
+            if ($selected_delete->delete()) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'Product data has been deleted',
+                ];
+    
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportExcel(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = ProductPayment::whereIn('product_payments.id', $request->input('data'))
+            ->join('users', 'users.id', '=', 'product_payments.user_id')
+            ->join('products', 'products.id', '=', 'product_payments.product_id')
+            ->join('categories', 'categories.id', '=', 'product_payments.category_id')
+            ->select(
+                'categories.name as category', 'product_payments.no_transaction', 'users.full_name', 'products.name', 'product_payments.amount', 'product_payments.payment_method', 'product_payments.payment_channel', 'product_payments.status', 'product_payments.note'
+            )->get();
+            Excel::store(new ProductPaymentExport($selected_delete), 'Transaction.xlsx');
+        return response()->download(storage_path("app/Transaction.xlsx"), "Transaction.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportPdf(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected = ProductPayment::whereIn('product_payments.id', $request->input('data'))
+            ->join('users', 'users.id', '=', 'product_payments.user_id')
+            ->join('products', 'products.id', '=', 'product_payments.product_id')
+            ->join('categories', 'categories.id', '=', 'product_payments.category_id')
+            ->select(
+                'categories.name as category', 'product_payments.no_transaction', 'users.full_name', 'products.name', 'product_payments.amount', 'product_payments.payment_method', 'product_payments.payment_channel', 'product_payments.status', 'product_payments.note'
+            )->get();
+
+            if ($selected) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'Product data has been retrieved',
+                    'data' => $selected
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating payment data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);

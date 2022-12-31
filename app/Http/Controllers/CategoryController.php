@@ -211,7 +211,7 @@ class CategoryController extends Controller
 
         try {
             $selected_delete = Category::whereIn('id', $request->input('data'))->select(
-                'name'
+                'name', 'amount', 'is_active'
             )->get();
             Excel::store(new CategoryExport($selected_delete), 'Category.xlsx');
         return response()->download(storage_path("app/Category.xlsx"), "Category.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);

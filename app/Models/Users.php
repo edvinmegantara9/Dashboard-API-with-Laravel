@@ -32,7 +32,7 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password', 'is_admin'
     ];
 
     /**
