@@ -378,7 +378,7 @@ class AuthController extends BaseController
         $credentials = $request->only(['email', 'password']);
         $email = $request->input('email');
         $password = $request->input('password');
-        $user = Users::where('email', $email)->where('is_admin', true)->first();
+        $user = Users::where('email', $email)->where('is_admin', 1)->first();
     
         if ($user) {
           if (Hash::check($password, $user->password)) {
