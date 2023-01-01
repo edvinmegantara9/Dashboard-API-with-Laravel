@@ -38,9 +38,9 @@ class ForgetPasswordEmail extends Notification
         }
         return (new MailMessage)
             ->subject(Lang::get('Reset Password'))
-            ->line(Lang::get('Please click the button below to reset your password.'))
+            ->line(Lang::get('Silakan klik tombol di bawah ini untuk mengatur ulang kata sandi Anda.'))
             ->action(Lang::get('Link reset password'), $verificationUrl)
-            ->line(Lang::get('If you did not create an account, no further action is required.'));
+            ->line(Lang::get('Jika ini bukan akun anda, abaikan pesan email ini.'));
     }
 
     /**
