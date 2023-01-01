@@ -38,7 +38,7 @@ class Authenticate
         if ($this->auth->guard($guard)->guest()) {
             return response()->json(
                 [ 'status' => 401,
-                  'message' => 'Unauthorized']
+                  'message' => 'Sesi telah berakhir, silahkan untuk login kembali!']
                 , 401);
         }
 

@@ -84,7 +84,7 @@ class AuthController extends BaseController
             if (!$token = Auth::attempt($credentials)) {
               return response()->json(
                 [ 'status' => 401,
-                  'message' => 'Unauthorized']
+                  'message' => 'Sesi telah berakhir, silahkan untuk login kembali!']
                 , 401);
             }
             return $this->respondWithToken($token, $user);
@@ -385,7 +385,7 @@ class AuthController extends BaseController
             if (!$token = Auth::attempt($credentials)) {
               return response()->json(
                 [ 'status' => 401,
-                  'message' => 'Unauthorized']
+                  'message' => 'Sesi telah berakhir, silahkan untuk login kembali!']
                 , 401);
             }
             return $this->respondWithToken($token, $user);
