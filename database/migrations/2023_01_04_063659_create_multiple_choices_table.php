@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductDetailsTable extends Migration
+class CreateMultipleChoicesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateProductDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_details', function (Blueprint $table) {
+        Schema::create('multiple_choices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('products');
-            $table->text('question');
-            $table->integer('point');
-            $table->softDeletes();
+            $table->foreignId('product_detail_id')->constrained('product_details');
+            $table->string('option');
+            $table->boolean('answer_correct')->default(false);
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateProductDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_details');
+        Schema::dropIfExists('multiple_choices');
     }
 }

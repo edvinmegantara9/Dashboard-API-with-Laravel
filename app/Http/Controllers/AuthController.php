@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Users;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
@@ -23,6 +24,8 @@ class AuthController extends BaseController
      */
     public function register(Request $request)
     {
+        DB::beginTransaction();
+        
         //validate incoming request 
         $this->validate($request, [
             'full_name'     => 'required',
@@ -39,7 +42,10 @@ class AuthController extends BaseController
             $user->email        = $request->input('email');
             $user->password     = app('hash')->make($request->input('password'));
             $user->phone_number = $request->input('phone_number');
+            $user->is_admin     = false;
             $user->save();
+
+            DB::commit();
 
             return response()->json( [
                         'status'  => '201', 
@@ -49,6 +55,7 @@ class AuthController extends BaseController
         } 
           catch (\Exception $e) 
         {
+            DB::rollBack();
             return response()->json( [
                        'status' => 409,
                        'result' => 'Anda gagal mendaftar',

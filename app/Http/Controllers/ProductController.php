@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ProductExport;
+use App\Models\MultipleChoice;
 use App\Models\Product;
 use App\Models\ProductDetails;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class ProductController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = Product::with('product_details')->orderBy('products.' . $sortby, $sorttype)
+            $data = Product::orderBy('products.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('products.name', 'LIKE', '%' . $keyword . '%');
@@ -56,9 +57,11 @@ class ProductController extends Controller
             'expired_result'  => 'required|integer',
             'max_point_result'=> 'required|integer',
             'product_details' => 'required|array|min:1',
-            'product_details.*.question'   => 'required',
-            'product_details.*.answer_correct' => 'required',
+            'product_details.*.question'  => 'required',
             'product_details.*.point' => 'required',
+            'product_details.*.multiple_choices' => 'required|array|min:2',
+            'product_details.*.multiple_choices.*.option' => 'required',
+            'product_details.*.multiple_choices.*.answer_correct' => 'required',
         ]);
 
         try {
@@ -75,9 +78,16 @@ class ProductController extends Controller
 					$detail = new ProductDetails;
 					$detail->product_id     = $product->id;
 					$detail->question       = $d['question'];
-                    $detail->answer_correct = $d['answer_correct'];
                     $detail->point          = $d['point'];
 					$detail->save();
+
+                    foreach ($d['multiple_choices'] as $value) {
+                        $multiple = new MultipleChoice;
+                        $multiple->product_detail_id = $detail->id;
+                        $multiple->answer_correct    = $value['answer_correct'];
+                        $multiple->option            = $value['option'];
+                        $multiple->save();
+                    }
 				}
             }
 
@@ -115,15 +125,32 @@ class ProductController extends Controller
                 $product->max_point_result = !empty($request->input('max_point_result')) ? $request->input('max_point_result') : $product->max_point_result;
 
                 if ($product->save()) {
+
+                    // find product detail by product id 
+                    $product_details = ProductDetails::where('product_id', $product->id)->get();
+                    foreach ($product_details as $value) {
+                        // first delete multiple choice before
+                        MultipleChoice::where("product_detail_id", $value->id)->delete();
+                    }
+
+                    // delete product detail
                     ProductDetails::where("product_id", $product->id)->delete();
 
+                    // create again product detail and multiple choice
                     foreach ($request->get('product_details') as $d) {
                         $detail = new ProductDetails;
                         $detail->product_id     = $product->id;
                         $detail->question       = $d['question'];
-                        $detail->answer_correct = $d['answer_correct'];
                         $detail->point          = $d['point'];
                         $detail->save();
+
+                        foreach ($d['multiple_choices'] as $value) {
+                            $multiple = new MultipleChoice;
+                            $multiple->product_detail_id = $detail->id;
+                            $multiple->answer_correct    = $value['answer_correct'];
+                            $multiple->option            = $value['option'];
+                            $multiple->save();
+                        }
                     }
                 }
 
@@ -168,7 +195,14 @@ class ProductController extends Controller
                 return response()->json($response, 404);
             }
 
-            ProductDetails::where("product_id", $product->id)->delete();
+            // find product detail by product id 
+            $product_details = ProductDetails::where('product_id', $id)->get();
+            foreach ($product_details as $value) {
+                // first delete multiple choice before
+                MultipleChoice::where("product_detail_id", $value->id)->delete();
+            }
+
+            ProductDetails::where("product_id", $id)->delete();
 
             if (!$product->delete()) {
 				DB::rollBack();
@@ -208,6 +242,10 @@ class ProductController extends Controller
             return response()->json($response, 404);
         }
 
+        foreach ($product->product_details as $value) {
+            $value->multiple_choices;
+        }
+
         $response = [
             'status' => 200,
             'data' => $product,
@@ -224,6 +262,14 @@ class ProductController extends Controller
             $selected_delete = Product::whereIn('id', $request->input('data'));
 
             foreach ($selected_delete as $key => $product) {
+
+                 // find product detail by product id 
+                $product_details = ProductDetails::where('product_id', $product->id)->get();
+                foreach ($product_details as $value) {
+                    // first delete multiple choice before
+                    MultipleChoice::where("product_detail_id", $value->id)->delete();
+                }
+
                 ProductDetails::where("product_id", $product->id)->delete();
             }
 
