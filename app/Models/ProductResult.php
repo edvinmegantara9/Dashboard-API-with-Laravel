@@ -8,7 +8,7 @@ class ProductResult extends Model
 {
     public function payment()
     {
-        return $this->belongsTo(ProductPayment::class, 'product_id', 'id');
+        return $this->belongsTo(ProductPayment::class, 'product_payment_id', 'id');
     }
 
     public function product()
