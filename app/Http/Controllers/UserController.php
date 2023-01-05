@@ -47,6 +47,7 @@ class UserController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving admin data',
@@ -87,6 +88,7 @@ class UserController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving user data',
@@ -125,6 +127,7 @@ class UserController extends Controller
             return response()->json($response, 404);
 
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on updating user data',
@@ -166,6 +169,7 @@ class UserController extends Controller
             ];
             return response()->json($response, 404);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on updating user data',
@@ -206,6 +210,7 @@ class UserController extends Controller
 
 
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on deleting user data',
@@ -232,6 +237,7 @@ class UserController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',
@@ -253,9 +259,10 @@ class UserController extends Controller
             Excel::store(new UserExport($selected_delete), 'User.xlsx');
         return response()->download(storage_path("app/User.xlsx"), "User.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating paket pekerjaan data',
+                'message' => 'error occured on exporting users data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -279,9 +286,10 @@ class UserController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating User data',
+                'message' => 'error occured on exporting Users data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);

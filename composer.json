@@ -17,6 +17,7 @@
         "maatwebsite/excel": "^3.1",
         "midtrans/midtrans-php": "^2.5",
         "phpoffice/phpspreadsheet": "^1.18",
+        "sentry/sentry-laravel": "^2.14",
         "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {

@@ -56,6 +56,7 @@ class AuthController extends BaseController
           catch (\Exception $e) 
         {
             DB::rollBack();
+            \Sentry\captureException($e);
             return response()->json( [
                        'status' => 409,
                        'result' => 'Anda gagal mendaftar',
@@ -358,6 +359,7 @@ class AuthController extends BaseController
         } 
           catch (\Exception $e) 
         {
+            \Sentry\captureException($e);
             return response()->json( [
                        'status' => 409,
                        'result' => 'Anda gagal mendaftar',

@@ -40,6 +40,7 @@ class ProductController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving product data',
@@ -102,6 +103,7 @@ class ProductController extends Controller
             return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating product data',
@@ -173,6 +175,7 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating product data',
@@ -222,6 +225,7 @@ class ProductController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating product data',
@@ -282,9 +286,10 @@ class ProductController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating paket pekerjaan data',
+                'message' => 'error occured on creating product data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -303,9 +308,10 @@ class ProductController extends Controller
             Excel::store(new ProductExport($selected_delete), 'Product.xlsx');
         return response()->download(storage_path("app/Product.xlsx"), "Product.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating paket pekerjaan data',
+                'message' => 'error occured on creating product data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -329,6 +335,7 @@ class ProductController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating Product data',

@@ -50,6 +50,7 @@ class ProductResultController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving product data',
@@ -115,6 +116,7 @@ class ProductResultController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving product data',
@@ -189,6 +191,7 @@ class ProductResultController extends Controller
             return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating product data',
@@ -271,6 +274,7 @@ class ProductResultController extends Controller
             return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on updated result data',
@@ -316,6 +320,7 @@ class ProductResultController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',
@@ -342,6 +347,7 @@ class ProductResultController extends Controller
             Excel::store(new ProductResultExport($selected_delete), 'Result.xlsx');
         return response()->download(storage_path("app/Result.xlsx"), "Result.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',
@@ -376,9 +382,10 @@ class ProductResultController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating payment data',
+                'message' => 'error occured on creating result data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);

@@ -40,6 +40,7 @@ class CategoryController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on retrieving categorie data',
@@ -77,6 +78,7 @@ class CategoryController extends Controller
             return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating category data',
@@ -124,6 +126,7 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating category data',
@@ -154,6 +157,7 @@ class CategoryController extends Controller
             return response()->json($response, 200);
 
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating category data',
@@ -172,6 +176,7 @@ class CategoryController extends Controller
                 'message' => 'data berhasil di import!'
             ]);
         } catch (\Throwable $th) {
+            \Sentry\captureException($th);
             return json_encode([
                 'status' => 500,
                 'message' => 'data gagal di import! ' . $th->getMessage()
@@ -195,6 +200,7 @@ class CategoryController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',
@@ -216,6 +222,7 @@ class CategoryController extends Controller
             Excel::store(new CategoryExport($selected_delete), 'Category.xlsx');
         return response()->download(storage_path("app/Category.xlsx"), "Category.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating paket pekerjaan data',
@@ -242,6 +249,7 @@ class CategoryController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating Category data',

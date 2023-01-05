@@ -45,9 +45,10 @@ class ProductPaymentController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on retrieving product data',
+                'message' => 'error occured on retrieving payment data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -97,9 +98,10 @@ class ProductPaymentController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on retrieving product data',
+                'message' => 'error occured on retrieving payment data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -160,6 +162,7 @@ class ProductPaymentController extends Controller
             return response()->json($response, 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'Gagal membuat transaksi pembayaran!',
@@ -399,6 +402,7 @@ class ProductPaymentController extends Controller
 
             
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $message = $e->getMessage();
             return json_encode(array('status' => 400, 'message' => $message));
         }
@@ -517,6 +521,7 @@ class ProductPaymentController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on deleting payment data',
@@ -543,9 +548,10 @@ class ProductPaymentController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating paket pekerjaan data',
+                'message' => 'error occured on creating payment data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -568,9 +574,10 @@ class ProductPaymentController extends Controller
             Excel::store(new ProductPaymentExport($selected_delete), 'Transaction.xlsx');
         return response()->download(storage_path("app/Transaction.xlsx"), "Transaction.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating paket pekerjaan data',
+                'message' => 'error occured on creating payment data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -601,6 +608,7 @@ class ProductPaymentController extends Controller
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
+            \Sentry\captureException($e);
             $response = [
                 'status' => 400,
                 'message' => 'error occured on creating payment data',
