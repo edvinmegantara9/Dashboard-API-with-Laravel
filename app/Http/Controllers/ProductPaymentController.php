@@ -211,7 +211,112 @@ class ProductPaymentController extends Controller
         $signature    = hash('sha512', $order_id.$status_code.$gross_amount.$serverKey);
      
         if ($signature == $request->signature_key) {
-            if ($status_code == 200 || $status_code == 201) {
+            $product_payment = ProductPayment::where('no_transaction', $order_id)->first();
+
+            if (!$product_payment) {
+                $response = [
+                    'status' => 404,
+                    'message' => 'Transaction tidak ditemukan!',
+                ];
+                return response()->json($response, 404);
+            }
+
+            $product_payment->payment_method  = $request->payment_type;
+        
+            if ($request->va_numbers) {
+                $product_payment->payment_channel = $request->va_numbers[0]['bank'];
+                $product_payment->note = $request->va_numbers[0]['va_number'];
+            } else if ($request->store) {
+                $product_payment->payment_channel = $request->store;
+                $product_payment->note = $request->payment_code; 
+            } else {
+                $product_payment->payment_channel = "-";
+                $product_payment->note = "-";
+            }
+            
+            switch ($request->transaction_status) {
+                case 'capture':
+                    if ($fraud_status == 'challenge'){
+                        // TODO set transaction status on your database to 'challenge'
+                        // and response with 200 OK
+                        $product_payment->status = 'challenge';
+                        $product_payment->save();
+                    } else if ($fraud_status == 'accept'){
+                        // TODO set transaction status on your database to 'success'
+                        // and response with 200 OK
+                        $product_payment->status = 'success';
+                        $product_payment->save();
+                    }
+                    break;
+                case 'settlement':
+                    $product_payment->status = 'success';
+                    $product_payment->save();
+                    break;
+                case 'pending':
+                    $product_payment->status = 'pending';
+                    $product_payment->save();
+                    break;
+                case 'cancel':
+                    $product_payment->status = 'cancel';
+                    $product_payment->save();
+                    break;
+                case 'expire':
+                    $product_payment->status = 'expire';
+                    $product_payment->save();
+                    break;
+                case 'refund':
+                    $product_payment->status = 'refund';
+                    $product_payment->save();
+                    break;
+                case 'partial_refund':
+                    $product_payment->status = 'partial_refund';
+                    $product_payment->save();
+                    break;
+                default:
+                    $product_payment->status = 'pending';
+                    $product_payment->save();
+                    break;
+            }
+
+            $response = [
+                'status' => 201,
+                'message' => 'Callback berhasil!',
+            ];
+            return response()->json($response, 201);
+    
+        } else {
+            $response = [
+                'status' => 404,
+                'message' => 'Callback tidak dikenali!',
+            ];
+            return response()->json($response, 404);
+        }
+    }
+
+    public function checkStatus($no_transaction)
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $headers = [
+                'Content-Type'  => 'application/json', 
+                'Accept'        => 'application/json',
+                'Authorization' => 'Basic ' . base64_encode(env('MIDTRANS_SECRET_KEY').":")
+            ];
+            $send = [
+                'headers'   => $headers,
+            ];
+    
+            $result = $client->get(env('MIDTRANS_URL_API').$no_transaction."/status", $send)->getBody()->getContents();
+            $request = json_decode($result);
+
+            $order_id     = $request->order_id;
+            $status_code  = $request->status_code;
+            $gross_amount = $request->gross_amount;
+            $serverKey    = env('MIDTRANS_SECRET_KEY'); 
+            $fraud_status = !empty($request->fraud_status) ? $request->fraud_status : '';
+            $signature    = hash('sha512', $order_id.$status_code.$gross_amount.$serverKey);
+    
+            if ($signature == $request->signature_key) {
                 $product_payment = ProductPayment::where('no_transaction', $order_id)->first();
 
                 if (!$product_payment) {
@@ -224,17 +329,17 @@ class ProductPaymentController extends Controller
 
                 $product_payment->payment_method  = $request->payment_type;
             
-                if ($request->va_numbers) {
-                    $product_payment->payment_channel = $request->va_numbers[0]['bank'];
-                    $product_payment->note = $request->va_numbers[0]['va_number'];
-                } else if ($request->store) {
+                if (!empty($request->va_numbers)) {
+                    $product_payment->payment_channel = $request->va_numbers[0]->bank;
+                    $product_payment->note = $request->va_numbers[0]->va_number;
+                } else if (!empty($request->store)) {
                     $product_payment->payment_channel = $request->store;
                     $product_payment->note = $request->payment_code; 
                 } else {
                     $product_payment->payment_channel = "-";
                     $product_payment->note = "-";
                 }
-               
+                
                 switch ($request->transaction_status) {
                     case 'capture':
                         if ($fraud_status == 'challenge'){
@@ -281,117 +386,9 @@ class ProductPaymentController extends Controller
 
                 $response = [
                     'status' => 201,
-                    'message' => 'Callback berhasil!',
+                    'message' => 'Berhasil singkronisasi!',
                 ];
                 return response()->json($response, 201);
-            }
-        } else {
-            $response = [
-                'status' => 404,
-                'message' => 'Callback tidak dikenali!',
-            ];
-            return response()->json($response, 404);
-        }
-    }
-
-    public function checkStatus($no_transaction)
-    {
-        try {
-            $client = new \GuzzleHttp\Client();
-            $headers = [
-                'Content-Type'  => 'application/json', 
-                'Accept'        => 'application/json',
-                'Authorization' => 'Basic ' . base64_encode(env('MIDTRANS_SECRET_KEY').":")
-            ];
-            $send = [
-                'headers'   => $headers,
-            ];
-    
-            $result = $client->get(env('MIDTRANS_URL_API').$no_transaction."/status", $send)->getBody()->getContents();
-            $request = json_decode($result);
-
-            $order_id     = $request->order_id;
-            $status_code  = $request->status_code;
-            $gross_amount = $request->gross_amount;
-            $serverKey    = env('MIDTRANS_SECRET_KEY'); 
-            $fraud_status = !empty($request->fraud_status) ? $request->fraud_status : '';
-            $signature    = hash('sha512', $order_id.$status_code.$gross_amount.$serverKey);
-    
-            if ($signature == $request->signature_key) {
-                if ($status_code == 200 || $status_code == 201) {
-                    $product_payment = ProductPayment::where('no_transaction', $order_id)->first();
-    
-                    if (!$product_payment) {
-                        $response = [
-                            'status' => 404,
-                            'message' => 'Transaction tidak ditemukan!',
-                        ];
-                        return response()->json($response, 404);
-                    }
-    
-                    $product_payment->payment_method  = $request->payment_type;
-                
-                    if (!empty($request->va_numbers)) {
-                        $product_payment->payment_channel = $request->va_numbers[0]->bank;
-                        $product_payment->note = $request->va_numbers[0]->va_number;
-                    } else if (!empty($request->store)) {
-                        $product_payment->payment_channel = $request->store;
-                        $product_payment->note = $request->payment_code; 
-                    } else {
-                        $product_payment->payment_channel = "-";
-                        $product_payment->note = "-";
-                    }
-                   
-                    switch ($request->transaction_status) {
-                        case 'capture':
-                            if ($fraud_status == 'challenge'){
-                                // TODO set transaction status on your database to 'challenge'
-                                // and response with 200 OK
-                                $product_payment->status = 'challenge';
-                                $product_payment->save();
-                            } else if ($fraud_status == 'accept'){
-                                // TODO set transaction status on your database to 'success'
-                                // and response with 200 OK
-                                $product_payment->status = 'success';
-                                $product_payment->save();
-                            }
-                            break;
-                        case 'settlement':
-                            $product_payment->status = 'success';
-                            $product_payment->save();
-                            break;
-                        case 'pending':
-                            $product_payment->status = 'pending';
-                            $product_payment->save();
-                            break;
-                        case 'cancel':
-                            $product_payment->status = 'cancel';
-                            $product_payment->save();
-                            break;
-                        case 'expire':
-                            $product_payment->status = 'expire';
-                            $product_payment->save();
-                            break;
-                        case 'refund':
-                            $product_payment->status = 'refund';
-                            $product_payment->save();
-                            break;
-                        case 'partial_refund':
-                            $product_payment->status = 'partial_refund';
-                            $product_payment->save();
-                            break;
-                        default:
-                            $product_payment->status = 'pending';
-                            $product_payment->save();
-                            break;
-                    }
-    
-                    $response = [
-                        'status' => 201,
-                        'message' => 'Berhasil singkronisasi!',
-                    ];
-                    return response()->json($response, 201);
-                }
             } else {
                 $response = [
                     'status' => 404,
