@@ -124,4 +124,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('email/forget-password', ['as' => 'email.forget.password', 'uses' => 'AuthController@emailForgetPassword']);
     $router->get('email/reset-password', ['as' => 'email.reset.password', 'uses' => 'AuthController@emailResetPassword']);
     $router->post('reset-password', ['uses' => 'AuthController@submitEmailResetPassword']);
+    $router->get('certificate-verification/{id}', 'ProductResultController@show');
 });
