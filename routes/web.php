@@ -113,6 +113,13 @@ $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], functi
         $router->get('selected_action/export_pdf', 'UserController@selectedExportPdf');
         $router->post('selected_action/import_excel', 'UserController@importExcel');
     });
+
+    $router->group(['prefix' => 'company'], function () use ($router) {
+        $router->get('', 'CompanyController@get');
+        $router->post('create', 'CompanyController@create');
+        $router->put('update/{id}', 'CompanyController@update');
+        $router->delete('delete/{id}', 'CompanyController@delete');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
@@ -125,4 +132,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('email/reset-password', ['as' => 'email.reset.password', 'uses' => 'AuthController@emailResetPassword']);
     $router->post('reset-password', ['uses' => 'AuthController@submitEmailResetPassword']);
     $router->get('certificate-verification/{id}', 'ProductResultController@show');
+
+    $router->group(['prefix' => 'company'], function () use ($router) {
+        $router->get('{id}', 'CompanyController@show');
+    });
 });
