@@ -55,7 +55,6 @@ class CompanyController extends Controller
             'address'      => 'required',
             'email'        => 'required',
             'phone_number' => 'required',
-            'logo'         => 'required',
         ]);
 
         try {
@@ -73,6 +72,8 @@ class CompanyController extends Controller
             $company->test_instruction    = $request->input('test_instruction');
             $company->payment_instruction = $request->input('payment_instruction');
             $company->about_application   = $request->input('about_application');
+            $company->privacy_policy      = $request->input('privacy_policy');
+            $company->developer_policy   = $request->input('developer_policy');
     
             if ($company->save()) {
 
@@ -125,7 +126,6 @@ class CompanyController extends Controller
             'address'      => 'required',
             'email'        => 'required',
             'phone_number' => 'required',
-            'logo'         => 'required',
         ]);
 
         try {
@@ -145,6 +145,8 @@ class CompanyController extends Controller
                 $company->test_instruction    = $request->input('test_instruction');
                 $company->payment_instruction = $request->input('payment_instruction');
                 $company->about_application   = $request->input('about_application');
+                $company->privacy_policy      = $request->input('privacy_policy');
+                $company->developer_policy    = $request->input('developer_policy');
 
                 if ($company->save()) {
                     CompanyService::where('company_id', $company->id)->delete();
