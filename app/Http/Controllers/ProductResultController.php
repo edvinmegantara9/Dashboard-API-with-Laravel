@@ -28,13 +28,11 @@ class ProductResultController extends Controller
         try {
             $data = ProductResult::orderBy('product_results.' . $sortby, $sorttype)
                 ->where('user_id', $user_id)
-                // ->whereIn('status', $status)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('product_results.full_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.no_transaction', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.nik', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('product_results.age', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.work', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.address', 'LIKE', '%' . $keyword . '%');
                 })
@@ -96,7 +94,6 @@ class ProductResultController extends Controller
                     return $query
                         ->where('product_results.full_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.nik', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('product_results.age', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.work', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.address', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('product_results.sim_type', 'LIKE', '%' . $keyword . '%')
@@ -133,7 +130,6 @@ class ProductResultController extends Controller
             'product_payment_id' => 'required|integer',
             'full_name'          => 'required|string',
             'nik'                => 'required|string',
-            'age'                => 'required|integer',
             'work'               => 'required|string',
             'address'            => 'required|string',
             'total_point'        => 'required|integer',
@@ -160,7 +156,6 @@ class ProductResultController extends Controller
             $product_result->product_payment_id = $request->input('product_payment_id'); 
             $product_result->full_name          = $request->input('full_name');
             $product_result->nik                = $request->input('nik');     
-            $product_result->age                = $request->input('age');   
             $product_result->work               = $request->input('work');   
             $product_result->address            = $request->input('address');   
             $product_result->sim_type           = $request->input('sim_type');   
@@ -208,7 +203,6 @@ class ProductResultController extends Controller
             'product_payment_id' => 'required|integer',
             'full_name'          => 'required|string',
             'nik'                => 'required',
-            'age'                => 'required|integer',
             'work'               => 'required|string',
             'address'            => 'required|string',
             'total_point'        => 'required',
@@ -243,8 +237,7 @@ class ProductResultController extends Controller
             $product_result->product_id         = $product->id;
             $product_result->product_payment_id = $request->input('product_payment_id'); 
             $product_result->full_name          = $request->input('full_name');
-            $product_result->nik                = $request->input('nik');    
-            $product_result->age                = $request->input('age');   
+            $product_result->nik                = $request->input('nik');   
             $product_result->work               = $request->input('work');   
             $product_result->address            = $request->input('address'); 
             $product_result->sim_type           = $request->input('sim_type');   

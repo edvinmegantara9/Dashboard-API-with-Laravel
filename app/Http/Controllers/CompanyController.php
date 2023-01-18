@@ -73,7 +73,8 @@ class CompanyController extends Controller
             $company->payment_instruction = $request->input('payment_instruction');
             $company->about_application   = $request->input('about_application');
             $company->privacy_policy      = $request->input('privacy_policy');
-            $company->developer_policy   = $request->input('developer_policy');
+            $company->developer_policy    = $request->input('developer_policy');
+            $company->term_and_condition  = $request->input('term_and_condition');
     
             if ($company->save()) {
 
@@ -147,6 +148,7 @@ class CompanyController extends Controller
                 $company->about_application   = $request->input('about_application');
                 $company->privacy_policy      = $request->input('privacy_policy');
                 $company->developer_policy    = $request->input('developer_policy');
+                $company->term_and_condition  = $request->input('term_and_condition');
 
                 if ($company->save()) {
                     CompanyService::where('company_id', $company->id)->delete();
