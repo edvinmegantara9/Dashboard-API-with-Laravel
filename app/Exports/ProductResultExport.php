@@ -44,7 +44,7 @@ class ProductResultExport extends DefaultValueBinder implements FromCollection, 
     public function headings(): array
     {
         return [
-            'KATEGORI','USER','PRODUCT', 'NO. TRANSAKSI', 'NAMA', 'NIK', 'UMUR', 'PEKERJAAN', 'ALAMAT', 'SIM', 'KEPERLUAN', 'POINT', 'STATUS', 'EXPIRED'
+            'KATEGORI','USER','PRODUCT', 'NO. TRANSAKSI', 'NAMA', 'NIK', 'PEKERJAAN', 'ALAMAT', 'SIM', 'KEPERLUAN', 'POINT', 'STATUS', 'EXPIRED'
         ];
     }
 

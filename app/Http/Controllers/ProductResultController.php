@@ -335,7 +335,7 @@ class ProductResultController extends Controller
             ->join('product_payments', 'product_payments.id', '=', 'product_results.product_payment_id')
             ->join('categories', 'categories.id', '=', 'product_payments.category_id')
             ->select(
-                'categories.name as category', 'users.full_name', 'products.name', 'product_payments.no_transaction', 'product_results.full_name as nama', 'product_results.nik', 'product_results.age', 'product_results.work', 'product_results.address', 'product_results.sim_type', 'product_results.needs', 'product_results.total_point', 'product_results.status', 'product_results.expired_at'
+                'categories.name as category', 'users.full_name', 'products.name', 'product_payments.no_transaction', 'product_results.full_name as nama', 'product_results.nik','product_results.work', 'product_results.address', 'product_results.sim_type', 'product_results.needs', 'product_results.total_point', 'product_results.status', 'product_results.expired_at'
             )->get();
             Excel::store(new ProductResultExport($selected_delete), 'Result.xlsx');
         return response()->download(storage_path("app/Result.xlsx"), "Result.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
@@ -362,7 +362,7 @@ class ProductResultController extends Controller
             ->join('product_payments', 'product_payments.id', '=', 'product_results.product_payment_id')
             ->join('categories', 'categories.id', '=', 'product_payments.category_id')
             ->select(
-                'categories.name as category', 'users.full_name', 'products.name', 'product_payments.no_transaction', 'product_results.full_name as nama', 'product_results.nik', 'product_results.age', 'product_results.work', 'product_results.address', 'product_results.sim_type', 'product_results.needs', 'product_results.total_point', 'product_results.status', 'product_results.expired_at'
+                'categories.name as category', 'users.full_name', 'products.name', 'product_payments.no_transaction', 'product_results.full_name as nama', 'product_results.nik', 'product_results.work', 'product_results.address', 'product_results.sim_type', 'product_results.needs', 'product_results.total_point', 'product_results.status', 'product_results.expired_at'
             )->get();
 
             if ($selected) {
