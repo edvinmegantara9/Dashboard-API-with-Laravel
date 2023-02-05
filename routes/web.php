@@ -19,7 +19,8 @@ $router->get('/debug-sentry', function () {
     throw new Exception('My first Sentry error!');
 });
 
-$router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], function ($router) {
+// $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], function ($router) {
+$router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router) {
 
     $router->get('me', 'AuthController@me');
     $router->post('change-password', 'AuthController@changePassword');
@@ -37,88 +38,28 @@ $router->group(['middleware' => ['auth', 'verified'], 'prefix' => 'api'], functi
         $router->post('selected_action/import_excel', 'UserController@importExcel');
     });
 
-    $router->group(['prefix' => 'admin'], function () use ($router) {
-        $router->post('', 'AuthController@registerAdmin');
-        $router->get('', 'UserController@getAdmin');
-        $router->put('update/{id}', 'UserController@update');
-        $router->put('change-password/{id}', 'UserController@changepassword');
-        $router->delete('delete/{id}', 'UserController@delete');
+    $router->group(['prefix' => 'role'], function () use ($router) {
+        $router->get('', 'RoleController@get');
+        $router->post('create', 'RoleController@create');
+        $router->put('update/{id}', 'RoleController@update');
+        $router->delete('delete/{id}', 'RoleController@delete');
+        $router->post('import', 'RoleController@import');
+        $router->post('selected_action/delete', 'RoleController@selectedDelete');
+        $router->get('selected_action/export_excel', 'RoleController@selectedExportExcel');
+        $router->get('selected_action/export_pdf', 'RoleController@selectedExportPdf');
+        $router->post('selected_action/import_excel', 'RoleController@importExcel');
     });
 
-    $router->group(['prefix' => 'category'], function () use ($router) {
-        $router->get('', 'CategoryController@get');
-        $router->post('create', 'CategoryController@create');
-        $router->put('update/{id}', 'CategoryController@update');
-        $router->delete('delete/{id}', 'CategoryController@delete');
-        $router->post('import', 'CategoryController@import');
-        $router->post('selected_action/delete', 'CategoryController@selectedDelete');
-        $router->get('selected_action/export_excel', 'CategoryController@selectedExportExcel');
-        $router->get('selected_action/export_pdf', 'CategoryController@selectedExportPdf');
-        $router->post('selected_action/import_excel', 'CategoryController@importExcel');
-    });
-
-    $router->group(['prefix' => 'product'], function () use ($router) {
-        $router->get('', 'ProductController@get');
-        $router->post('create', 'ProductController@create');
-        $router->put('update/{id}', 'ProductController@update');
-        $router->delete('delete/{id}', 'ProductController@delete');
-        $router->get('{id}', 'ProductController@show');
-        $router->post('selected_action/delete', 'ProductController@selectedDelete');
-        $router->get('selected_action/export_excel', 'ProductController@selectedExportExcel');
-        $router->get('selected_action/export_pdf', 'ProductController@selectedExportPdf');
-        $router->post('selected_action/import_excel', 'ProductController@importExcel');
-    });
-
-    $router->group(['prefix' => 'product-payment'], function () use ($router) {
-        $router->get('', 'ProductPaymentController@get');
-        $router->get('admin', 'ProductPaymentController@getAdmin');
-        $router->post('create', 'ProductPaymentController@create');
-        $router->delete('delete/{id}', 'ProductPaymentController@delete');
-        $router->get('snap', 'ProductPaymentController@snapPayment');
-        $router->get('check-status/{no_transaction}', 'ProductPaymentController@checkStatus');
-        $router->post('check-status-snap', 'ProductPaymentController@statusSnap'); 
-        $router->post('selected_action/delete', 'ProductPaymentController@selectedDelete');
-        $router->get('selected_action/export_excel', 'ProductPaymentController@selectedExportExcel');
-        $router->get('selected_action/export_pdf', 'ProductPaymentController@selectedExportPdf');
-        $router->post('selected_action/import_excel', 'ProductPaymentController@importExcel');
-    });
-
-    $router->group(['prefix' => 'product-result'], function () use ($router) {
-        $router->get('', 'ProductResultController@get');
-        $router->get('admin', 'ProductResultController@getAdmin');
-        $router->post('create', 'ProductResultController@create');
-        $router->put('update/{id}', 'ProductResultController@update');
-        $router->get('{id}', 'ProductResultController@show');
-        $router->post('selected_action/delete', 'ProductResultController@selectedDelete');
-        $router->get('selected_action/export_excel', 'ProductResultController@selectedExportExcel');
-        $router->get('selected_action/export_pdf', 'ProductResultController@selectedExportPdf');
-        $router->post('selected_action/import_excel', 'ProductResultController@importExcel');
-    });
-
-    $router->group(['prefix' => 'dashboard'], function () use ($router) {
-        $router->get('get-year', 'DashboardController@getYearTransaction');
-        $router->get('grafik-volume-transaction/{tahun}', 'DashboardController@grafikVolumeTransaction');
-        $router->get('grafik-volume-transaction-by-sim/{tahun}', 'DashboardController@grafikVolumeTransactionBySim');
-        $router->get('grafik-volume-transaction-by-payment-method/{tahun}', 'DashboardController@grafikVolumeTransactionByPaymentMethod');
-    });
-
-    $router->group(['prefix' => 'user'], function () use ($router) {
-        $router->get('', 'UserController@get');
-        $router->get('admin', 'UserController@getAdmin');
-        $router->put('update/{id}', 'UserController@update');
-        $router->put('change-password/{id}', 'UserController@changepassword');
-        $router->delete('delete/{id}', 'UserController@delete');
-        $router->post('selected_action/delete', 'UserController@selectedDelete');
-        $router->get('selected_action/export_excel', 'UserController@selectedExportExcel');
-        $router->get('selected_action/export_pdf', 'UserController@selectedExportPdf');
-        $router->post('selected_action/import_excel', 'UserController@importExcel');
-    });
-
-    $router->group(['prefix' => 'company'], function () use ($router) {
-        $router->get('', 'CompanyController@get');
-        $router->post('create', 'CompanyController@create');
-        $router->put('update/{id}', 'CompanyController@update');
-        $router->delete('delete/{id}', 'CompanyController@delete');
+    $router->group(['prefix' => 'menu'], function () use ($router) {
+        $router->get('', 'MenuController@get');
+        $router->post('create', 'MenuController@create');
+        $router->put('update/{id}', 'MenuController@update');
+        $router->delete('delete/{id}', 'MenuController@delete');
+        $router->post('import', 'MenuController@import');
+        $router->post('selected_action/delete', 'MenuController@selectedDelete');
+        $router->get('selected_action/export_excel', 'MenuController@selectedExportExcel');
+        $router->get('selected_action/export_pdf', 'MenuController@selectedExportPdf');
+        $router->post('selected_action/import_excel', 'MenuController@importExcel');
     });
 });
 
@@ -131,9 +72,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('email/forget-password', ['as' => 'email.forget.password', 'uses' => 'AuthController@emailForgetPassword']);
     $router->get('email/reset-password', ['as' => 'email.reset.password', 'uses' => 'AuthController@emailResetPassword']);
     $router->post('reset-password', ['uses' => 'AuthController@submitEmailResetPassword']);
-    $router->get('certificate-verification/{id}', 'ProductResultController@show');
-
-    $router->group(['prefix' => 'company'], function () use ($router) {
-        $router->get('{id}', 'CompanyController@show');
-    });
 });
+
+

@@ -103,7 +103,7 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'full_name' => 'required',
-            'postition' => 'required',
+            'position' => 'required',
             'nip'       => 'required',
             'email'     => 'required',
             'role_id'   => 'required',
@@ -114,7 +114,7 @@ class UserController extends Controller
 
             if ($users) {
                 $users->full_name = $request->input('full_name');
-                $users->postition = $request->input('postition');
+                $users->position = $request->input('position');
                 $users->nip       = $request->input('nip');
                 $users->email     = $request->input('email');
                 $users->role_id   = $request->input('role_id');

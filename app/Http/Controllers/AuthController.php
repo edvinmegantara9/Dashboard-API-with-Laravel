@@ -12,7 +12,7 @@ class AuthController extends BaseController
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','submitForgetPasswordForm', 'emailForgetPassword',]]);
+        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm', 'emailForgetPassword',]]);
     }
 
     /**
@@ -42,6 +42,7 @@ class AuthController extends BaseController
             $user->full_name    = $request->input('full_name');
             $user->position     = $request->input('position');
             $user->nip          = $request->input('nip');
+            $user->email        = $request->input('email');
             $user->password     = app('hash')->make($request->input('password'));
             $user->role_id      = $request->input('role_id');
             $user->save();
@@ -83,10 +84,11 @@ class AuthController extends BaseController
         ]);
 
         $credentials = $request->only(['nip', 'password']);
+        
         $nip = $request->input('nip');
         $password = $request->input('password');
         $user = User::where('nip', $nip)->first();
-    
+
         if ($user) {
           if (Hash::check($password, $user->password)) {
             if (!$token = Auth::attempt($credentials)) {
@@ -313,13 +315,15 @@ class AuthController extends BaseController
 
     public function respondWithToken($token, $user)
     {
-        return response()->json([
-            'status' => 200,
-            'message' => 'login berhasil',
-            'token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => null,
-            'user' => $user
-        ], 200);
+      $user->roles->menus;
+
+      return response()->json([
+          'status' => 200,
+          'message' => 'login berhasil',
+          'token' => $token,
+          'token_type' => 'bearer',
+          'expires_in' => null,
+          'user' => $user
+      ], 200);
     }
 }

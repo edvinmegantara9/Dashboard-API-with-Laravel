@@ -12,4 +12,9 @@ class Role extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class, 'role_menus', 'role_id', 'menu_id');
+    }
 }

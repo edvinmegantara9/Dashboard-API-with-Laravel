@@ -23,7 +23,7 @@ class RoleController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = Role::orderBy('roles.' . $sortby, $sorttype)
+            $data = Role::with('menus')->orderBy('roles.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
                         ->where('roles.name', 'LIKE', '%' . $keyword . '%');
