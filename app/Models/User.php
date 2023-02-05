@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-class Users extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
+class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, Notifiable, MustVerifyEmail, SoftDeletes;
     // use SoftDeletes;
@@ -32,7 +32,7 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
      * @var array
      */
     protected $hidden = [
-        'password', 'is_admin'
+        'password',
     ];
 
     /**
@@ -71,10 +71,15 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
             /**
             * If user email have changed email verification is required
             */
-            if ( $model->isDirty('email') ) {
-                $model->setAttribute('email_verified_at', null);
-                $model->sendEmailVerificationNotification();
-            }
+            // if ($model->isDirty('email') ) {
+            //     $model->setAttribute('email_verified_at', null);
+            //     $model->sendEmailVerificationNotification();
+            // }
         });
+    }
+
+    public function roles()
+    {
+        return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 }

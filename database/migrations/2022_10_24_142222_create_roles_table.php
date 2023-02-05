@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCompanyClientsTable extends Migration
+class CreateCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateCompanyClientsTable extends Migration
      */
     public function up()
     {
-        Schema::create('company_clients', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies');
             $table->string('name');
-            $table->string('logo');
+            $table->foreignId('menu_id')->constrained('menus');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateCompanyClientsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('company_clients');
+        Schema::dropIfExists('categories');
     }
 }

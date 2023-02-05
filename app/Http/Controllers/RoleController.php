@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\CategoryExport;
-use App\Imports\CategoryImport;
-use App\Models\Category;
+use App\Exports\RoleExport;
+use App\Imports\RoleImport;
+use App\Models\Role;
+use App\Models\RoleMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
-class CategoryController extends Controller
+class RoleController extends Controller
 {
     public function get(Request $request)
     {
@@ -22,18 +23,17 @@ class CategoryController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = Category::orderBy('categories.' . $sortby, $sorttype)
+            $data = Role::orderBy('roles.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                     return $query
-                        ->where('categories.name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('categories.amount', 'LIKE', '%' . $keyword . '%');
+                        ->where('roles.name', 'LIKE', '%' . $keyword . '%');
                 })
                 ->paginate($row);
 
             if ($data) {
                 $response = [
                     'status' => 200,
-                    'message' => 'categories data has been retrieved',
+                    'message' => 'roles data has been retrieved',
                     'data' => $data
                 ];
 
@@ -54,25 +54,30 @@ class CategoryController extends Controller
     {
         $this->validate($request, [
             'name'         => 'required',
-            'amount'       => 'required',
-            'is_active'    => 'required',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $category = new Category;
-			$category->name      = $request->input('name');
-            $category->amount    = $request->input('amount');
-            $category->is_active = $request->input('is_active');
-            $category->save();
+            $role = new Role;
+			$role->name      = $request->input('name');
+            $role->save();
+
+            if (count($request->get('role_menus')) > 0) {
+                foreach ($request->get('role_menus') as $d) {
+                    $detail = new RoleMenu;
+                    $detail->role_id     = $role->id;
+                    $detail->menu_id     = $d['menu_id'];
+                    $detail->save();
+                }
+            }
 
             DB::commit();
 
             $response = [
                 'status' => 201,
-                'message' => 'category data has been created',
-                'data' => $category
+                'message' => 'role berhasil ditambahkan!',
+                'data' => $role
             ];
 
             return response()->json($response, 201);
@@ -81,7 +86,7 @@ class CategoryController extends Controller
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating category data',
+                'message' => 'Ada error pada saat menambahkan data role',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -92,34 +97,39 @@ class CategoryController extends Controller
     {
         $this->validate($request, [
             'name'         => 'required',
-            'amount'       => 'required',
-            'is_active'    => 'required',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $category = Category::find($id);
+            $role = Role::find($id);
 
-            if ($category) {
-                $category->name      = $request->input('name');
-                $category->amount    = $request->input('amount');
-                $category->is_active = $request->input('is_active');
-                $category->save();
+            if ($role) {
+                $role->name      = $request->input('name');
+                $role->save();
+
+                if (count($request->get('role_menus')) > 0) {
+                    foreach ($request->get('role_menus') as $d) {
+                        $detail = new RoleMenu;
+                        $detail->role_id     = $role->id;
+                        $detail->menu_id     = $d['menu_id'];
+                        $detail->save();
+                    }
+                }
 
                 DB::commit();
 
                 $response = [
                     'status' => 200,
-                    'message' => 'category data has been updated',
-                    'data' => $category
+                    'message' => 'Data role berhasil di update!',
+                    'data' => $role
                 ];
 
                 return response()->json($response, 200);
             }
             $response = [
                 'status' => 404,
-                'message' => 'category data not found',
+                'message' => 'Data tidak ditemukan!',
             ];
 
             return response()->json($response, 404);
@@ -129,7 +139,7 @@ class CategoryController extends Controller
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating category data',
+                'message' => 'Ada error pada saat mengubah data!',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -139,19 +149,19 @@ class CategoryController extends Controller
     public function delete($id)
     {
         try {
-            $category = Category::findOrFail($id);
+            $role = Role::findOrFail($id);
             
-            if (!$category->delete()) {
+            if (!$role->delete()) {
                 $response = [
                     'status' => 404,
-                    'message' => 'category data not found',
+                    'message' => 'Data tidak ditemukan!',
                 ];
                 return response()->json($response, 404);
             }
 
             $response = [
                 'status' => 200,
-                'message' => 'category data has been deleted',
+                'message' => 'Data berhasil dihapus!',
             ];
 
             return response()->json($response, 200);
@@ -160,7 +170,7 @@ class CategoryController extends Controller
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating category data',
+                'message' => 'Ada error pada saat menghapus Data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
@@ -170,7 +180,7 @@ class CategoryController extends Controller
     public function import() 
     {
         try {
-            Excel::import(new CategoryImport, request()->file('file'));
+            Excel::import(new RoleImport, request()->file('file'));
             return json_encode([
                 'status' => 201,
                 'message' => 'data berhasil di import!'
@@ -190,11 +200,11 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $selected_delete = Category::whereIn('id', $request->input('data'));
+            $selected_delete = Role::whereIn('id', $request->input('data'));
             if ($selected_delete->delete()) {
                 $response = [
                     'status' => 200,
-                    'message' => 'Category data has been deleted',
+                    'message' => 'Role data has been deleted',
                 ];
     
                 return response()->json($response, 200);
@@ -216,11 +226,11 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $selected_delete = Category::whereIn('id', $request->input('data'))->select(
-                'name', 'amount', 'is_active'
+            $selected_delete = Role::whereIn('id', $request->input('data'))->select(
+                'name'
             )->get();
-            Excel::store(new CategoryExport($selected_delete), 'Category.xlsx');
-        return response()->download(storage_path("app/Category.xlsx"), "Category.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+            Excel::store(new RoleExport($selected_delete), 'Role.xlsx');
+        return response()->download(storage_path("app/Role.xlsx"), "Role.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             $response = [
@@ -238,11 +248,11 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $lp2b = Category::whereIn('id', $request->input('data'))->get();
+            $lp2b = Role::whereIn('id', $request->input('data'))->get();
             if ($lp2b) {
                 $response = [
                     'status' => 200,
-                    'message' => 'Category data has been retrieved',
+                    'message' => 'Role data has been retrieved',
                     'data' => $lp2b
                 ];
 
@@ -252,7 +262,7 @@ class CategoryController extends Controller
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating Category data',
+                'message' => 'error occured on creating Role data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);

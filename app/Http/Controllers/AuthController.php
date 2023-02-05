@@ -5,15 +5,14 @@ use App\Http\Controllers\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends BaseController
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register', 'submitForgetPasswordForm', 'emailForgetPassword', 'loginAdmin']]);
+        $this->middleware('auth:api', ['except' => ['login','submitForgetPasswordForm', 'emailForgetPassword',]]);
     }
 
     /**
@@ -29,27 +28,29 @@ class AuthController extends BaseController
         //validate incoming request 
         $this->validate($request, [
             'full_name'     => 'required',
+            'position'      => 'required',
+            'nip'           => 'required|string|unique:users', 
             'email'         => 'required|string|email|unique:users', 
             'password'      => 'required|confirmed|min:6',
-            'phone_number'  => 'required|string|unique:users',
+            'role_id'       => 'required', 
         ],[
           'required' => 'Data :attribute harus diisi'
         ]);
 
         try {
-            $user = new Users;
+            $user = new User;
             $user->full_name    = $request->input('full_name');
-            $user->email        = $request->input('email');
+            $user->position     = $request->input('position');
+            $user->nip          = $request->input('nip');
             $user->password     = app('hash')->make($request->input('password'));
-            $user->phone_number = $request->input('phone_number');
-            $user->is_admin     = false;
+            $user->role_id      = $request->input('role_id');
             $user->save();
 
             DB::commit();
 
             return response()->json( [
-                        'status'  => '201', 
-                        'message' => 'Anda berhasil mendaftar, selanjutnya akan mengarahkan ke halaman login'
+                'status'  => '201', 
+                'message' => 'User berhasil di daftarkan!!'
             ], 201);
 
         } 
@@ -59,13 +60,12 @@ class AuthController extends BaseController
             \Sentry\captureException($e);
             return response()->json( [
                        'status' => 409,
-                       'result' => 'Anda gagal mendaftar',
+                       'result' => 'Gagal mendaftar User',
                        'message' => $e
             ], 409);
         }
     }
 
-	
      /**
      * Get a JWT via given credentials.
      *
@@ -76,16 +76,16 @@ class AuthController extends BaseController
     {
           //validate incoming request 
         $this->validate($request, [
-            'email' => 'required|string|email',
+            'nip'      => 'required|string',
             'password' => 'required|string',
         ],[
           'required' => 'Data :attribute harus diisi'
         ]);
 
-        $credentials = $request->only(['email', 'password']);
-        $email = $request->input('email');
+        $credentials = $request->only(['nip', 'password']);
+        $nip = $request->input('nip');
         $password = $request->input('password');
-        $user = Users::where('email', $email)->first();
+        $user = User::where('nip', $nip)->first();
     
         if ($user) {
           if (Hash::check($password, $user->password)) {
@@ -99,13 +99,13 @@ class AuthController extends BaseController
           } else {
             return response()->json([
               'status' => 400,
-              'message' => 'Login gagal, pastikan email & password benar'
+              'message' => 'Login gagal, pastikan nip & password benar'
             ], 400);
           }
         } else {
           return response()->json([
             'status' => 400,
-            'message' => 'Login gagal, pastikan email & password benar',
+            'message' => 'Login gagal, pastikan nip & password benar',
           ], 400);
         }
     }
@@ -126,7 +126,7 @@ class AuthController extends BaseController
       $new_password = $request->input('password');
 
       $auth = Auth::user()->id;
-      $user = Users::where('id', $auth)->first();
+      $user = User::where('id', $auth)->first();
       if ($user) {
           if (Hash::check($old_password, $user->password)) {
               $password = Hash::make($new_password);
@@ -134,7 +134,7 @@ class AuthController extends BaseController
               if (!$user->update()) {
                   return response()->json([
                       'status' => 404,
-                      'message' => 'Error during update'
+                      'message' => 'Gagal mengganti password!'
                   ], 404);
               }
 
@@ -170,7 +170,7 @@ class AuthController extends BaseController
      */	 	
     public function me()
     {   
-        $user = Users::find(Auth::id());
+        $user = User::find(Auth::id());
         return response()->json($user);
     }
 
@@ -203,13 +203,13 @@ class AuthController extends BaseController
     public function emailForgetPassword(Request $request)
     {      
       $this->validate($request, [
-        'email' => 'required|string|email',
+        'nip' => 'required',
       ],[
           'required' => 'Data :attribute harus diisi'
       ]);
 
-      $email = $request->input('email');
-      $user = Users::where('email', $email)->first();
+      $nip = $request->input('nip');
+      $user = User::where('nip', $nip)->first();
 
       if ($user) {
         $user->sendForgetPasswordNotification();
@@ -243,7 +243,7 @@ class AuthController extends BaseController
         ], 401);
       }
 
-      $user = Users::where('id', Auth::user()->id)->first();
+      $user = User::where('id', Auth::user()->id)->first();
       $user->password     = app('hash')->make($request->input('password'));
       $user->save();
 
@@ -321,94 +321,5 @@ class AuthController extends BaseController
             'expires_in' => null,
             'user' => $user
         ], 200);
-    }
-
-    /**
-     * Store a new user.
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function registerAdmin(Request $request)
-    {
-        //validate incoming request 
-        $this->validate($request, [
-            'full_name'     => 'required',
-            'email'         => 'required|string|email|unique:users', 
-            'password'      => 'required|confirmed|min:6',
-            'phone_number'  => 'required|string|unique:users',
-        ],[
-          'required' => 'Data :attribute harus diisi'
-        ]);
-
-        try {
-            $user = new Users;
-            $user->full_name    = $request->input('full_name');
-            $user->email        = $request->input('email');
-            $user->password     = app('hash')->make($request->input('password'));
-            $user->phone_number = $request->input('phone_number');
-            $user->email_verified_at = date("Y-m-d h:i:s");
-            $user->is_admin     = 1;
-            $user->save();
-
-            return response()->json( [
-                        'status'  => '201', 
-                        'message' => 'Admin, Berhasil ditambahkan!'
-            ], 201);
-
-        } 
-          catch (\Exception $e) 
-        {
-            \Sentry\captureException($e);
-            return response()->json( [
-                       'status' => 409,
-                       'result' => 'Anda gagal mendaftar',
-                       'message' => $e
-            ], 409);
-        }
-    }
-
-         /**
-     * Get a JWT via given credentials.
-     *
-     * @param  Request  $request
-     * @return Response
-     */	 
-    public function loginAdmin(Request $request)
-    {
-          //validate incoming request 
-        $this->validate($request, [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ],[
-          'required' => 'Data :attribute harus diisi'
-        ]);
-
-        $credentials = $request->only(['email', 'password']);
-        $email = $request->input('email');
-        $password = $request->input('password');
-        $user = Users::where('email', $email)->where('is_admin', 1)->first();
-    
-        if ($user) {
-          if (Hash::check($password, $user->password)) {
-            if (!$token = Auth::attempt($credentials)) {
-              return response()->json(
-                [ 'status' => 401,
-                  'message' => 'Sesi telah berakhir, silahkan untuk login kembali!']
-                , 401);
-            }
-            return $this->respondWithToken($token, $user);
-          } else {
-            return response()->json([
-              'status' => 400,
-              'message' => 'Login gagal, pastikan email & password benar'
-            ], 400);
-          }
-        } else {
-          return response()->json([
-            'status' => 400,
-            'message' => 'Login gagal, pastikan email & password benar',
-          ], 400);
-        }
     }
 }

@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\UserExport;
-use App\Models\Messages;
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -15,46 +14,6 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-    }
-
-    public function getAdmin(Request $request)
-    {
-        $row = $request->input('row');
-        $keyword = $request->input('keyword');
-        $sortby = $request->input('sortby');
-        $sorttype = $request->input('sorttype');
-
-        if ($keyword == 'null') $keyword = '';
-        $keyword = urldecode($keyword);
-
-        try {
-            $users = Users::where('is_admin', true)->orderBy('users.' . $sortby, $sorttype)
-                ->where(function ($query) use ($keyword) {
-                    return $query
-                        ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.email', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.phone_number', 'LIKE', '%' . $keyword . '%');
-                })
-                ->paginate($row);
-
-            if ($users) {
-                $response = [
-                    'status' => 200,
-                    'message' => 'admin data has been retrieved',
-                    'data' => $users
-                ];
-
-                return response()->json($response, 200);
-            }
-        } catch (\Exception $e) {
-            \Sentry\captureException($e);
-            $response = [
-                'status' => 400,
-                'message' => 'error occured on retrieving admin data',
-                'error' => $e
-            ];
-            return response()->json($response, 400);
-        }
     }
 
     public function get(Request $request)
@@ -68,14 +27,17 @@ class UserController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $users = Users::orderBy('users.' . $sortby, $sorttype)
-                ->where('is_admin', false)
+            $users = User::with('roles')->orderBy('users.' . $sortby, $sorttype)
+                ->join('roles', 'users.role_id', '=', 'roles.id')
                 ->where(function ($query) use ($keyword) {
                     return $query
                         ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.email', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.phone_number', 'LIKE', '%' . $keyword . '%');
+                        ->orWhere('users.position', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.nip', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('roles.name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('users.email', 'LIKE', '%' . $keyword . '%');
                 })
+                ->select('users.*')
                 ->paginate($row);
 
             if ($users) {
@@ -105,7 +67,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $users = Users::find($id);
+            $users = User::find($id);
             if($users)
             {
                 $users->password = app('hash')->make($request->input('password'));
@@ -140,18 +102,22 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'email' => 'required',
             'full_name' => 'required',
-            'phone_number' => 'required',
+            'postition' => 'required',
+            'nip'       => 'required',
+            'email'     => 'required',
+            'role_id'   => 'required',
         ]);
 
         try {
-            $users = Users::find($id);
+            $users = User::find($id);
 
             if ($users) {
                 $users->full_name = $request->input('full_name');
-                $users->email = $request->input('email');
-                $users->phone_number = $request->input('phone_number');
+                $users->postition = $request->input('postition');
+                $users->nip       = $request->input('nip');
+                $users->email     = $request->input('email');
+                $users->role_id   = $request->input('role_id');
                 $users->save();
 
                 $response = [
@@ -184,10 +150,10 @@ class UserController extends Controller
 
         try {
             DB::beginTransaction();
-            $users = Users::findOrFail($id);
+            $users = User::findOrFail($id);
 
             if ($users) {
-                Users::where('id', $id)->delete();
+                User::where('id', $id)->delete();
             }
 
             if(!$users->delete())
@@ -226,7 +192,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $selected_delete = Users::whereIn('id', $request->input('data'));
+            $selected_delete = User::whereIn('id', $request->input('data'));
 
             if ($selected_delete->delete()) {
                 $response = [
@@ -253,7 +219,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $selected_delete = Users::whereIn('id', $request->input('data'))->select(
+            $selected_delete = User::whereIn('id', $request->input('data'))->select(
                 'full_name', 'email', 'phone_number'
             )->get();
             Excel::store(new UserExport($selected_delete), 'User.xlsx');
@@ -275,7 +241,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $product = Users::whereIn('id', $request->input('data'))->get();
+            $product = User::whereIn('id', $request->input('data'))->get();
             if ($product) {
                 $response = [
                     'status' => 200,
@@ -289,7 +255,7 @@ class UserController extends Controller
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on exporting Users data',
+                'message' => 'error occured on exporting User data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);

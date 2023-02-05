@@ -44,7 +44,7 @@ class UserExport extends DefaultValueBinder implements FromCollection, WithHeadi
     public function headings(): array
     {
         return [
-            'NAMA', 'EMAIL', 'PHONE NUMBER',
+            'NAMA', 'EMAIL', 'NIP',
         ];
     }
 
