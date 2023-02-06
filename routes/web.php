@@ -61,6 +61,15 @@ $router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router)
         $router->get('selected_action/export_pdf', 'MenuController@selectedExportPdf');
         $router->post('selected_action/import_excel', 'MenuController@importExcel');
     });
+
+    $router->group(['prefix' => 'document'], function () use ($router) {
+       
+        $router->post('create', 'DocumentController@create');
+        
+    });
+
+
+
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
