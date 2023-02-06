@@ -261,4 +261,8 @@ class UserController extends Controller
             return response()->json($response, 400);
         }
     }
+
+    public function test() {
+        return 'test';
+    }
 }
