@@ -10,6 +10,6 @@ class Menu extends Model
     use SoftDeletes;
     
     protected $fillable = [
-        'name',
+        'name', 'path'
     ];
 }

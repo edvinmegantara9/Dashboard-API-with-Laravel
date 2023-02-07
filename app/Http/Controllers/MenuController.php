@@ -162,4 +162,96 @@ class MenuController extends Controller
             return response()->json($response, 400);
         }
     }
+
+    public function import() 
+    {
+        try {
+            Excel::import(new MenuImport, request()->file('file'));
+            return response()->json([
+                'status' => 201,
+                'message' => 'data berhasil di import!'
+            ], 201);
+        } catch (\Throwable $th) {
+            \Sentry\captureException($th);
+            return response()->json([
+                'status' => 500,
+                'message' => 'data gagal di import! ' . $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function selectedDelete(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = Menu::whereIn('id', $request->input('data'));
+            if ($selected_delete->delete()) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'Menu data has been deleted',
+                ];
+    
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportExcel(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $selected_delete = Menu::whereIn('id', $request->input('data'))->select(
+                'name', 'path'
+            )->get();
+            Excel::store(new MenuExport($selected_delete), 'Menu.xlsx');
+        return response()->download(storage_path("app/Menu.xlsx"), "Menu.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating paket pekerjaan data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    public function selectedExportPdf(Request $request) {
+        $this->validate($request, [
+            'data' => 'required'
+        ]);
+
+        try {
+            $lp2b = Menu::whereIn('id', $request->input('data'))->get();
+            if ($lp2b) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'Menu data has been retrieved',
+                    'data' => $lp2b
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on creating Menu data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
 }

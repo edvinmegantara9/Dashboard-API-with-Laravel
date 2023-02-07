@@ -63,7 +63,8 @@ class RoleController extends Controller
 			$role->name      = $request->input('name');
             $role->save();
 
-            if (count($request->get('role_menus')) > 0) {
+            if (!empty($request->get('role_menus'))) {
+
                 foreach ($request->get('role_menus') as $d) {
                     $detail = new RoleMenu;
                     $detail->role_id     = $role->id;
@@ -108,7 +109,8 @@ class RoleController extends Controller
                 $role->name      = $request->input('name');
                 $role->save();
 
-                if (count($request->get('role_menus')) > 0) {
+                if (!empty($request->get('role_menus'))) {
+                    RoleMenu::where('role_id', $role->id)->delete();
                     foreach ($request->get('role_menus') as $d) {
                         $detail = new RoleMenu;
                         $detail->role_id     = $role->id;
