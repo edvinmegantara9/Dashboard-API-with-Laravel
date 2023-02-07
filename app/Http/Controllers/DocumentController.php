@@ -195,7 +195,7 @@ class DocumentController extends Controller
 
            
             DocumentConsider::where('document_id', $id)->delete();
-            DocumentNotice::where('document_id', $id)->delete();
+            
 
             #harus direfactor nanti
             if(DocumentNotice::where('document_id', $id)){
