@@ -37,7 +37,36 @@ class DocumentController extends Controller
             'document_type' => 'required',
             'tittle' => 'required',
             'signer' => 'required',
-            'date' => 'required'
+            'date' => 'required',
+            // 
+            'document_considers' => 'required|array|min:1',
+            'document_considers.*.description' => 'required',
+            'document_considers.*.margin_top' => 'required|integer',
+            'document_considers.*.margin_bottom' => 'required|integer',
+            'document_considers.*.margin_left' => 'required|integer',
+            'document_considers.*.margin_right' => 'required|integer',
+            // 
+            'document_remembers' => 'required|array|min:1',
+            'document_remembers.*.description' => 'required',
+            'document_remembers.*.margin_top' => 'required|integer',
+            'document_remembers.*.margin_bottom' => 'required|integer',
+            'document_remembers.*.margin_left' => 'required|integer',
+            'document_remembers.*.margin_right' => 'required|integer',
+            // 
+            'document_notices' => 'required|array|min:1',
+            'document_notices.*.description' => 'required',
+            'document_notices.*.margin_top' => 'required|integer',
+            'document_notices.*.margin_bottom' => 'required|integer',
+            'document_notices.*.margin_left' => 'required|integer',
+            'document_notices.*.margin_right' => 'required|integer',
+            // 
+            'document_statuses.status' => 'required',
+            'document_statuses.remark' => 'required',
+
+            
+
+
+
         ]);
 
     try{
