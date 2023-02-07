@@ -24,14 +24,51 @@ class DocumentController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function get(Request $request)
+    {
+        $row        = $request->input('row');
+        $keyword    = $request->input('keyword');
+        $sortby     = $request->input('sortby');
+        $sorttype   = $request->input('sorttype');
+
+        if ($keyword == 'null') $keyword = '';
+        $keyword = urldecode($keyword);
+
+        try {
+            $data = Document::orderBy('documents.' . $sortby, $sorttype)
+                ->when($keyword, function ($query) use ($keyword) {
+                    return $query
+                        ->where('documents.document_type', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('documents.document_number', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('documents.tittle', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('documents.signer', 'LIKE', '%' . $keyword . '%');
+                        
+                })
+                ->paginate($row);
+
+            if ($data) {
+                $response = [
+                    'status' => 200,
+                    'message' => 'menus data has been retrieved',
+                    'data' => $data
+                ];
+
+                return response()->json($response, 200);
+            }
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on retrieving categorie data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    
+    }
+
     public function create(Request $request)
     {
-        
 
         $this->validate($request,[
             'document_type' => 'required',
@@ -52,7 +89,7 @@ class DocumentController extends Controller
             'document_remembers.*.margin_bottom' => 'required|integer',
             'document_remembers.*.margin_left' => 'required|integer',
             'document_remembers.*.margin_right' => 'required|integer',
-            // 
+            // kalau notices ga selalu ada, required nya tinggal hapus
             'document_notices' => 'required|array|min:1',
             'document_notices.*.description' => 'required',
             'document_notices.*.margin_top' => 'required|integer',
@@ -62,10 +99,6 @@ class DocumentController extends Controller
             // 
             'document_statuses.status' => 'required',
             'document_statuses.remark' => 'required',
-
-            
-
-
 
         ]);
 
@@ -147,6 +180,51 @@ class DocumentController extends Controller
 
 
     }
+
+    public function delete($id){
+        try {
+            $doc = Document::find($id);
+            
+            if (!$doc) {
+                $response = [
+                    'status' => 404,
+                    'message' => 'Data tidak ditemukan!',
+                ];
+                return response()->json($response, 404);
+            }
+
+           
+            DocumentConsider::where('document_id', $id)->delete();
+            
+
+            #harus direfactor nanti
+            if(DocumentNotice::where('document_id', $id)){
+                DocumentNotice::where('document_id', $id)->delete();
+            };
+            DocumentRemember::where('document_id', $id)->delete();
+            DocumentStatus::where('document_id', $id)->delete();
+            $doc->delete();
+
+
+            $response = [
+                'status' => 200,
+                'message' => 'Data Dokumen berhasil dihapus!',
+            ];
+
+            return response()->json($response, 200);
+
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error pada saat menghapus Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    
 
     public function store(Request $request)
     {
