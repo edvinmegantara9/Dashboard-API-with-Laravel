@@ -82,4 +82,5 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
+    
 }
