@@ -1,0 +1,16 @@
+[33mcommit 8b4558d691caa971151abf7d634847885904a14f[m[33m ([m[1;36mHEAD -> [m[1;32mSenoBranch[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: c67da76 8bd6647
+Author: Edvin megantara <edvin.megantara9@gmail.com>
+Date:   Tue Feb 7 17:54:30 2023 +0700
+
+    Merge pull request #6 from allin-studio/edvin_branch
+    
+    add cicid revision
+
+[33mcommit 8bd6647551a10d1d4a4f29af751618b3728e2fac[m[33m ([m[1;31morigin/edvin_branch[m[33m)[m
+Author: edvinmegantara9 <edvin.megantara9@gmail.com>
+Date:   Tue Feb 7 17:54:05 2023 +0700
+
+    add cicid revision
+
+M	.github/workflows/main.yml

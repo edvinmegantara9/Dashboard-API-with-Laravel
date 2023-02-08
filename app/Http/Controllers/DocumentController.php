@@ -195,8 +195,6 @@ class DocumentController extends Controller
 
            
             DocumentConsider::where('document_id', $id)->delete();
-            
-
             #harus direfactor nanti
             if(DocumentNotice::where('document_id', $id)){
                 DocumentNotice::where('document_id', $id)->delete();
@@ -231,23 +229,45 @@ class DocumentController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Document $document)
+    
+    public function show($id)
     {
-        //
+        try {
+
+            $data = Document::findOrFail($id);
+            
+            #jika butuh data terkait yang berhubungan dengan id document tersebut, tinggal uncoment 
+            // $consider = DocumentConsider::where('document_id', $id)->get();
+            // #harus direfactor nanti
+            // if(DocumentNotice::where('document_id', $id)){
+            //    $notice = DocumentNotice::where('document_id', $id)->get();
+            // };
+            // $remember = DocumentRemember::where('document_id', $id)->get();
+            // $status = DocumentStatus::where('document_id', $id)->get();
+
+            $response = [
+                'status' => 200,
+                'message' => 'Data Dokumen ditemukan',
+                'data' => $data,
+                // 'consider' => $consider,
+                // 'remember' => $remember,
+                // 'notice' => $notice,
+                // 'status' => $status
+            ];
+            return response()->json($response,200);
+
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error pada saat Show Data Document',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
-     */
+    
     public function edit(Document $document)
     {
         //
