@@ -236,8 +236,9 @@ class DocumentController extends Controller
 
             $data = Document::findOrFail($id);
             
-            #jika butuh data terkait yang berhubungan dengan id document tersebut, tinggal uncoment 
-            // $consider = DocumentConsider::where('document_id', $id)->get();
+            // jika butuh data terkait yang berhubungan dengan id document tersebut, tinggal uncoment 
+
+            // $consider = DocumentConsider::whereDocument_id($id)->get(); #bisa penulisan seperti itu jg 
             // #harus direfactor nanti
             // if(DocumentNotice::where('document_id', $id)){
             //    $notice = DocumentNotice::where('document_id', $id)->get();
@@ -280,9 +281,50 @@ class DocumentController extends Controller
      * @param  \App\Models\Document  $document
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Document $document)
+    public function update(Request $request, $id)
     {
-        //
+        $this->validate($request,[
+            'document_type' => 'required',
+            'tittle' => 'required',
+            'signer' => 'required',
+            'date' => 'required|date'
+        ]);
+
+        try {
+            $doc = Document::find($id);
+
+            if ($doc) {
+                $doc->document_type = $request->input('document_type');
+                $doc->tittle = $request->input('tittle');
+                $doc->signer = $request->input('signer');
+                $doc->date = $request->input('date');
+                $doc->save();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'Document data has been updated',
+                    'data' => $doc
+                ];
+
+                return response()->json($response, 200);
+            }
+
+            $response = [
+                'status' => 404,
+                'message' => 'Document data not found',
+            ];
+            return response()->json($response, 404);
+        } catch (\Exception $e) {
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'error occured on updating Document data',
+                'error' => $e
+            ];
+            return response()->json($response, 400);
+        }
+
+
     }
 
     /**
