@@ -20,7 +20,7 @@ class CreateDocumentsTable extends Migration
             $table->string('tittle');
             $table->string('signer');
             $table->foreignId('user_id')->constrained('users');
-            $table->dateTime('date');
+            $table->dateTime('date');        
             $table->timestamps(); 
         });
     }
