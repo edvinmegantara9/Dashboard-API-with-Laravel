@@ -234,28 +234,29 @@ class DocumentController extends Controller
     {
         try {
 
-            $data = Document::findOrFail($id);
             
-            // jika butuh data terkait yang berhubungan dengan id document tersebut, tinggal uncoment 
+            $data = Document::with([
+            'document_considers',
+            'document_remembers',
+            'document_notices',
+            'document_statuses',
+            'document_decisions',
+            'document_attachments'])
+            ->where('id', $id)
+            ->firstOrFail();
+            
+            if($data!=null){
 
-            // $consider = DocumentConsider::whereDocument_id($id)->get(); #bisa penulisan seperti itu jg 
-            // #harus direfactor nanti
-            // if(DocumentNotice::where('document_id', $id)){
-            //    $notice = DocumentNotice::where('document_id', $id)->get();
-            // };
-            // $remember = DocumentRemember::where('document_id', $id)->get();
-            // $status = DocumentStatus::where('document_id', $id)->get();
+                $response = [
+                    'status' => 200,
+                    'message' => 'Data Dokumen ditemukan',
+                    'data' => $data,
+                    
+                ];
+                return response()->json($response,200);
+            }
 
-            $response = [
-                'status' => 200,
-                'message' => 'Data Dokumen ditemukan',
-                'data' => $data,
-                // 'consider' => $consider,
-                // 'remember' => $remember,
-                // 'notice' => $notice,
-                // 'status' => $status
-            ];
-            return response()->json($response,200);
+            
 
         } catch (\Exception $e) {
             \Sentry\captureException($e);
