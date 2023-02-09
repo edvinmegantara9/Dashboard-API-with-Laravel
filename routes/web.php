@@ -66,7 +66,9 @@ $router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router)
        
         $router->post('create', 'DocumentController@create');
         $router->get('', 'DocumentController@get');
+        $router->get('show/{id}', 'DocumentController@show');
         $router->delete('delete/{id}', 'DocumentController@delete');
+        $router->put('update/{id}', 'DocumentController@update');
     });
 
 
