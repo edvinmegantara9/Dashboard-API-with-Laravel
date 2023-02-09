@@ -10,6 +10,7 @@ use App\Models\DocumentConsider;
 use App\Models\DocumentRemember;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\DocumentAttachment;
 use Illuminate\Support\Facades\Auth;
 
 class DocumentController extends Controller
@@ -41,7 +42,8 @@ class DocumentController extends Controller
                         ->where('documents.document_type', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('documents.document_number', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('documents.tittle', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.signer', 'LIKE', '%' . $keyword . '%');
+                        ->orWhere('documents.signer', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('documents.status', 'LIKE', '%' . $keyword . '%');
                         
                 })
                 ->paginate($row);
@@ -75,6 +77,7 @@ class DocumentController extends Controller
             'tittle' => 'required',
             'signer' => 'required',
             'date' => 'required',
+            'status' => 'required',
             // 
             'document_considers' => 'required|array|min:1',
             'document_considers.*.description' => 'required',
@@ -110,6 +113,7 @@ class DocumentController extends Controller
         $doc->signer = $request->input('signer');
         $doc->user_id = Auth::user()->id;
         $doc->date = $request->input('date');
+        $doc->status = $request->input('status');
         $doc->save();
 
         if (count($request->get('document_considers')) > 0) {
@@ -151,8 +155,8 @@ class DocumentController extends Controller
         }
         $status = new DocumentStatus;
         $status->document_id = $doc->id;
-        $status->status = $request->input('document_statuses.status');
-        $status->remark = $request->input('document_statuses.remark');
+        $status->status = $request->input('document_statuses.*.status');
+        $status->remark = $request->input('document_statuses.*.remark');
         $status->user_id = Auth::user()->id;
         $status->save();
 
@@ -275,23 +279,50 @@ class DocumentController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
-     */
+    
     public function update(Request $request, $id)
     {
         $this->validate($request,[
             'document_type' => 'required',
             'tittle' => 'required',
             'signer' => 'required',
-            'date' => 'required|date'
+            'date' => 'required',
+            'status' => 'required',
+            // 
+            'document_considers' => 'required|array|min:1',
+            'document_considers.*.description' => 'required',
+            'document_considers.*.margin_top' => 'required|integer',
+            'document_considers.*.margin_bottom' => 'required|integer',
+            'document_considers.*.margin_left' => 'required|integer',
+            'document_considers.*.margin_right' => 'required|integer',
+            // 
+            'document_remembers' => 'required|array|min:1',
+            'document_remembers.*.description' => 'required',
+            'document_remembers.*.margin_top' => 'required|integer',
+            'document_remembers.*.margin_bottom' => 'required|integer',
+            'document_remembers.*.margin_left' => 'required|integer',
+            'document_remembers.*.margin_right' => 'required|integer',
+            // kalau notices ga selalu ada, required nya tinggal hapus
+            'document_notices' => 'required|array|min:1',
+            'document_notices.*.description' => 'required',
+            'document_notices.*.margin_top' => 'required|integer',
+            'document_notices.*.margin_bottom' => 'required|integer',
+            'document_notices.*.margin_left' => 'required|integer',
+            'document_notices.*.margin_right' => 'required|integer',
+
+            'document_attachments' => 'required|array|min:1',
+            'document_attachments.*.description' => 'required',
+            'document_attachments.*.margin_top' => 'required|integer',
+            'document_attachments.*.margin_bottom' => 'required|integer',
+            'document_attachments.*.margin_left' => 'required|integer',
+            'document_attachments.*.margin_right' => 'required|integer'
+
+
         ]);
 
         try {
+            DB::beginTransaction();
+
             $doc = Document::find($id);
 
             if ($doc) {
@@ -299,31 +330,109 @@ class DocumentController extends Controller
                 $doc->tittle = $request->input('tittle');
                 $doc->signer = $request->input('signer');
                 $doc->date = $request->input('date');
+                $doc->status = $request->input('status');
                 $doc->save();
+
+                if (!empty($request->get('document_considers'))) {
+                    DocumentConsider::where('document_id', $doc->id)->delete();
+                    foreach ($request->get('document_considers') as $d) {
+                
+                        $consider = new DocumentConsider;
+                        $consider->document_id = $doc->id;
+                        $consider->description = $d['description'];
+                        $consider->margin_top =$d['margin_top'];
+                        $consider->margin_bottom =$d['margin_bottom'];
+                        $consider->margin_left =$d['margin_left'];
+                        $consider->margin_right =$d['margin_right'];
+                        $consider->save();                        
+                    }
+                }
+
+                if (!empty($request->get('document_remembers'))) {
+                    DocumentRemember::where('document_id', $doc->id)->delete();
+                    foreach ($request->get('document_remembers') as $d) {
+                
+                        $remember = new DocumentRemember();
+                        $remember->document_id = $doc->id;
+                        $remember->description = $d['description'];
+                        $remember->margin_top =$d['margin_top'];
+                        $remember->margin_bottom =$d['margin_bottom'];
+                        $remember->margin_left =$d['margin_left'];
+                        $remember->margin_right =$d['margin_right'];
+                        $remember->save();                        
+                    }
+                }
+
+                if (!empty($request->get('document_notices'))) {
+                    DocumentNotice::where('document_id', $doc->id)->delete();
+                    foreach ($request->get('document_notices') as $d) {
+                
+                        $notice = new DocumentNotice;
+                        $notice->document_id = $doc->id;
+                        $notice->description = $d['description'];
+                        $notice->margin_top =$d['margin_top'];
+                        $notice->margin_bottom =$d['margin_bottom'];
+                        $notice->margin_left =$d['margin_left'];
+                        $notice->margin_right =$d['margin_right'];
+                        $notice->save();                        
+                    }
+                }
+
+                if (!empty($request->get('document_attachments'))) {
+                    DocumentAttachment::where('document_id', $doc->id)->delete();
+                    foreach ($request->get('document_attachments') as $d) {
+                
+                        $attachment = new DocumentAttachment();
+                        $attachment->document_id = $doc->id;
+                        $attachment->tittle = $d['tittle'];
+                        $attachment->description = $d['description'];
+                        $attachment->margin_top =$d['margin_top'];
+                        $attachment->margin_bottom =$d['margin_bottom'];
+                        $attachment->margin_left =$d['margin_left'];
+                        $attachment->margin_right =$d['margin_right'];
+                        $attachment->save();                        
+                    }
+                }
+
+                if (!empty($request->get('document_statuses'))) {
+                    DocumentStatus::where('document_id', $doc->id)->delete();
+                    $status = new DocumentStatus;
+                    $status->document_id = $doc->id;
+                    $status->status = $request->input('document_statuses.status');
+                    $status->remark = $request->input('document_statuses.remark');
+                    $status->user_id = Auth::user()->id;
+                    $status->save();
+                }
+
+                DB::commit();
 
                 $response = [
                     'status' => 200,
-                    'message' => 'Document data has been updated',
-                    'data' => $doc
+                    'message' => 'Data Document Behasil di update',
+                    
                 ];
 
                 return response()->json($response, 200);
             }
-
             $response = [
                 'status' => 404,
-                'message' => 'Document data not found',
+                'message' => 'Data tidak ditemukan!',
             ];
+
             return response()->json($response, 404);
+
         } catch (\Exception $e) {
+            DB::rollBack();
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on updating Document data',
-                'error' => $e
+                'message' => 'Ada error pada saat mengubah data!',
+                'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
         }
+
+        
 
 
     }
