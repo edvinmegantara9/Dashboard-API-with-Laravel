@@ -11,7 +11,9 @@ use App\Models\DocumentRemember;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\DocumentAttachment;
+use App\Models\DocumentSupport;
 use Illuminate\Support\Facades\Auth;
+
 
 class DocumentController extends Controller
 {
@@ -99,9 +101,19 @@ class DocumentController extends Controller
             'document_notices.*.margin_bottom' => 'required|integer',
             'document_notices.*.margin_left' => 'required|integer',
             'document_notices.*.margin_right' => 'required|integer',
-            // 
-            'document_statuses.status' => 'required',
-            'document_statuses.remark' => 'required',
+            
+            // 'document_statuses.status' => 'required',
+            // 'document_statuses.remark' => 'required',
+            
+            // 'document_attachments' => 'required|array|min:1',
+            // 'document_attachments.*.description' => 'required',
+            // 'document_attachments.*.margin_top' => 'required|integer',
+            // 'document_attachments.*.margin_bottom' => 'required|integer',
+            // 'document_attachments.*.margin_left' => 'required|integer',
+            // 'document_attachments.*.margin_right' => 'required|integer',
+            
+            // 'document_supports.*.file' => 'required',
+            
 
         ]);
 
@@ -155,11 +167,34 @@ class DocumentController extends Controller
         }
         $status = new DocumentStatus;
         $status->document_id = $doc->id;
-        $status->status = $request->input('document_statuses.*.status');
-        $status->remark = $request->input('document_statuses.*.remark');
+        $status->status = $request->input('document_statuses.status');
+        $status->remark = $request->input('document_statuses.remark');
         $status->user_id = Auth::user()->id;
         $status->save();
 
+        if (count($request->get('document_attachments')) > 0) {
+            foreach ($request->get('document_attachments') as $d) {
+                $attachment = new DocumentAttachment();
+                $attachment->document_id = $doc->id;
+                $attachment->tittle = $d['tittle'];
+                $attachment->description = $d['description'];
+                $attachment->margin_top =$d['margin_top'];
+                $attachment->margin_bottom =$d['margin_bottom'];
+                $attachment->margin_left =$d['margin_left'];
+                $attachment->margin_right =$d['margin_right'];
+                $attachment->save();
+                          
+            }
+        }
+
+        if (count($request->get('document_supports')) > 0) {
+            foreach ($request->get('document_supports') as $d) {
+                $suport = new DocumentSupport();
+                $suport->document_id = $doc->id;
+                $suport->file = $d['file'];    
+                $suport->save();            
+            }
+        }
         DB::commit();
 
             $response = [
@@ -205,6 +240,8 @@ class DocumentController extends Controller
             };
             DocumentRemember::where('document_id', $id)->delete();
             DocumentStatus::where('document_id', $id)->delete();
+            DocumentAttachment::where('document_id', $id)->delete();
+            DocumentSupport::where('document_id',$id)->delete();
             $doc->delete();
 
 
@@ -245,7 +282,8 @@ class DocumentController extends Controller
             'document_notices',
             'document_statuses',
             'document_decisions',
-            'document_attachments'])
+            'document_attachments',
+            'document_supports'])
             ->where('id', $id)
             ->firstOrFail();
             
@@ -302,7 +340,7 @@ class DocumentController extends Controller
             'document_remembers.*.margin_bottom' => 'required|integer',
             'document_remembers.*.margin_left' => 'required|integer',
             'document_remembers.*.margin_right' => 'required|integer',
-            // kalau notices ga selalu ada, required nya tinggal hapus
+            //kalau notices ga selalu ada, required nya tinggal hapus
             'document_notices' => 'required|array|min:1',
             'document_notices.*.description' => 'required',
             'document_notices.*.margin_top' => 'required|integer',
@@ -394,6 +432,17 @@ class DocumentController extends Controller
                     }
                 }
 
+                if (!empty($request->get('document_supports'))) {
+                    DocumentSupport::where('document_id', $doc->id)->delete();
+                    foreach ($request->get('document_supports') as $d) {
+                
+                        $suport = new DocumentSupport();
+                        $suport->document_id = $doc->id;
+                        $suport->file = $d['file'];    
+                        $suport->save();
+                    }
+                }
+
                 if (!empty($request->get('document_statuses'))) {
                     DocumentStatus::where('document_id', $doc->id)->delete();
                     $status = new DocumentStatus;
@@ -403,6 +452,8 @@ class DocumentController extends Controller
                     $status->user_id = Auth::user()->id;
                     $status->save();
                 }
+
+                
 
                 DB::commit();
 
