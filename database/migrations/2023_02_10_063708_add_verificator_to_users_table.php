@@ -14,7 +14,7 @@ class AddVerificatorToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('verificator');
+            $table->integer('verificator')->nullable();
         });
     }
 
