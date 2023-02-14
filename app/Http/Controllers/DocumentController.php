@@ -488,26 +488,41 @@ class DocumentController extends Controller
     try{
         DB::beginTransaction();
         $doc = Document::find($request->input('document_id'));
+        $doc->legal_drafter = '3';
+                //4
+        
+                // $doc->admin_verified_at = new DateTime();
+        $doc->status = $request->input('status');
+        $doc->save();
         
         if($doc){
 
             $doc->status = $request->input('status');
             $status = new DocumentStatus;
             $status->user_id =  Auth::user()->id;
+            $status->document_id = $request->input('document_id');
+            $status->status = $request->input('status');
+            $status->remark = $request->input('remark');
+            
 
-            if($request->input('status')=="proses"){
+            if($request->input('status')=='proses'){
                 ///bagian 3 nya masi blm ngerti 
+                $documents = Document::select(DB::raw('COUNT(*) as total_document, legal_drafter'))
+                     ->groupBy('legal_drafter')
+                     ->orderByRaw('COUNT(*) ASC') 
+                     ->first();
+
+                $doc->legal_drafter = $documents['legal_drafter'];
+                //4
                 $doc->admin_verified = Auth::user()->id;
                 // $doc->admin_verified_at = new DateTime();
-
-
-
+                $doc->save();
+                $status->save();
 
             }
 
         }
 
-        
         DB::commit();
 
             $response = [
@@ -523,7 +538,7 @@ class DocumentController extends Controller
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'Ada error pada saat menambahkan data Dokumen',
+                'message' => 'Ada error saat update Data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
