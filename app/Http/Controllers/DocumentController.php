@@ -126,6 +126,7 @@ class DocumentController extends Controller
         $doc->user_id = Auth::user()->id;
         $doc->date = $request->input('date');
         $doc->status = $request->input('status');
+        $doc->legal_drafter = $request->input('legal_drafter');
         $doc->save();
 
         if (count($request->get('document_considers')) > 0) {
@@ -311,11 +312,6 @@ class DocumentController extends Controller
         }
     }
 
-    
-    public function edit(Document $document)
-    {
-        //
-    }
 
     
     public function update(Request $request, $id)
@@ -488,14 +484,51 @@ class DocumentController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Document  $document
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Document $document)
-    {
-        //
-    }
+   public function approveAdmin(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        if($doc){
+
+            $doc->status = $request->input('status');
+            $status = new DocumentStatus;
+            $status->user_id =  Auth::user()->id;
+
+            if($request->input('status')=="proses"){
+                ///bagian 3 nya masi blm ngerti 
+                $doc->admin_verified = Auth::user()->id;
+                // $doc->admin_verified_at = new DateTime();
+
+
+
+
+            }
+
+        }
+
+        
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil!',
+                
+            ];
+
+            return response()->json($response, 201);
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error pada saat menambahkan data Dokumen',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+    
 }
