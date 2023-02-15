@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\DocumentNotice;
 use App\Models\DocumentStatus;
@@ -503,14 +504,24 @@ class DocumentController extends Controller
         $status->remark = $request->input('remark');
         $status->save();    
         
+        
         if($request->input('status')=='proses'){
             ///bagian 3 nya masi blm ngerti 
-            $documents = Document::select(DB::raw('COUNT(*) as total_document, legal_drafter'))
-                    ->groupBy('legal_drafter')
-                    ->orderByRaw('COUNT(*) ASC') 
-                    ->first();
-
-            $doc->legal_drafter = $documents['legal_drafter'];
+            // $documents = User::
+            // select(DB::raw('COUNT(*) as total_document, legal_drafter'))
+            //         ->groupBy('legal_drafter')
+            //         ->orderByRaw('COUNT(*) ASC') 
+            //         ->first();
+            $documents = DB::table('users')
+            ->select('users.id', DB::raw('COALESCE(COUNT(documents.id), 0) AS total_document'))
+            ->leftJoin('documents', 'users.id', '=', 'documents.legal_drafter')
+            ->groupBy('users.id')
+            ->orderBy('total_document', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->first();
+            // dd($documents);
+    
+            $doc->legal_drafter = $documents->id;
             //4
             $doc->admin_verified = Auth::user()->id;
             // untuk waktu masih ngebug

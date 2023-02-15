@@ -107,6 +107,7 @@ class UserController extends Controller
             'nip'       => 'required',
             'email'     => 'required',
             'role_id'   => 'required',
+            'verificator' => 'required|integer'
         ]);
 
         try {
@@ -118,6 +119,7 @@ class UserController extends Controller
                 $users->nip       = $request->input('nip');
                 $users->email     = $request->input('email');
                 $users->role_id   = $request->input('role_id');
+                $users->verificator   = $request->input('verificator');
                 $users->save();
 
                 $response = [
