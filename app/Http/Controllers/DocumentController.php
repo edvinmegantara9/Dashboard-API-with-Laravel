@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\DocumentNotice;
 use App\Models\DocumentStatus;
@@ -20,16 +21,6 @@ use Carbon\Carbon;
 
 class DocumentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
     public function get(Request $request)
     {
         $row        = $request->input('row');
@@ -525,64 +516,53 @@ class DocumentController extends Controller
         };
    }
 
-   public function approveLegalDrafter(Request $request){
-    try{
-        DB::beginTransaction();
-        $doc = Document::find($request->input('document_id'));
-        
-        if(!$doc){
+    public function approveLegalDrafter(Request $request){
+        try{
+            DB::beginTransaction();
+            $doc = Document::find($request->input('document_id')); 
+            if (!$doc){
+                throw new \Exception('Data Dokumen tidak ada');
+            }
+            $doc->status = $request->input('status');
+            $status = new DocumentStatus;
+            $status->user_id =  Auth::user()->id;
+            $status->document_id = $request->input('document_id');
+            $status->status = $request->input('status');
+            $status->remark = $request->input('remark');
 
-            throw new \Exception('Data Dokumen tidak ada');
-
-        }
-        $doc->status = $request->input('status');
-        $status = new DocumentStatus;
-        $status->user_id =  Auth::user()->id;
-        $status->document_id = $request->input('document_id');
-        $status->status = $request->input('status');
-        $status->remark = $request->input('remark');
-            if($request->input('status')=='LEGAL DRAFTING'){
-                
+            if($request->input('status') == 'LEGAL DRAFTING'){
                 $doc->legal_drafter_verified = Auth::user()->id;
                 $doc->legal_drafter_verified_at = Carbon::now();
             }
-        $doc->save();
-        $status->save();
+            $doc->save();
+            $status->save();
 
-        DB::commit();
+            DB::commit();
 
             $response = [
                 'status' => 201,
                 'message' => 'Dokumen Berhasil di Update Legal Drafter!',
                 
             ];
-
             return response()->json($response, 201);
-        
-
-    }catch(\Exception $e){
-        DB::rollBack();
-            \Sentry\captureException($e);
-            $response = [
-                'status' => 400,
-                'message' => 'Ada error saat update Data',
-                'error' => $e->getMessage()
-            ];
-            return response()->json($response, 400);
-
-    };
+        } catch(\Exception $e){
+            DB::rollBack();
+                \Sentry\captureException($e);
+                $response = [
+                    'status' => 400,
+                    'message' => 'Ada error saat update Data',
+                    'error' => $e->getMessage()
+                ];
+                return response()->json($response, 400);
+        };
    }
 
    public function approveSuncang(Request $request){
     try{
         DB::beginTransaction();
         $doc = Document::find($request->input('document_id'));
-        
-        
         if(!$doc){
-
             throw new \Exception('Data Dokumen tidak ada');
-
         }
         $doc->status = $request->input('status');
         $status = new DocumentStatus;
@@ -591,25 +571,20 @@ class DocumentController extends Controller
         $status->status = $request->input('status');
         $status->remark = $request->input('remark');
         if($request->input('status')=='APPROVED SUNCANG'){
-            
             $doc->suncang_verified = Auth::user()->id;
             $doc->suncang_verified_at = Carbon::now();
         }
         $doc->save();
         $status->save();
-
         DB::commit();
 
-            $response = [
-                'status' => 201,
-                'message' => 'Dokumen Berhasil di Update Suncang!',
-                
-            ];
-
-            return response()->json($response, 201);
-        
-
-    }catch(\Exception $e){
+        $response = [
+            'status' => 201,
+            'message' => 'Dokumen Berhasil di Update Suncang!',
+            
+        ];
+        return response()->json($response, 201);
+    } catch(\Exception $e){
         DB::rollBack();
             \Sentry\captureException($e);
             $response = [
@@ -675,12 +650,8 @@ class DocumentController extends Controller
     try{
         DB::beginTransaction();
         $doc = Document::find($request->input('document_id'));
-        
-        
         if(!$doc){
-
             throw new \Exception('Data Dokumen tidak ada');
-
         }
         $doc->status = $request->input('status');
         $status = new DocumentStatus;
@@ -689,7 +660,6 @@ class DocumentController extends Controller
         $status->status = $request->input('status');
         $status->remark = $request->input('remark');
         if($request->input('status')=='APPROVED KABAG'){
-            
             $doc->kabag_verified = Auth::user()->id;
             $doc->kabag_verified_at = Carbon::now();
             $doc->kabag_verified_sign = $request->input('sign');
@@ -698,15 +668,12 @@ class DocumentController extends Controller
         $status->save();
         DB::commit();
 
-            $response = [
-                'status' => 201,
-                'message' => 'Dokumen Berhasil di Update Kabag!',
-                
-            ];
+        $response = [
+            'status' => 201,
+            'message' => 'Dokumen Berhasil di Update Kabag!',
+        ];
 
-            return response()->json($response, 201);
-        
-
+        return response()->json($response, 201);
     }catch(\Exception $e){
         DB::rollBack();
             \Sentry\captureException($e);
@@ -814,9 +781,6 @@ class DocumentController extends Controller
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
-
     };
    }
-
-
 }
