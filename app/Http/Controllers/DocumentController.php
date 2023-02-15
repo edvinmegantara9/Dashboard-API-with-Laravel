@@ -13,6 +13,8 @@ use App\Http\Controllers\Controller;
 use App\Models\DocumentAttachment;
 use App\Models\DocumentSupport;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
 
 
 class DocumentController extends Controller
@@ -105,14 +107,14 @@ class DocumentController extends Controller
             // 'document_statuses.status' => 'required',
             // 'document_statuses.remark' => 'required',
             
-            // 'document_attachments' => 'required|array|min:1',
-            // 'document_attachments.*.description' => 'required',
-            // 'document_attachments.*.margin_top' => 'required|integer',
-            // 'document_attachments.*.margin_bottom' => 'required|integer',
-            // 'document_attachments.*.margin_left' => 'required|integer',
-            // 'document_attachments.*.margin_right' => 'required|integer',
+            'document_attachments' => 'required|array|min:1',
+            'document_attachments.*.description' => 'required',
+            'document_attachments.*.margin_top' => 'required|integer',
+            'document_attachments.*.margin_bottom' => 'required|integer',
+            'document_attachments.*.margin_left' => 'required|integer',
+            'document_attachments.*.margin_right' => 'required|integer',
             
-            // 'document_supports.*.file' => 'required',
+            'document_supports.*.file' => 'required',
             
 
         ]);
@@ -488,50 +490,48 @@ class DocumentController extends Controller
     try{
         DB::beginTransaction();
         $doc = Document::find($request->input('document_id'));
-        $doc->legal_drafter = '3';
-                //4
-        
-                // $doc->admin_verified_at = new DateTime();
-        $doc->status = $request->input('status');
-        $doc->save();
-        
-        if($doc){
 
-            $doc->status = $request->input('status');
-            $status = new DocumentStatus;
-            $status->user_id =  Auth::user()->id;
-            $status->document_id = $request->input('document_id');
-            $status->status = $request->input('status');
-            $status->remark = $request->input('remark');
+        if(!$doc){
+
             
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+        $status->save();    
+        
+        if($request->input('status')=='proses'){
+            ///bagian 3 nya masi blm ngerti 
+            $documents = Document::select(DB::raw('COUNT(*) as total_document, legal_drafter'))
+                    ->groupBy('legal_drafter')
+                    ->orderByRaw('COUNT(*) ASC') 
+                    ->first();
 
-            if($request->input('status')=='proses'){
-                ///bagian 3 nya masi blm ngerti 
-                $documents = Document::select(DB::raw('COUNT(*) as total_document, legal_drafter'))
-                     ->groupBy('legal_drafter')
-                     ->orderByRaw('COUNT(*) ASC') 
-                     ->first();
-
-                $doc->legal_drafter = $documents['legal_drafter'];
-                //4
-                $doc->admin_verified = Auth::user()->id;
-                // $doc->admin_verified_at = new DateTime();
-                $doc->save();
-                $status->save();
-
-            }
+            $doc->legal_drafter = $documents['legal_drafter'];
+            //4
+            $doc->admin_verified = Auth::user()->id;
+            // untuk waktu masih ngebug
+            $doc->admin_verified_at = Carbon::now();
+            
 
         }
 
+        $doc->save();
+        $status->save(); 
         DB::commit();
 
             $response = [
                 'status' => 201,
-                'message' => 'Dokumen Berhasil!',
+                'message' => 'Dokumen Berhasil di Approve Admin!',
                 
             ];
 
             return response()->json($response, 201);
+
+        
 
     }catch(\Exception $e){
         DB::rollBack();
@@ -545,5 +545,299 @@ class DocumentController extends Controller
 
     };
    }
-    
+
+   public function approveLegalDrafter(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        if(!$doc){
+
+            throw new \Exception('Data Dokumen tidak ada');
+
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+            if($request->input('status')=='LEGAL DRAFTING'){
+                
+                $doc->legal_drafter_verified = Auth::user()->id;
+                $doc->legal_drafter_verified_at = Carbon::now();
+            }
+        $doc->save();
+        $status->save();
+
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil di Update Legal Drafter!',
+                
+            ];
+
+            return response()->json($response, 201);
+        
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error saat update Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+
+   public function approveSuncang(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        
+        if(!$doc){
+
+            throw new \Exception('Data Dokumen tidak ada');
+
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+        if($request->input('status')=='APPROVED SUNCANG'){
+            
+            $doc->suncang_verified = Auth::user()->id;
+            $doc->suncang_verified_at = Carbon::now();
+        }
+        $doc->save();
+        $status->save();
+
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil di Update Suncang!',
+                
+            ];
+
+            return response()->json($response, 201);
+        
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error saat update Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+
+   public function approveKasubag(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        
+        if(!$doc){
+
+            throw new \Exception('Data Dokumen tidak ada');
+
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+        if($request->input('status')=='APPROVED KASUBAG'){
+            
+            $doc->kasubag_verified = Auth::user()->id;
+            $doc->kasubag_verified_at = Carbon::now();
+            $doc->kasubag_verfied_sign = $request->input('sign');
+        }
+        $doc->save();
+        $status->save();
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil di Update Kasubag!',
+                
+            ];
+
+            return response()->json($response, 201);
+        
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error saat update Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+
+   public function approveKabag(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        
+        if(!$doc){
+
+            throw new \Exception('Data Dokumen tidak ada');
+
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+        if($request->input('status')=='APPROVED KABAG'){
+            
+            $doc->kabag_verified = Auth::user()->id;
+            $doc->kabag_verified_at = Carbon::now();
+            $doc->kabag_verified_sign = $request->input('sign');
+        }
+        $doc->save();
+        $status->save();
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil di Update Kabag!',
+                
+            ];
+
+            return response()->json($response, 201);
+        
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error saat update Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+
+   public function approveAssistant(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        
+        if(!$doc){
+
+            throw new \Exception('Data Dokumen tidak ada');
+
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+        if($request->input('status')=='APPROVED ASSISTANT'){
+            
+            $doc->asistant_verified = Auth::user()->id;
+            $doc->asistant_verified_at = Carbon::now();
+            $doc->asistant_verified_sign = $request->input('sign');
+        }
+        $doc->save();
+        $status->save();
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil di Update Assistant!',
+                
+            ];
+
+            return response()->json($response, 201);
+        
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error saat update Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+
+   public function approveSekda(Request $request){
+    try{
+        DB::beginTransaction();
+        $doc = Document::find($request->input('document_id'));
+        
+        
+        if(!$doc){
+
+            throw new \Exception('Data Dokumen tidak ada');
+
+        }
+        $doc->status = $request->input('status');
+        $status = new DocumentStatus;
+        $status->user_id =  Auth::user()->id;
+        $status->document_id = $request->input('document_id');
+        $status->status = $request->input('status');
+        $status->remark = $request->input('remark');
+        if($request->input('status')=='APPROVED SEKDA'){
+            
+            $doc->sekda_verified = Auth::user()->id;
+            $doc->sekda_verified_at = Carbon::now();
+            $doc->sekda_verified_sign = $request->input('sign');
+        }
+        $doc->save();
+        $status->save();
+        DB::commit();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Dokumen Berhasil di Update Sekda!',
+                
+            ];
+
+            return response()->json($response, 201);
+        
+
+    }catch(\Exception $e){
+        DB::rollBack();
+            \Sentry\captureException($e);
+            $response = [
+                'status' => 400,
+                'message' => 'Ada error saat update Data',
+                'error' => $e->getMessage()
+            ];
+            return response()->json($response, 400);
+
+    };
+   }
+
+
 }
