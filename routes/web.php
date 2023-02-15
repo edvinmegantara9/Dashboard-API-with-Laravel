@@ -69,6 +69,14 @@ $router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router)
         $router->get('show/{id}', 'DocumentController@show');
         $router->delete('delete/{id}', 'DocumentController@delete');
         $router->put('update/{id}', 'DocumentController@update');
+        $router->put('approveAdmin', 'DocumentController@approveAdmin');
+        $router->put('approveLegalDrafter', 'DocumentController@approveLegalDrafter');
+        $router->put('approveSuncang', 'DocumentController@approveSuncang');
+        $router->put('approveKasubag', 'DocumentController@approveKasubag');
+        $router->put('approveKabag', 'DocumentController@approveKabag');
+        $router->put('approveAssistant', 'DocumentController@approveAssistant');
+        $router->put('approveSekda', 'DocumentController@approveSekda');
+        
     });
 
 

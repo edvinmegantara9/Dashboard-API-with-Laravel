@@ -6,7 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Document extends Model
 {
-    //
+    
+    protected $fillable = [
+    'legal_drafter',
+    'admin_verified',
+    'legal_drafter_verified',
+    'suncang_verified',
+    'kasubag_verified','
+    kabag_verified',
+    'asistant_verified',
+    'sekda_verified'];
+
     public function users()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
@@ -34,6 +44,10 @@ class Document extends Model
 
     public function document_attachments(){
         return $this->hasMany(DocumentAttachment::class, 'document_id', 'id');
-    }    
+    }
+    
+    public function document_supports(){
+        return $this->hasMany(DocumentSupport::class, 'document_id', 'id');
+    }
     
 }
