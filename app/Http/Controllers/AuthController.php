@@ -33,6 +33,7 @@ class AuthController extends BaseController
             'email'         => 'required|string|email|unique:users', 
             'password'      => 'required|confirmed|min:6',
             'role_id'       => 'required', 
+            'verificator'   => 'required|integer'
         ],[
           'required' => 'Data :attribute harus diisi'
         ]);
@@ -45,6 +46,7 @@ class AuthController extends BaseController
             $user->email        = $request->input('email');
             $user->password     = app('hash')->make($request->input('password'));
             $user->role_id      = $request->input('role_id');
+            $user->verificator      = $request->input('verificator');
             $user->save();
 
             DB::commit();
