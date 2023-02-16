@@ -31,17 +31,57 @@ class DocumentController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $data = Document::orderBy('documents.' . $sortby, $sorttype)
+            $data = Document::with([
+                
+                'user',
+                'adminVerified',
+                'legalDrafter',
+                'legalDrafterVerified',
+                'suncangVerified',
+                'kasubagVerified',
+                'kabagVerified',
+                'asistantVerified',
+                'sekdaVerified',
+                'documentConsider',
+                'documentRemember',
+                'documentNotice',
+                'documentStatus',
+                'documentDecision',
+                'documentAttachment',
+                'documentSupport']) ;
+
+            if(Auth::user()->verificator == 0){
+
+                $data = $data->where('user_id', Auth::user()->id)
+                ->whereIn('status', $request->input('status'))
+                ->orderBy('documents.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
-                    return $query
-                        ->where('documents.document_type', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.document_number', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.tittle', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.signer', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('documents.status', 'LIKE', '%' . $keyword . '%');
+                return $query
+                ->where('documents.document_type', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.document_number', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.tittle', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.signer', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.status', 'LIKE', '%' . $keyword . '%');
                         
                 })
                 ->paginate($row);
+            }
+            else{
+                $data = $data->whereIn('status', $request->input('status'))
+                ->orderBy('documents.' . $sortby, $sorttype)
+                ->when($keyword, function ($query) use ($keyword) {
+                return $query
+                ->where('documents.document_type', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.document_number', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.tittle', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.signer', 'LIKE', '%' . $keyword . '%')
+                ->orWhere('documents.status', 'LIKE', '%' . $keyword . '%');
+                        
+                })
+                ->paginate($row);
+
+            }
+                
 
             if ($data) {
                 $response = [
@@ -256,13 +296,23 @@ class DocumentController extends Controller
     {
         try {           
             $data = Document::with([
-                'document_considers',
-                'document_remembers',
-                'document_notices',
-                'document_statuses',
-                'document_decisions',
-                'document_attachments',
-                'document_supports'])
+                
+                'user',
+                'adminVerified',
+                'legalDrafter',
+                'legalDrafterVerified',
+                'suncangVerified',
+                'kasubagVerified',
+                'kabagVerified',
+                'asistantVerified',
+                'sekdaVerified',
+                'documentConsider',
+                'documentRemember',
+                'documentNotice',
+                'documentStatus',
+                'documentDecision',
+                'documentAttachment',
+                'documentSupport']) 
                 ->where('id', $id)
                 ->firstOrFail();
             
@@ -456,7 +506,7 @@ class DocumentController extends Controller
                 $documents = Document::select(DB::raw('COUNT(*) as total_document, legal_drafter'))
                         ->groupBy('legal_drafter')->get();
 
-                return $documents;
+                // return $documents;
                         
                 if (count($documents) == 1) {
                     // case belum ada sama sekali
