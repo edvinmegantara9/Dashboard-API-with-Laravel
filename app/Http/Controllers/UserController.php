@@ -32,7 +32,6 @@ class UserController extends Controller
                 ->where(function ($query) use ($keyword) {
                     return $query
                         ->where('users.full_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('users.position', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('users.nip', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('roles.name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('users.email', 'LIKE', '%' . $keyword . '%');
@@ -115,7 +114,6 @@ class UserController extends Controller
 
             if ($users) {
                 $users->full_name = $request->input('full_name');
-                $users->position = $request->input('position');
                 $users->nip       = $request->input('nip');
                 $users->email     = $request->input('email');
                 $users->role_id   = $request->input('role_id');

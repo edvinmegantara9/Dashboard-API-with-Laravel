@@ -28,12 +28,10 @@ class AuthController extends BaseController
         //validate incoming request 
         $this->validate($request, [
             'full_name'     => 'required',
-            'position'      => 'required',
             'nip'           => 'required|string|unique:users', 
             'email'         => 'required|string|email|unique:users', 
             'password'      => 'required|confirmed|min:6',
             'role_id'       => 'required', 
-            'verificator'   => 'required|integer'
         ],[
           'required' => 'Data :attribute harus diisi'
         ]);
@@ -41,12 +39,10 @@ class AuthController extends BaseController
         try {
             $user = new User;
             $user->full_name    = $request->input('full_name');
-            $user->position     = $request->input('position');
             $user->nip          = $request->input('nip');
             $user->email        = $request->input('email');
             $user->password     = app('hash')->make($request->input('password'));
             $user->role_id      = $request->input('role_id');
-            $user->verificator      = $request->input('verificator');
             $user->save();
 
             DB::commit();
