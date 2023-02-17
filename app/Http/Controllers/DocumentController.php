@@ -26,6 +26,7 @@ class DocumentController extends Controller
         $keyword    = $request->input('keyword');
         $sortby     = $request->input('sortby');
         $sorttype   = $request->input('sorttype');
+        $status     = json_decode($request->input('status'));
 
         if ($keyword == 'null') $keyword = '';
         $keyword = urldecode($keyword);
@@ -53,7 +54,7 @@ class DocumentController extends Controller
             if(Auth::user()->verificator == 0){
 
                 $data = $data->where('user_id', Auth::user()->id)
-                ->whereIn('status', $request->input('status'))
+                ->whereIn('status', $status)
                 ->orderBy('documents.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                 return $query
@@ -67,7 +68,7 @@ class DocumentController extends Controller
                 ->paginate($row);
             }
             else{
-                $data = $data->whereIn('status', $request->input('status'))
+                $data = $data->whereIn('status', $status)
                 ->orderBy('documents.' . $sortby, $sorttype)
                 ->when($keyword, function ($query) use ($keyword) {
                 return $query
@@ -667,7 +668,7 @@ class DocumentController extends Controller
             
             $doc->kasubag_verified = Auth::user()->id;
             $doc->kasubag_verified_at = Carbon::now();
-            $doc->kasubag_verfied_sign = $request->input('sign');
+            $doc->kasubag_verified_sign = $request->input('sign');
         }
         $doc->save();
         $status->save();
