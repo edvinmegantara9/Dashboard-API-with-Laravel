@@ -43,8 +43,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-	
-     /**
+
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
@@ -82,5 +82,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
-    
+    public function restorant()
+    {
+        return $this->belongsTo(Restorant::class, 'restorant_id', 'id');
+    }
 }

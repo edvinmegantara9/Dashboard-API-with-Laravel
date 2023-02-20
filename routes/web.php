@@ -63,7 +63,7 @@ $router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router)
     });
 
     $router->group(['prefix' => 'document'], function () use ($router) {
-       
+
         $router->post('create', 'DocumentController@create');
         $router->get('', 'DocumentController@get');
         $router->get('show/{id}', 'DocumentController@show');
@@ -76,11 +76,14 @@ $router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router)
         $router->put('approveKabag', 'DocumentController@approveKabag');
         $router->put('approveAssistant', 'DocumentController@approveAssistant');
         $router->put('approveSekda', 'DocumentController@approveSekda');
-        
     });
 
-
-
+    $router->group(['prefix' => 'restorant'], function () use ($router) {
+        $router->get('', 'RestorantController@get');
+        $router->post('create', 'RestorantController@create');
+        $router->put('update/{id}', 'RestorantController@update');
+        $router->delete('delete/{id}', 'RestorantController@delete');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
@@ -92,6 +95,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('email/forget-password', ['as' => 'email.forget.password', 'uses' => 'AuthController@emailForgetPassword']);
     $router->get('email/reset-password', ['as' => 'email.reset.password', 'uses' => 'AuthController@emailResetPassword']);
     $router->post('reset-password', ['uses' => 'AuthController@submitEmailResetPassword']);
+
+    $router->group(['prefix' => 'donasi'], function () use ($router) {
+        $router->get('', 'DonasiController@get');
+        $router->post('create', 'DonasiController@create');
+        $router->put('update/{id}', 'DonasiController@update');
+        $router->delete('delete/{id}', 'DonasiController@delete');
+    });
 });
-
-
