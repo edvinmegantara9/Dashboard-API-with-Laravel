@@ -27,7 +27,7 @@ class UserController extends Controller
         $keyword = urldecode($keyword);
 
         try {
-            $users = User::with('roles')->orderBy('users.' . $sortby, $sorttype)
+            $users = User::with('roles', 'restorant')->orderBy('users.' . $sortby, $sorttype)
                 ->join('roles', 'users.role_id', '=', 'roles.id')
                 ->where(function ($query) use ($keyword) {
                     return $query
@@ -67,8 +67,7 @@ class UserController extends Controller
 
         try {
             $users = User::find($id);
-            if($users)
-            {
+            if ($users) {
                 $users->password = app('hash')->make($request->input('password'));
                 $users->save();
 
@@ -77,7 +76,7 @@ class UserController extends Controller
                     'message' => 'user password has been updated',
                     'data' => $users
                 ];
-    
+
                 return response()->json($response, 200);
             }
 
@@ -86,7 +85,6 @@ class UserController extends Controller
                 'message' => 'user data not found',
             ];
             return response()->json($response, 404);
-
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             $response = [
@@ -118,6 +116,7 @@ class UserController extends Controller
                 $users->email     = $request->input('email');
                 $users->role_id   = $request->input('role_id');
                 $users->verificator   = $request->input('verificator');
+                $users->restorant_id = $request->input('restorant_id');
                 $users->save();
 
                 $response = [
@@ -156,8 +155,7 @@ class UserController extends Controller
                 User::where('id', $id)->delete();
             }
 
-            if(!$users->delete())
-            {
+            if (!$users->delete()) {
                 $response = [
                     'status' => 404,
                     'message' => 'user data not found',
@@ -173,8 +171,6 @@ class UserController extends Controller
             ];
 
             return response()->json($response, 200);
-
-
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             $response = [
@@ -186,7 +182,8 @@ class UserController extends Controller
         }
     }
 
-    public function selectedDelete(Request $request) {
+    public function selectedDelete(Request $request)
+    {
         $this->validate($request, [
             'data' => 'required'
         ]);
@@ -199,31 +196,34 @@ class UserController extends Controller
                     'status' => 200,
                     'message' => 'User data has been deleted',
                 ];
-    
+
                 return response()->json($response, 200);
             }
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             $response = [
                 'status' => 400,
-                'message' => 'error occured on creating paket pekerjaan data',
+                'message' => 'error occured on deleting user data',
                 'error' => $e->getMessage()
             ];
             return response()->json($response, 400);
         }
     }
 
-    public function selectedExportExcel(Request $request) {
+    public function selectedExportExcel(Request $request)
+    {
         $this->validate($request, [
             'data' => 'required'
         ]);
 
         try {
             $selected_delete = User::whereIn('id', $request->input('data'))->select(
-                'full_name', 'email', 'phone_number'
+                'full_name',
+                'email',
+                'phone_number'
             )->get();
             Excel::store(new UserExport($selected_delete), 'User.xlsx');
-        return response()->download(storage_path("app/User.xlsx"), "User.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
+            return response()->download(storage_path("app/User.xlsx"), "User.xlsx", ["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "GET, POST, PUT, DELETE, OPTIONS"]);
         } catch (\Exception $e) {
             \Sentry\captureException($e);
             $response = [
@@ -235,7 +235,8 @@ class UserController extends Controller
         }
     }
 
-    public function selectedExportPdf(Request $request) {
+    public function selectedExportPdf(Request $request)
+    {
         $this->validate($request, [
             'data' => 'required'
         ]);
@@ -262,7 +263,8 @@ class UserController extends Controller
         }
     }
 
-    public function test() {
+    public function test()
+    {
         return 'test';
     }
 }
