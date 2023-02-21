@@ -100,11 +100,9 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'full_name' => 'required',
-            'position' => 'required',
             'nip'       => 'required',
             'email'     => 'required',
             'role_id'   => 'required',
-            'verificator' => 'required|integer'
         ]);
 
         try {
@@ -115,7 +113,6 @@ class UserController extends Controller
                 $users->nip       = $request->input('nip');
                 $users->email     = $request->input('email');
                 $users->role_id   = $request->input('role_id');
-                $users->verificator   = $request->input('verificator');
                 $users->restorant_id = $request->input('restorant_id');
                 $users->save();
 
