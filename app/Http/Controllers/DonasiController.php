@@ -57,6 +57,7 @@ class DonasiController extends Controller
             'phone_number' => 'required',
             'bukti_transfer' => 'required',
             'payment_method' => 'required',
+            'jumlah_donasi' => 'required'
         ]);
 
         try {
@@ -68,6 +69,7 @@ class DonasiController extends Controller
                 'phone_number' => $request->input('phone_number'),
                 'bukti_transfer' => $request->input('bukti_transfer'),
                 'payment_method' => $request->input('payment_method'),
+                'jumlah_donasi' => $request->input('jumlah_donasi')
             ]);
             DB::commit();
             return response()->json([
@@ -93,6 +95,7 @@ class DonasiController extends Controller
             'phone_number' => 'required',
             'bukti_transfer' => 'required',
             'payment_method' => 'required',
+            'jumlah_donasi' => 'required'
         ]);
 
         $donasi = Donasi::findorfail($id);
@@ -104,6 +107,8 @@ class DonasiController extends Controller
                 'phone_number' => $request->input('phone_number'),
                 'bukti_transfer' => $request->input('bukti_transfer'),
                 'payment_method' => $request->input('payment_method'),
+                'restorant_id' => $request->input('restorant_id'),
+                'jumlah_donasi' => $request->input('jumlah_donasi')
             ]);
             DB::commit();
             return response()->json([

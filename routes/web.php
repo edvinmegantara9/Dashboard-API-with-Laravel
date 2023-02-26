@@ -84,6 +84,10 @@ $router->group(['middleware' => ['auth'], 'prefix' => 'api'], function ($router)
         $router->put('update/{id}', 'RestorantController@update');
         $router->delete('delete/{id}', 'RestorantController@delete');
     });
+
+    $router->group(['prefix' => 'dashboard'], function () use ($router) {
+        $router->get('', 'DashboardController@get');
+    });
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
